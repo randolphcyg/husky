@@ -48,15 +48,15 @@ const GlobalHeaderRight: React.FC<{}> = () => {
             value: 'Pro Layout',
           },
         ]}
-        // onSearch={value => {
-        //   //console.log('input', value);
-        // }}
+      // onSearch={value => {
+      //   //console.log('input', value);
+      // }}
       />
-      <Tooltip title="使用文档">
+      <Tooltip title="平台使用说明文档">
         <span
           className={styles.action}
           onClick={() => {
-            window.location.href = 'https://pro.ant.design/docs/getting-started';
+            window.location.href = 'https://blog.csdn.net/qq_33997198/article/details/108515387';
           }}
         >
           <QuestionCircleOutlined />
@@ -68,7 +68,8 @@ const GlobalHeaderRight: React.FC<{}> = () => {
           <Tag color={ENVTagColor[REACT_APP_ENV]}>{REACT_APP_ENV}</Tag>
         </span>
       )}
-      <SelectLang className={styles.action} />
+      {/* 删除多语言组件 */}
+      {/* <SelectLang className={styles.action} /> */}
     </Space>
   );
 };

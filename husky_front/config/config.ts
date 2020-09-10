@@ -63,6 +63,22 @@ export default defineConfig({
         },
       ],
     },
+    // 可视化
+    {
+      path: '/visual',
+      name: 'visual',
+      icon: 'crown',
+      access: 'canAdmin',
+      // component: './Visual',
+      routes: [
+        {
+          path: '/visual/bug',
+          name: 'Bug可视化',
+          icon: 'smile',
+          component: './visual/visual_bug',
+        },
+      ],
+    },
     {
       name: 'list.table-list',
       icon: 'table',

@@ -4,24 +4,24 @@ import { DefaultFooter } from '@ant-design/pro-layout';
 
 export default () => (
   <DefaultFooter
-    copyright="2019 蚂蚁金服体验技术部出品"
+    copyright="2020 甄云科技平台管理部出品"
     links={[
       {
-        key: 'Ant Design Pro',
-        title: 'Ant Design Pro',
-        href: 'https://pro.ant.design',
+        key: '甄云科技',
+        title: '甄云科技',
+        href: 'https://www.going-link.com/',
         blankTarget: true,
       },
       {
-        key: 'github',
+        key: 'husky',
         title: <GithubOutlined />,
-        href: 'https://github.com/ant-design/ant-design-pro',
+        href: 'https://gitee.com/RandolphCYG/husky',
         blankTarget: true,
       },
       {
-        key: 'Ant Design',
-        title: 'Ant Design',
-        href: 'https://ant.design',
+        key: 'Randolph',
+        title: 'Randolph',
+        href: 'https://blog.csdn.net/qq_33997198',
         blankTarget: true,
       },
     ]}

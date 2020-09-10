@@ -5,6 +5,7 @@ export default {
   'menu.login': 'Login',
   'menu.admin': 'Admin',
   'menu.admin.sub-page': 'Sub-Page',
+  'menu.visual': 'Visual',  // echarts
   'menu.register': 'Registro',
   'menu.register.result': 'Resultado de registro',
   'menu.dashboard': 'Dashboard',

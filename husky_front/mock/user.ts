@@ -33,7 +33,7 @@ export default {
       return;
     }
     res.send({
-      name: 'Serati Ma',
+      name: 'Admin',
       avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
       userid: '00000001',
       email: 'antdesign@alipay.com',
