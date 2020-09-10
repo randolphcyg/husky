@@ -1,0 +1,26 @@
+{   
+    "plugins": [
+      [
+        "@babel/plugin-proposal-decorators", // 启用装饰器
+        {
+          "legacy": true
+        }
+      ],
+      [
+        "@babel/plugin-proposal-class-properties",
+        {
+          "loose": true
+        }
+      ],
+      [
+        "module-resolver",
+        {
+          "alias": {
+            "@": "./src",
+            "@public/*": ["./public/*"]
+          }
+        }
+      ]
+    ]
+  }
+  
