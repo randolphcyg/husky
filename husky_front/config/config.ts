@@ -48,18 +48,18 @@ export default defineConfig({
       icon: 'smile',
       component: './Welcome',
     },
+    // ad域
     {
-      path: '/admin',
-      name: 'admin',
-      icon: 'crown',
+      path: '/ad',
+      name: 'ad',
+      icon: 'table',
       access: 'canAdmin',
-      component: './Admin',
+      // component: './ad',
       routes: [
         {
-          path: '/admin/sub-page',
-          name: 'sub-page',
-          icon: 'smile',
-          component: './Welcome',
+          path: '/ad/user',
+          name: 'user',
+          component: './ad/user',
         },
       ],
     },
@@ -69,21 +69,23 @@ export default defineConfig({
       name: 'visual',
       icon: 'crown',
       access: 'canAdmin',
-      // component: './Visual',
+      component: './visual',
       routes: [
         {
           path: '/visual/bug',
-          name: 'Bug可视化',
+          name: 'bug',
           icon: 'smile',
-          component: './visual/visual_bug',
+          component: './visual/bug',
         },
       ],
     },
+    // 示例
     {
-      name: 'list.table-list',
-      icon: 'table',
-      path: '/list',
-      component: './ListTableList',
+      path: '/demo',
+      name: 'demo',
+      icon: 'smile',
+      access: 'canAdmin',
+      component: './demo',
     },
     {
       path: '/',

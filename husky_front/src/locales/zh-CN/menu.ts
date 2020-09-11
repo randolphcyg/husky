@@ -2,9 +2,11 @@ export default {
   'menu.welcome': '欢迎',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',
-  'menu.admin': '管理页',
-  'menu.admin.sub-page': '二级管理页',
-  'menu.visual': '可视化',  // echarts
+  'menu.ad': 'AD域管理',  // AD域管理
+  'menu.ad.user': 'AD域用户',  // AD域管理-用户
+  'menu.visual': '可视化',  // 可视化
+  'menu.visual.bug': 'BUG可视化',  // 可视化-bug
+  'menu.demo': '示例',  // 示例
   'menu.login': '登录',
   'menu.register': '注册',
   'menu.register.result': '注册结果',

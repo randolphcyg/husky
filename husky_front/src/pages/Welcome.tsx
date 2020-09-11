@@ -15,7 +15,7 @@ export default (): React.ReactNode => (
   <PageContainer>
     <Card>
       <Alert
-        message="更快更强的重型组件，已经发布。"
+        message="甄云更高效率的管理工具，即将发布！"
         type="success"
         showIcon
         banner
@@ -25,24 +25,30 @@ export default (): React.ReactNode => (
         }}
       />
       <Typography.Text strong>
-        高级表格{' '}
-        <a href="https://protable.ant.design/" rel="noopener noreferrer" target="__blank">
-          欢迎使用
+        甄云账号中心{' '}
+        <a href="https://blog.csdn.net/qq_33997198/article/details/106056311" rel="noopener noreferrer" target="__blank">
+          AD域
         </a>
       </Typography.Text>
-      <CodePreview>yarn add @ant-design/pro-table</CodePreview>
+      <p>1.下载项目</p>
+      <CodePreview>git clone git@gitee.com:RandolphCYG/husky.git</CodePreview>
       <Typography.Text
         strong
         style={{
           marginBottom: 12,
         }}
       >
-        高级布局{' '}
-        <a href="https://prolayout.ant.design/" rel="noopener noreferrer" target="__blank">
-          欢迎使用
+        甄云迭代进度可视化{' '}
+        <a href="https://blog.csdn.net/qq_33997198/article/details/108515387" rel="noopener noreferrer" target="__blank">
+          全栈可伸缩性项目
         </a>
       </Typography.Text>
-      <CodePreview>yarn add @ant-design/pro-layout</CodePreview>
+      <p>2.进入前端项目目录</p>
+      <CodePreview>cd husky_front</CodePreview>
+      <p>3.前端依赖</p>
+      <CodePreview>yarn</CodePreview>
+      <p>4.启动前端项目</p>
+      <CodePreview>yarn start</CodePreview>
     </Card>
   </PageContainer>
 );

@@ -2,9 +2,11 @@ export default {
   'menu.welcome': 'Welcome',
   'menu.more-blocks': 'More Blocks',
   'menu.home': 'Home',
-  'menu.admin': 'Admin',
-  'menu.admin.sub-page': 'Sub-Page',
-  'menu.visual': 'Visual',  // echarts
+  'menu.ad': 'AD service',  // AD域管理
+  'menu.ad.user': 'AD User',  // AD域管理-用户
+  'menu.visual': 'visual',  // 可视化
+  'menu.visual.bug': 'visual',  // 可视化-bug
+  'menu.demo': 'demo',  // 示例
   'menu.login': 'Login',
   'menu.register': 'Register',
   'menu.register.result': 'Register Result',

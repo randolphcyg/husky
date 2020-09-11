@@ -3,9 +3,11 @@ export default {
   'menu.more-blocks': '更多區塊',
   'menu.home': '首頁',
   'menu.login': '登錄',
-  'menu.admin': '权限',
-  'menu.admin.sub-page': '二级管理页',
-  'menu.visual': '可视化',  // echarts
+  'menu.ad': 'AD域管理',  // AD域管理
+  'menu.ad.user': 'AD域用戶',  // AD域管理-用户
+  'menu.visual': '可視化',  // 可视化
+  'menu.visual.bug': 'BUG可視化',  // 可视化-bug
+  'menu.demo': '示例',  // 示例
   'menu.exception.403': '403',
   'menu.exception.404': '404',
   'menu.exception.500': '500',

@@ -4,10 +4,10 @@ import { Card, Typography, Alert } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 
 export default (): React.ReactNode => (
-  <PageContainer content=" 这个页面只有 admin 权限才能查看">
+  <PageContainer content="BUG可视化页面简介：用来对迭代的BUG情况进行可视化描述">
     <Card>
       <Alert
-        message="umi ui 现已发布，欢迎使用 npm run ui 启动体验。"
+        message="更多功能正在开发中，未来都会集成到此平台来！"
         type="success"
         showIcon
         banner
@@ -17,13 +17,13 @@ export default (): React.ReactNode => (
         }}
       />
       <Typography.Title level={2} style={{ textAlign: 'center' }}>
-        <SmileTwoTone /> Ant Design Pro <HeartTwoTone twoToneColor="#eb2f96" /> You
+        <SmileTwoTone /> Randolph <HeartTwoTone twoToneColor="#eb2f96" /> You
       </Typography.Title>
     </Card>
     <p style={{ textAlign: 'center', marginTop: 24 }}>
-      Want to add more pages? Please refer to{' '}
+      想添加更多页面? 请参考{' '}
       <a href="https://pro.ant.design/docs/block-cn" target="_blank" rel="noopener noreferrer">
-        use block
+        使用 块
       </a>
       。
     </p>
