@@ -1,4 +1,4 @@
-import { AlipayCircleOutlined, TaobaoCircleOutlined, WeiboCircleOutlined } from '@ant-design/icons';
+// import { AlipayCircleOutlined, TaobaoCircleOutlined, WeiboCircleOutlined } from '@ant-design/icons';
 import { Alert, Checkbox, message } from 'antd';
 import React, { useState } from 'react';
 import { Link, SelectLang, useModel } from 'umi';
@@ -59,6 +59,7 @@ const Login: React.FC<{}> = () => {
     try {
       // 登录
       const msg = await fakeAccountLogin({ ...values, type });
+      console.log(msg.status);
       if (msg.status === 'ok') {
         message.success('登录成功！');
         replaceGoto();
@@ -66,6 +67,9 @@ const Login: React.FC<{}> = () => {
           refresh();
         }, 0);
         return;
+      }
+      else if (msg.status === 'error') {    // 补充一个账号密码错误的判断，不知道是不是多余了
+        message.error('用户名密码错误！');
       }
       // 如果失败去设置用户错误信息
       setUserLoginState(msg);
@@ -167,10 +171,10 @@ const Login: React.FC<{}> = () => {
             </div>
             <Submit loading={submitting}>登录</Submit>
             <div className={styles.other}>
-              其他登录方式
+              {/* 其他登录方式
               <AlipayCircleOutlined className={styles.icon} />
               <TaobaoCircleOutlined className={styles.icon} />
-              <WeiboCircleOutlined className={styles.icon} />
+              <WeiboCircleOutlined className={styles.icon} /> */}
               <Link className={styles.register} to="/user/register">
                 注册账户
               </Link>
