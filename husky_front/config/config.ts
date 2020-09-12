@@ -12,9 +12,11 @@ export default defineConfig({
     hmr: true,
   },
   layout: {
-    name: 'Ant Design Pro',
+    name: 'going-link',
     locale: true,
     siderWidth: 208,
+    // logo: false,   // 不显示默认logo
+    logo: '../zy.svg',  // 显示执行logo
   },
   locale: {
     // default zh-CN
