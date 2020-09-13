@@ -4,6 +4,7 @@ export default {
   'menu.home': '首頁',
   'menu.login': '登錄',
   'menu.ad': 'AD域管理',  // AD域管理
+  'menu.ad.server': 'AD域服務器',  // AD域管理-服务器
   'menu.ad.user': 'AD域用戶',  // AD域管理-用户
   'menu.visual': '可視化',  // 可视化
   'menu.visual.bug': 'BUG可視化',  // 可视化-bug

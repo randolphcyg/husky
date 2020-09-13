@@ -54,10 +54,14 @@ export default defineConfig({
     {
       path: '/ad',
       name: 'ad',
-      icon: 'table',
+      icon: 'windows',
       access: 'canAdmin',
-      // component: './ad',
       routes: [
+        {
+          path: '/ad/server',
+          name: 'server',
+          component: './ad/server',
+        },
         {
           path: '/ad/user',
           name: 'user',
@@ -69,14 +73,12 @@ export default defineConfig({
     {
       path: '/visual',
       name: 'visual',
-      icon: 'crown',
+      icon: 'pieChart',
       access: 'canAdmin',
-      component: './visual',
       routes: [
         {
           path: '/visual/bug',
           name: 'bug',
-          icon: 'smile',
           component: './visual/bug',
         },
       ],
@@ -85,7 +87,7 @@ export default defineConfig({
     {
       path: '/demo',
       name: 'demo',
-      icon: 'smile',
+      icon: 'apple',
       access: 'canAdmin',
       component: './demo',
     },

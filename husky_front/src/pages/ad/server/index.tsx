@@ -4,7 +4,7 @@ import { Card, Typography, Alert } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 
 export default (): React.ReactNode => (
-  <PageContainer content="BUG可视化页面简介：用来对迭代的BUG情况进行可视化描述">
+  <PageContainer content="服务器页面简介：用来配置本地或者远程待管理的AD服务器">
     <Card>
       <Alert
         message="更多功能正在开发中，未来都会集成到此平台来！"

@@ -161,24 +161,24 @@ const Login: React.FC<{}> = () => {
               <Checkbox checked={autoLogin} onChange={(e) => setAutoLogin(e.target.checked)}>
                 自动登录
               </Checkbox>
-              <a
+              {/* <a
                 style={{
                   float: 'right',
                 }}
               >
                 忘记密码
-              </a>
+              </a> */}
             </div>
             <Submit loading={submitting}>登录</Submit>
-            <div className={styles.other}>
-              {/* 其他登录方式
+            {/* <div className={styles.other}>
+              其他登录方式
               <AlipayCircleOutlined className={styles.icon} />
               <TaobaoCircleOutlined className={styles.icon} />
-              <WeiboCircleOutlined className={styles.icon} /> */}
+              <WeiboCircleOutlined className={styles.icon} />
               <Link className={styles.register} to="/user/register">
                 注册账户
               </Link>
-            </div>
+            </div> */}
           </LoginFrom>
         </div>
       </div>

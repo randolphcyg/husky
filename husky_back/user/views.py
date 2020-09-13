@@ -10,6 +10,8 @@ import json
 
 @csrf_exempt
 def login_view(request):
+    '''登录方法，接收前端的用户名密码登录方式，用户名密码用来匹配数据库中的用户，使后端登录
+    '''
     if request.method == 'POST':
         req_data = json.loads(request.body)
         username = req_data.get("username")
@@ -26,7 +28,7 @@ def login_view(request):
                    'type': 'account'}
         else:       # 数据库校验失败
             res = {'status': 'error',
-                   'type': '',}
+                   'type': '', }
         return JsonResponse(res)
     else:       # 请求出问题
         res = {'status': 'error',
@@ -88,3 +90,8 @@ def currentUser(request):
     else:
         res = {}
         return JsonResponse(res)
+
+@csrf_exempt
+def ad_user():
+    res = {}
+    return JsonResponse(res)

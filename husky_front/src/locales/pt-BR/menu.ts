@@ -3,9 +3,12 @@ export default {
   'menu.more-blocks': 'More Blocks',
   'menu.home': 'Início',
   'menu.login': 'Login',
-  'menu.admin': 'Admin',
-  'menu.admin.sub-page': 'Sub-Page',
-  'menu.visual': 'Visual',  // echarts
+  'menu.ad': 'AD service',  // AD域管理
+  'menu.ad.server': 'AD server',  // AD域管理-服务器
+  'menu.ad.user': 'AD user',  // AD域管理-用户
+  'menu.visual': 'visual',  // 可视化
+  'menu.visual.bug': 'bug visual',  // 可视化-bug
+  'menu.demo': 'demo',  // 示例
   'menu.register': 'Registro',
   'menu.register.result': 'Resultado de registro',
   'menu.dashboard': 'Dashboard',
