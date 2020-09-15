@@ -95,3 +95,21 @@ def currentUser(request):
 def ad_user():
     res = {}
     return JsonResponse(res)
+
+@csrf_exempt
+def bug_info(current):
+    res = {
+  'key': 1,
+  'disabled': False,
+  'href': '',
+  'avatar': '',
+  'owner': '',
+  'name': '测试',
+  'desc': '还行',
+  'callNo': 1,
+  'status': 1,
+  'updatedAt': '',
+  'createdAt': '',
+  'progress': 1,
+}
+    return JsonResponse(res)

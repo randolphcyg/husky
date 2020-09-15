@@ -16,11 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include, url
-from user.views import login_view, currentUser
+from user.views import login_view, currentUser, bug_info
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^api/login/', login_view, name='login'),
-    url(r'^api/currentUser/', currentUser, name='currentUser')
+    url(r'^api/currentUser/', currentUser, name='currentUser'),
+    url(r'api/bugList', bug_info, name='bugList'),
 ]
