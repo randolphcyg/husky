@@ -10,8 +10,7 @@ const status = [
   <Alert message="待办" type="info" showIcon={false} />,
   <Alert message="已完成" type="success" showIcon />,
   <Alert message="已取消" type="error" showIcon />];
-
-class TodoPage extends Component {
+class VisualPage extends Component {
 
   state = {
     modalVisible: false,
@@ -23,7 +22,7 @@ class TodoPage extends Component {
 
   handelSubmit = async (values) => {
     const item = { title: values.title, status: 0 };
-    //调用todo service的addItem添加待办事项
+    //调用 visual service 的 addItem 添加待办事项
     const rsp = await addItem(item);
     if (rsp.code === 0) {
       message.success('添加成功！');
@@ -35,7 +34,7 @@ class TodoPage extends Component {
 
 
   updateStatus = async (item, _status) => {
-    //调用todo service的updateItem更新待办事项
+    //调用 visual service的updateItem更新待办事项
     const rsp = await updateItem({ ...item, status: _status });
     if (rsp.code === 0) {
       message.success('修改成功！');
@@ -53,7 +52,7 @@ class TodoPage extends Component {
     console.log('dispatch结束');
   }
 
-  handleModalVisible(visible) {
+  handleModalVisible(visible: boolean) {
     this.setState({ modalVisible: visible });
   }
 
@@ -142,6 +141,7 @@ class TodoPage extends Component {
           <ProTable
             onSubmit={async values => {
               await this.handelSubmit(values);
+              console.log(values)
               this.handleModalVisible(false);
             }}
             rowKey="key"
@@ -152,5 +152,5 @@ class TodoPage extends Component {
       </PageHeaderWrapper>);
   }
 }
-//使用umi的connect方法把命名空间为todo的model的数据通过props传给页面
-export default connect(({ visual }) => ({ visual }))(TodoPage);
+//使用umi的connect方法把命名空间为 visual 的 model 的数据通过 props 传给页面
+export default connect(({ visual }) => ({ visual }))(VisualPage);
