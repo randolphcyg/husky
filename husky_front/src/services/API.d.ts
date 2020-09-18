@@ -32,4 +32,9 @@ declare namespace API {
     extra: any;
     status: string;
   }
+  // 查询bug信息列表接口
+  export interface BugData {
+    bugId?: number;
+    desc?: string;
+  }
 }

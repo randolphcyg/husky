@@ -45,13 +45,16 @@
     ],
     "dependencies": {
         "@ant-design/icons": "^4.0.0",
+        "@ant-design/pro-field": "^0.3.1",
         "@ant-design/pro-layout": "^6.2.5",
+        "@ant-design/pro-provider": "^0.1.0",
         "@ant-design/pro-table": "^2.4.0",
         "@craco/craco": "^5.6.4",
+        "@types/node": "^14.10.3",
         "antd": "^4.4.0",
         "classnames": "^2.2.6",
         "lodash": "^4.17.11",
-        "moment": "^2.25.3",
+        "moment": "^2.28.0",
         "omit.js": "^2.0.2",
         "path-to-regexp": "2.4.0",
         "qs": "^6.9.0",
@@ -61,6 +64,7 @@
         "react-highlight-words": "^0.16.0",
         "umi": "^3.2.20",
         "umi-request": "^1.0.8",
+        "use-media-antd-query": "^1.0.2",
         "use-merge-value": "^1.0.1"
     },
     "devDependencies": {

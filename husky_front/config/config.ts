@@ -15,7 +15,7 @@ export default defineConfig({
     name: 'going-link',
     locale: true,
     // logo: false,   // 不显示默认logo
-    logo: '../zy.svg',  // 显示执行logo
+    logo: '../zy.svg', // 显示执行logo
   },
   locale: {
     // default zh-CN
@@ -103,7 +103,6 @@ export default defineConfig({
     // ...darkTheme,
     'primary-color': defaultSettings.primaryColor,
   },
-  // @ts-ignore
   title: false,
   ignoreMomentLocale: true,
   proxy: proxy[REACT_APP_ENV || 'dev'],

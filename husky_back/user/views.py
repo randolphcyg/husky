@@ -41,6 +41,7 @@ def currentUser(request):
     '''暂时用户表没拓展这么多属性，先不做权限
     '''
     if request.method == 'GET':
+        print(request.user)
         res = {
             'name': 'HAHAadmin',
             'avatar': 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
@@ -91,25 +92,30 @@ def currentUser(request):
         res = {}
         return JsonResponse(res)
 
+
 @csrf_exempt
 def ad_user():
     res = {}
     return JsonResponse(res)
 
+
 @csrf_exempt
-def bug_info(current):
+def bugs(current):
+    '''查询bug信息列表
+    '''
+    print('后端查询bugs')
     res = {
-  'key': 1,
-  'disabled': False,
-  'href': '',
-  'avatar': '',
-  'owner': '',
-  'name': '测试',
-  'desc': '还行',
-  'callNo': 1,
-  'status': 1,
-  'updatedAt': '',
-  'createdAt': '',
-  'progress': 1,
-}
+        'code': 0,
+        'message': '操作成功',
+        'body': [
+            {'id': 8, 'title': 'AntD pro v5组件个性化开发', 'status': 0},
+            {'id': 7, 'title': 'AntD pro v5组件学习与使用', 'status': 0},
+            {'id': 6, 'title': 'AntD pro v5开发业务接口', 'status': 0},
+            {'id': 5, 'title': 'AntD pro v5增加菜单', 'status': 1},
+            {'id': 4, 'title': 'AAntD pro v5用户接口后端实现', 'status': 2},
+            {'id': 3, 'title': 'AntD pro v5搭建配置', 'status': 1},
+            {'id': 2, 'title': 'React基础', 'status': 1},
+            {'id': 1, 'title': 'JS基础', 'status': 1}
+        ]
+    }
     return JsonResponse(res)
