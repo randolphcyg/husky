@@ -58,8 +58,8 @@ class TodoPage extends Component {
   }
 
   render() {
-    const { todo } = this.props;
-    const { todoList } = todo;
+    const { visual } = this.props;
+    const { todoList } = visual;
     const { modalVisible } = this.state;
     const columns = [
       {
@@ -153,4 +153,4 @@ class TodoPage extends Component {
   }
 }
 //使用umi的connect方法把命名空间为todo的model的数据通过props传给页面
-export default connect(({ todo }) => ({ todo }))(TodoPage);
+export default connect(({ visual }) => ({ visual }))(TodoPage);

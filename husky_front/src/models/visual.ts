@@ -2,7 +2,7 @@ import { getAll } from '@/services/visual';
 import { message } from 'antd';
 
 export default {
-  namespace: 'todo',
+  namespace: 'visual',
   state: {
     todoList: [],
   },

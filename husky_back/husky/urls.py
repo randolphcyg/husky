@@ -21,7 +21,7 @@ from user.views import login_view, currentUser, bugs
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'^api/login/', login_view, name='login'),
-    url(r'^api/currentUser/', currentUser, name='currentUser'),
-    url(r'^api/bugs', bugs, name='bugs'),
+    url(r'^api/login', login_view, name='login'),
+    url(r'^api/currentUser', currentUser, name='currentUser'),
+    url(r'^api/items', bugs, name='items'),
 ]

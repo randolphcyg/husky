@@ -105,7 +105,7 @@ export default {
       address: 'Sidney No. 1 Lake Park',
     },
   ],
-  'POST /api/login/': (req: Request, res: Response) => {
+  'POST /api/login': (req: Request, res: Response) => {
     const { password, username, type } = req.body;
     if (password === 'admin' && username === 'admin') {
       res.send({
