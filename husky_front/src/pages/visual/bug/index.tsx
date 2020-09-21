@@ -6,8 +6,7 @@ import { Button, Divider, Alert, Modal, message, Radio } from 'antd';
 import { connect } from 'umi';
 import { addItem, updateItem } from '@/services/visual';
 import echarts from 'echarts/lib/echarts';
-import 'echarts/lib/chart/bar';    // 柱状图
-import 'echarts/lib/chart/line';    //折线图
+import 'echarts/lib/chart/pie';    //饼图
 
 
 var dataSet = [10, 15, 30, 20];
@@ -21,53 +20,296 @@ class VisualPage extends Component {
     this.loadData();
   }
 
-  generateCharts = async (item) => {
-    console.log(item)
-    // 图表显示容器
-    let el = document.getElementById("main");
-    console.log(el)
-    // 图表初始化
-    let myChart = echarts.init(el);
-
-    setInterval(() => {
-
-      var dataSet1 = dataSet.map(function (ele) {
-        return Math.random(20) * ele;
-      })
-
-      // 图表配置项
-      let option = {
-        title: {
-          text: '柱状图',
-          subtext: '销量统计'
+  generateCharts = async () => {
+    var dom = document.getElementById("container");
+    var myChart = echarts.init(dom);
+    var innerCircleData = [];
+    // Generate mock data
+    var obj = {
+      '高': {
+        '测试中': {
+          '敖田': 1,
+          '颜茹霞': 1,
+          '刘毅': 1,
+          '赵乐': 1
         },
-        xAxis: {
-          data: ["河北", "河北", "山西", "广州"]
+        '处理中': {
+          '杜瑞': 1
         },
-        yAxis: {
-          gridIndex: 0,
-          min: 0,
-          max: 30,
-          interval: 5
+        '待处理': {
+          '林锦': 1,
+          '祝忠海': 1
         },
-        series: [{
-          name: '销量',
-          type: 'bar',
-          data: dataSet1
-        }],
-        legend: {
-          show: true,
-          data: [{
-            name: '销量',
-            icon: 'circle'
-          }]
+      },
+      '紧急': {
+        '测试中': {
+          '敖田': 2,
+          '林锦': 1,
+          '李云霓': 1,
+          '王娟': 1
+        },
+        '处理中': {},
+        '待处理': {
+          '祝忠海': 1,
+          '罗俊杰': 1
+        },
+      },
+      '中': {
+        '测试中': {
+          '王腊腊': 1,
+          '文深': 1
+        },
+        '处理中': {},
+        '待处理': {
+          '林锦': 1
+        },
+      },
+      '低': {
+        '测试中': {},
+        '处理中': {
+          '马煜华': 1,
+          '丁稀智': 1
+        },
+        '待处理': {},
+      },
+    };
+    // 遍历json数据，将内圈需要的数据计算出来          
+    echarts.util.each(obj, function (item, index) {
+      var sum = 0;
+      for (var outIndex in obj[index]) {
+        for (let innerIndex in obj[index][outIndex]) {
+          sum += obj[index][outIndex][innerIndex];
         }
       }
+      if (index === '紧急') { // 突出 紧急 状态
+        innerCircleData.push({
+          value: sum,
+          name: index,
+          selected: true,
+        });
+      } else {
+        innerCircleData.push({
+          value: sum,
+          name: index
+        });
+      }
+      // console.log(innerCircleData);
+      return innerCircleData
+    });
+    // 外圈所需数据
+    let outerCircleData = [];
+    var count = 0; // 计数器
+    echarts.util.each(obj, function (item, index) {
+      for (var outIndex in obj[index]) {
+        var sum = 0;
+        var lastValue = 0;
+        for (var innerIndex in obj[index][outIndex]) {
+          sum += obj[index][outIndex][innerIndex]
+        }
 
-      // 进行图表配置
-      myChart.setOption(option);
+        console.log(index + '-' + outIndex, sum, (sum / 19) * 2 * Math.PI)
+        if (count === 0) { // 第一个
+          outerCircleData.push({
+            value: sum,
+            name: index + '-' + outIndex,
+            "_startArc": 0,
+            "_endArc": (sum / 19) * 2 * Math.PI,
+          });
+        } else if (count === obj[index].length - 1) { // 最后一个
+          outerCircleData.push({
+            value: sum,
+            name: index + '-' + outIndex,
+            "_startArc": (sum / 19) * 2 * Math.PI,
+            "_endArc": 2 * Math.PI,
+          });
+        } else if (sum !== 0) { // 中间的角度
+          outerCircleData.push({
+            value: sum,
+            name: index + '-' + outIndex,
+            "_startArc": outerCircleData[outerCircleData.length - 1]._endArc,
+            "_endArc": (sum / 19) * 2 * Math.PI + outerCircleData[outerCircleData.length - 1]._endArc,
+          });
+        }
+        count++;
+      }
+    });
 
-    }, 1000);
+    let option = {
+      // 背景颜色
+      backgroundColor: "rgb(22, 1, 43)",
+      color: ["rgb(190, 100, 0)", "rgb(190, 0, 0)", "rgb(191, 191, 0)", "rgb(95, 191, 0)",
+        "rgb(188, 140, 80)", "rgb(188, 120, 80)", "rgb(190, 100, 0)", "rgb(191, 80, 80)", "rgb(191, 26, 26)", "rgb(186, 186, 80)", "rgb(186, 186, 30)", "rgb(105, 186, 24)"],
+      animationEasing: "ExponentialOut",
+      animation: true,
+      // 标题组件
+      title: {
+        text: '不满足SLA的问题-可视化图例',
+        subtext: '优化ing...',
+        top: 15,
+        left: 'center',
+        textStyle: {
+          fontSize: 20,
+          color: 'rgb(238, 197, 102)'
+        },
+        // 副标题样式
+        subtextStyle: {
+          fontSize: 16,
+          fontStyle: "oblique"
+        }
+      },
+      // 提示框组件
+      tooltip: {
+        trigger: 'item',
+        formatter: '{a} <br/>{b}: {c} ({d}%)'
+      },
+      // 图例组件
+      legend: {
+        orient: 'vertical',
+        left: 30,
+        x: "left",
+        y: "center",
+        data: ['高', '紧急', '中', '低', '高-测试中', '高-处理中', '高-待处理',
+          '紧急-测试中', '紧急-待处理', '中-测试中', '中-待处理', '低-处理中'
+        ],
+        textStyle: {
+          color: 'rgb(238, 197, 102)'
+        },
+      },
+      // 工具栏
+      toolbox: {
+        show: true,
+        feature: {
+          dataZoom: {
+            yAxisIndex: "none"
+          },
+          dataView: {
+            readOnly: false
+          },
+          restore: {},
+          saveAsImage: {}
+        }
+      },
+      dataset: {
+        // json数据
+        source: {
+          '高': {
+            '测试中': {
+              '敖田': 1,
+              '颜茹霞': 1,
+              '刘毅': 1,
+              '赵乐': 1
+            },
+            '处理中': {
+              '杜瑞': 1
+            },
+            '待处理': {
+              '林锦': 1,
+              '祝忠海': 1
+            },
+          },
+          '紧急': {
+            '测试中': {
+              '敖田': 2,
+              '林锦': 1,
+              '李云霓': 1,
+              '王娟': 1
+            },
+            '处理中': {},
+            '待处理': {
+              '祝忠海': 1,
+              '罗俊杰': 1
+            },
+          },
+          '中': {
+            '测试中': {
+              '王腊腊': 1,
+              '文深': 1
+            },
+            '处理中': {},
+            '待处理': {
+              '林锦': 1
+            },
+          },
+          '低': {
+            '测试中': {},
+            '处理中': {
+              '马煜华': 1,
+              '丁稀智': 1
+            },
+            '待处理': {},
+          },
+        }
+      },
+      // 系列数据
+      series: [{
+        name: '状态',
+        type: 'pie',
+        selectedMode: 'single',
+        radius: [0, '30%'],
+        label: {
+          position: 'inner'
+        },
+        labelLine: {
+          show: false
+        },
+        data: innerCircleData,
+      }, {
+        name: '状态详情',
+        type: 'pie',
+        radius: ['40%', '55%'],
+        label: {
+          formatter: function formatterFunc(params) {
+            const values = params.data; // 内容
+            const formatter = [`{rect|}{name|${values.name}} ${values.value}%`,
+            `${values.value}% {name|${values.name}}{rect|}`
+            ];
+            const midAngle = (values._startArc + values._endArc) / 2;
+            if (midAngle <= Math.PI) {
+              return formatter[0];
+            } else {
+              return formatter[1];
+            }
+          },
+          rich: {
+            name: {
+              "color": '#fff',
+              "borderColor": '#264884',
+              "borderWidth": 1,
+              "padding": [10, 15],
+            },
+            rect: {
+              "height": 10,
+              "width": 6,
+              "backgroundColor": "#264884"
+            }
+          },
+        },
+        data: outerCircleData
+      }]
+    };
+    if (option && typeof option === "object") {
+      myChart.setOption(option, true);
+    }
+    // 注册内圈点击事件函数
+    myChart.on("click", innerCircleEvent);
+    // 添加内圈点击事件函数
+    function innerCircleEvent(param) {
+      if (param.seriesIndex == 0) {
+        for (var i = 0; i < option.series[0].data.length; i++) {
+          option.series[0].data[i].selected = false;
+        }
+        var selected = param.data;
+        selected.selected = true;
+        console.log(selected);
+        // console.log(option.series[0].data[param.dataIndex]);
+        // option.series[0].data[param.dataIndex] = selected;
+        // option.series[1].data=dataA;
+        // option.series[1].data = param.data[param.dataIndex];
+        // console.log(option);
+        // myChart.clear();
+        // myChart.setOption(option);
+      }
+    }
   }
 
   //获取列表
@@ -81,12 +323,11 @@ class VisualPage extends Component {
 
   handleModalVisible(visible: boolean) {
     this.setState({ modalVisible: visible });
-    this.generateCharts();  // TODO 生成echarts dom节点没生成，元素取不到
   }
-
 
   render() {
     const { visual } = this.props;
+    console.log(visual)
     const { todoList } = visual;
     const { modalVisible } = this.state;
     const columns = [
@@ -148,7 +389,9 @@ class VisualPage extends Component {
           footer={null}
           width={1300}
         >
-          <div id="main" style={{ width: '80%', height: 400 }}>echarts案例</div>
+          {/* 模态框 container 留空 */}
+          <div id="container" style={{ width: '100%', height: 420 }}></div>
+          <Button type='primary' key='btn-generate' onClick={() => this.generateCharts()} >生成图表</Button>
         </Modal>
       </PageHeaderWrapper>);
   }
