@@ -108,14 +108,14 @@ def bugs(current):
         'code': 0,
         'message': '操作成功',
         'body': [
-            {'id': 8, 'title': 'AntD pro v5组件个性化开发', 'status': 0},
-            {'id': 7, 'title': 'AntD pro v5组件学习与使用', 'status': 0},
-            {'id': 6, 'title': 'AntD pro v5开发业务接口', 'status': 0},
+            {'id': 8, 'title': 'AntD pro v5组件个性化开发', },
+            {'id': 7, 'title': 'AntD pro v5组件学习与使用', },
+            {'id': 6, 'title': 'AntD pro v5开发业务接口', },
             {'id': 5, 'title': 'AntD pro v5增加菜单', 'status': 1},
-            {'id': 4, 'title': 'AAntD pro v5用户接口后端实现', 'status': 2},
-            {'id': 3, 'title': 'AntD pro v5搭建配置', 'status': 1},
-            {'id': 2, 'title': 'React基础', 'status': 1},
-            {'id': 1, 'title': 'JS基础', 'status': 1}
+            {'id': 4, 'title': 'AAntD pro v5用户接口后端实现', },
+            {'id': 3, 'title': 'AntD pro v5搭建配置', },
+            {'id': 2, 'title': 'React基础', },
+            {'id': 1, 'title': 'JS基础', }
         ]
     }
     return JsonResponse(res)
