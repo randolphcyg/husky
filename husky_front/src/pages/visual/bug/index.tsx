@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { DownloadOutlined } from '@ant-design/icons';
 import ProTable from '@ant-design/pro-table';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button, Divider, Alert, Modal, message, Radio } from 'antd';
+import { Button, Divider, Alert, Modal, message, Radio, Spin } from 'antd';
 import { connect } from 'umi';
 import { addItem, updateItem } from '@/services/visual';
 import echarts from 'echarts/lib/echarts';
@@ -390,7 +390,15 @@ class VisualPage extends Component {
           width={1300}
         >
           {/* 模态框 container 留空 */}
-          <div id="container" style={{ width: '100%', height: 420 }}></div>
+          <div id="container" style={{ width: '100%', height: 420 }}>
+            <Spin tip="Loading...">
+              <Alert
+                message="暂无图例"
+                description="点击【生成图表】按钮生成图表"
+                type="info"
+              />
+            </Spin>
+          </div>
           <Button type='primary' key='btn-generate' onClick={() => this.generateCharts()} >生成图表</Button>
         </Modal>
       </PageHeaderWrapper>);
