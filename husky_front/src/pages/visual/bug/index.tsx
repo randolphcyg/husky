@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
-import { DownloadOutlined } from '@ant-design/icons';
 import ProTable from '@ant-design/pro-table';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button, Divider, Alert, Modal, message, Radio, Spin } from 'antd';
+import { Button, Divider, Alert, Modal, message, Spin } from 'antd';
 import { connect } from 'umi';
 import echarts from 'echarts/lib/echarts';
-import 'echarts/lib/chart/pie';    //饼图
-
-
-var dataSet = [10, 15, 30, 20];
+import 'echarts/lib/chart/bar';       //柱状图
+import 'echarts/lib/chart/pie';       //饼图
+import 'echarts/lib/chart/line';      //折线图
+import 'echarts/extension/dataTool';   //工具栏
 
 class VisualPage extends Component {
   state = {
@@ -19,7 +18,72 @@ class VisualPage extends Component {
     this.loadData();
   }
 
-  generateCharts = async () => {
+  //获取列表
+  loadData() {
+    console.log('页面方法 loadData');
+    //使用connect后，dispatch通过props传给了组件
+    const { dispatch } = this.props;
+    dispatch({ type: 'visual/fetchBugList', payload: null });
+  }
+
+  // 模态框控制
+  handleModalVisible(visible: boolean) {
+    this.setState({ modalVisible: visible });
+  }
+
+  // 柱状图
+  generateHistogram() {
+    console.log('柱状图 generateHistogram');
+    var dom = document.getElementById("container");
+    var myChart = echarts.init(dom);
+    let option = {
+      color: ['#3398DB'],
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+          type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+        }
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: [
+        {
+          type: 'category',
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          axisTick: {
+            alignWithLabel: true
+          }
+        }
+      ],
+      yAxis: [
+        {
+          type: 'value'
+        }
+      ],
+      series: [
+        {
+          name: '直接访问',
+          type: 'bar',
+          barWidth: '60%',
+          data: [10, 52, 200, 334, 390, 330, 220]
+        }
+      ]
+    };
+    // 作图
+    if (option && typeof option === "object") {
+      myChart.setOption(option, true);
+    }
+  }
+  // 饼图
+  // generatePieChart() {
+  //   console.log('饼图 generatePieChart');
+  // }
+  generatePieChart = async () => {
+    console.log('饼图 generatePieChart');
     var dom = document.getElementById("container");
     var myChart = echarts.init(dom);
     var innerCircleData = [];
@@ -311,42 +375,94 @@ class VisualPage extends Component {
       }
     }
   }
-
-  //获取列表
-  loadData() {
-    console.log('页面方法 loadData');
-    //使用connect后，dispatch通过props传给了组件
-    const { dispatch } = this.props;
-    dispatch({ type: 'visual/fetchBugList', payload: null });
-    console.log('dispatch结束');
+  // 折线图
+  generateLineChart() {
+    console.log('折线图 generateLineChart');
+    var dom = document.getElementById("container");
+    var myChart = echarts.init(dom);
+    var base = +new Date(1968, 9, 3);
+    var oneDay = 24 * 3600 * 1000;
+    var date = [];
+    var data = [Math.random() * 300];
+    for (var i = 1; i < 20000; i++) {
+      var now = new Date(base += oneDay);
+      date.push([now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'));
+      data.push(Math.round((Math.random() - 0.5) * 20 + data[i - 1]));
+    }
+    let option = {
+      tooltip: {
+        trigger: 'axis',
+        position: function (pt) {
+          return [pt[0], '10%'];
+        }
+      },
+      title: {
+        left: 'center',
+        text: '大数据量面积图',
+      },
+      toolbox: {
+        feature: {
+          dataZoom: {
+            yAxisIndex: 'none'
+          },
+          restore: {},
+          saveAsImage: {}
+        }
+      },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: date
+      },
+      yAxis: {
+        type: 'value',
+        boundaryGap: [0, '100%']
+      },
+      dataZoom: [{
+        type: 'inside',
+        start: 0,
+        end: 10
+      }, {
+        start: 0,
+        end: 10,
+        handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+        handleSize: '80%',
+        handleStyle: {
+          color: '#fff',
+          shadowBlur: 3,
+          shadowColor: 'rgba(0, 0, 0, 0.6)',
+          shadowOffsetX: 2,
+          shadowOffsetY: 2
+        }
+      }],
+      series: [
+        {
+          name: '模拟数据',
+          type: 'line',
+          smooth: true,
+          symbol: 'none',
+          sampling: 'average',
+          itemStyle: {
+            color: 'rgb(255, 70, 131)'
+          },
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,
+              color: 'rgb(255, 158, 68)'
+            }, {
+              offset: 1,
+              color: 'rgb(255, 70, 131)'
+            }])
+          },
+          data: data
+        }
+      ]
+    };
+    // 作图
+    if (option && typeof option === "object") {
+      myChart.setOption(option, true);
+    }
   }
-
-  handleModalVisible(visible: boolean) {
-    this.setState({ modalVisible: visible });
-  }
-
-  // test(element) {
-  //   if (element) {
-  //     // 基于准备好的dom，初始化echarts实例
-  //     // const dom = element
-  //     const dom = document.getElementById("container");
-  //     const myChart = echarts.init(dom)
-  //     // 绘制图表
-  //     myChart.setOption({
-  //       title: { text: 'ECharts 入门示例' },
-  //       tooltip: {},
-  //       xAxis: {
-  //         data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
-  //       },
-  //       yAxis: {},
-  //       series: [{
-  //         name: '销量',
-  //         type: 'bar',
-  //         data: [5, 20, 36, 10, 10, 20]
-  //       }]
-  //     })
-  //   }
-  // };
 
   render() {
     const { visual } = this.props;
@@ -399,24 +515,6 @@ class VisualPage extends Component {
         dataIndex: 'managers_delay',
         hideInForm: true,
       },
-      {
-        title: '操作',
-        hideInForm: true,
-        render: (_, record) => {
-          const operations = [];
-          operations.push(<Button type='primary' key='btn-generate' onClick={() => this.handleModalVisible(true)} >可视化</Button>);
-          operations.push(<Divider key='divider-generate' type="vertical" />);
-          operations.push(<Button key='btn-second' onClick={() => this.generateCharts()}>次按钮</Button>);
-          operations.push(<Divider key='divider-second' type="vertical" />);
-          operations.push(<Button key='btn-dashed' type="dashed">虚拟按钮</Button>);
-          return (
-            <>
-              {operations}
-            </>
-          )
-
-        },
-      },
     ]
     return (
       <PageHeaderWrapper>
@@ -424,7 +522,7 @@ class VisualPage extends Component {
           headerTitle="数据列表"
           rowKey="id"
           toolBarRender={() => [
-            <Button type="primary" onClick={() => this.loadData()}>查询</Button>
+            <Button type="primary" key='btn-generateHistogram' onClick={() => this.handleModalVisible(true)}>可视化图表</Button>,
           ]}
           search={false}
           dataSource={bugList}
@@ -443,7 +541,7 @@ class VisualPage extends Component {
           width={1300}
         >
           {/* 模态框 container 留空 */}
-          <div id="container" style={{ width: '100%', height: 420 }} ref={this.test}>
+          <div id="container" style={{ width: '100%', height: 420 }}>
             <Spin tip="Loading...">
               <Alert
                 message="暂无图例"
@@ -452,7 +550,9 @@ class VisualPage extends Component {
               />
             </Spin>
           </div>
-          <Button type='primary' key='btn-generate' onClick={() => this.generateCharts()} >生成图表</Button>
+          <Button type="primary" key='btn-generateHistogram' onClick={() => this.generateHistogram()}>柱状图</Button>,
+          <Button type="ghost" key='btn-generatePieChart' onClick={() => this.generatePieChart()}>扇形图</Button>,
+          <Button type="default" key='btn-generateLineChart' onClick={() => this.generateLineChart()}>折线图</Button>,
         </Modal>
       </PageHeaderWrapper>);
   }
