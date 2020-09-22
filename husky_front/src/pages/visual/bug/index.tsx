@@ -466,7 +466,6 @@ class VisualPage extends Component {
 
   render() {
     const { visual } = this.props;
-    console.log(visual)
     const { bugList } = visual;
     const { modalVisible } = this.state;
     const columns = [
@@ -522,9 +521,9 @@ class VisualPage extends Component {
           headerTitle="数据列表"
           rowKey="id"
           toolBarRender={() => [
-            <Button type="primary" key='btn-generateHistogram' onClick={() => this.handleModalVisible(true)}>可视化图表</Button>,
+            <Button type="primary" key='btn-modal' onClick={() => this.handleModalVisible(true)}>可视化图表</Button>,
           ]}
-          search={false}
+          search={true}
           dataSource={bugList}
           columns={columns}
           rowSelection={false}
