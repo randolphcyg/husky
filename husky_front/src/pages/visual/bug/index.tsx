@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ProTable from '@ant-design/pro-table';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button, Divider, Alert, Modal, message, Spin } from 'antd';
+import { Button, Divider, Alert, Modal, message, Spin, Pagination } from 'antd';
 import { connect } from 'umi';
 import echarts from 'echarts/lib/echarts';
 import 'echarts/lib/chart/bar';       //柱状图
@@ -473,36 +473,31 @@ class VisualPage extends Component {
         title: '编号',
         dataIndex: 'num',
         hideInForm: true,
+        fixed: 'left',
+        width: 70,
       },
       {
         title: '标题',
         dataIndex: 'title',
-        rules: [
-          {
-            required: true,
-            message: '待办事项标题不能为空',
-          },
-        ]
-      },
-      {
-        title: '编号',
-        dataIndex: 'num',
-        hideInForm: true,
+        width: 300,
       },
       {
         title: '优先级',
         dataIndex: 'level',
         hideInForm: true,
+        width: 100,
       },
       {
         title: '状态',
         dataIndex: 'status',
         hideInForm: true,
+        width: 100,
       },
       {
         title: '经办人',
         dataIndex: 'manager',
         hideInForm: true,
+        width: 100,
       },
       {
         title: '经办人流转',
@@ -514,7 +509,16 @@ class VisualPage extends Component {
         dataIndex: 'managers_delay',
         hideInForm: true,
       },
-    ]
+      {
+        title: '操作',
+        dataIndex: 'options',
+        // hideInForm: true,
+        fixed: 'right',
+        width: 100,
+        render: () => <a>动作</a>,
+      },
+    ];
+
     return (
       <PageHeaderWrapper>
         <ProTable
@@ -523,13 +527,11 @@ class VisualPage extends Component {
           toolBarRender={() => [
             <Button type="primary" key='btn-modal' onClick={() => this.handleModalVisible(true)}>可视化图表</Button>,
           ]}
-          search={true}
-          dataSource={bugList}
-          columns={columns}
-          rowSelection={false}
-          expandable={false}
-          {...this.state}
-          pagination={false}
+          columns={columns}     // 列名
+          dataSource={bugList}  // 数据源
+          search={true}         // 搜索
+          scroll={{ x: 1300 }}  // 滑动轴
+          pagination={true}     // 分页
         />
         <Modal
           destroyOnClose
