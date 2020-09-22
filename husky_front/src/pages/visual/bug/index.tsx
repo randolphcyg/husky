@@ -4,7 +4,6 @@ import ProTable from '@ant-design/pro-table';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Button, Divider, Alert, Modal, message, Radio, Spin } from 'antd';
 import { connect } from 'umi';
-import { addItem, updateItem } from '@/services/visual';
 import echarts from 'echarts/lib/echarts';
 import 'echarts/lib/chart/pie';    //饼图
 
@@ -301,6 +300,7 @@ class VisualPage extends Component {
         var selected = param.data;
         selected.selected = true;
         console.log(selected);
+        // 显示详细信息
         // console.log(option.series[0].data[param.dataIndex]);
         // option.series[0].data[param.dataIndex] = selected;
         // option.series[1].data=dataA;
@@ -317,7 +317,7 @@ class VisualPage extends Component {
     console.log('页面方法 loadData');
     //使用connect后，dispatch通过props传给了组件
     const { dispatch } = this.props;
-    dispatch({ type: 'visual/fetchTodoList', payload: null });
+    dispatch({ type: 'visual/fetchBugList', payload: null });
     console.log('dispatch结束');
   }
 
@@ -325,15 +325,38 @@ class VisualPage extends Component {
     this.setState({ modalVisible: visible });
   }
 
+  // test(element) {
+  //   if (element) {
+  //     // 基于准备好的dom，初始化echarts实例
+  //     // const dom = element
+  //     const dom = document.getElementById("container");
+  //     const myChart = echarts.init(dom)
+  //     // 绘制图表
+  //     myChart.setOption({
+  //       title: { text: 'ECharts 入门示例' },
+  //       tooltip: {},
+  //       xAxis: {
+  //         data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
+  //       },
+  //       yAxis: {},
+  //       series: [{
+  //         name: '销量',
+  //         type: 'bar',
+  //         data: [5, 20, 36, 10, 10, 20]
+  //       }]
+  //     })
+  //   }
+  // };
+
   render() {
     const { visual } = this.props;
     console.log(visual)
-    const { todoList } = visual;
+    const { bugList } = visual;
     const { modalVisible } = this.state;
     const columns = [
       {
-        title: 'ID',
-        dataIndex: 'id',
+        title: '编号',
+        dataIndex: 'num',
         hideInForm: true,
       },
       {
@@ -347,13 +370,43 @@ class VisualPage extends Component {
         ]
       },
       {
+        title: '编号',
+        dataIndex: 'num',
+        hideInForm: true,
+      },
+      {
+        title: '优先级',
+        dataIndex: 'level',
+        hideInForm: true,
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        hideInForm: true,
+      },
+      {
+        title: '经办人',
+        dataIndex: 'manager',
+        hideInForm: true,
+      },
+      {
+        title: '经办人流转',
+        dataIndex: 'managers',
+        hideInForm: true,
+      },
+      {
+        title: '经办人停留时间',
+        dataIndex: 'managers_delay',
+        hideInForm: true,
+      },
+      {
         title: '操作',
         hideInForm: true,
         render: (_, record) => {
           const operations = [];
           operations.push(<Button type='primary' key='btn-generate' onClick={() => this.handleModalVisible(true)} >可视化</Button>);
           operations.push(<Divider key='divider-generate' type="vertical" />);
-          operations.push(<Button key='btn-second' onClick={() => this.generateCharts(record)}>次按钮</Button>);
+          operations.push(<Button key='btn-second' onClick={() => this.generateCharts()}>次按钮</Button>);
           operations.push(<Divider key='divider-second' type="vertical" />);
           operations.push(<Button key='btn-dashed' type="dashed">虚拟按钮</Button>);
           return (
@@ -374,7 +427,7 @@ class VisualPage extends Component {
             <Button type="primary" onClick={() => this.loadData()}>查询</Button>
           ]}
           search={false}
-          dataSource={todoList}
+          dataSource={bugList}
           columns={columns}
           rowSelection={false}
           expandable={false}
@@ -390,7 +443,7 @@ class VisualPage extends Component {
           width={1300}
         >
           {/* 模态框 container 留空 */}
-          <div id="container" style={{ width: '100%', height: 420 }}>
+          <div id="container" style={{ width: '100%', height: 420 }} ref={this.test}>
             <Spin tip="Loading...">
               <Alert
                 message="暂无图例"

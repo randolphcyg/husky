@@ -4,31 +4,31 @@ import { message } from 'antd';
 export default {
   namespace: 'visual',
   state: {
-    todoList: [],
+    bugList: [],
   },
   effects: {
-    *fetchTodoList({ payload }, { call, put }) {
-      console.log('model effects fetchTodoList')
+    *fetchBugList({ payload }, { call, put }) {
+      console.log('model-effects-fetchBugList');
       const response = yield call(getAll, payload);
       if (response.code === 0) {
         yield put({
-          type: 'setTodoList',
+          type: 'setBugList',
           payload: response.body,
         });
       } else {
         message.error(response.message);
         yield put({
-          type: 'setTodoList',
+          type: 'setBugList',
           payload: [],
         });
       }
     },
   },
   reducers: {
-    setTodoList(state, action) {
+    setBugList(state, action) {
       return {
         ...state,
-        todoList: action.payload,
+        bugList: action.payload,
       };
     },
   },

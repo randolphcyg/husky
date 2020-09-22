@@ -16,7 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include, url
-from user.views import login_view, currentUser, bugs
+from user.views import login_view, currentUser
+from visual.views import bugs
 
 
 urlpatterns = [

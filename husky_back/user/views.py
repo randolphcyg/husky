@@ -17,10 +17,8 @@ def login_view(request):
         username = req_data.get("username")
         password = req_data.get("password")
         type = req_data.get("type")
-        print(username, password, type)
         user = authenticate(username=username, password=password)
         if user:
-            print('后端登录')
             login(request, user)        # 后端登录
             res = {'name': 'admin',
                    'password': 'admin',
@@ -41,9 +39,8 @@ def currentUser(request):
     '''暂时用户表没拓展这么多属性，先不做权限
     '''
     if request.method == 'GET':
-        print(request.user)
         res = {
-            'name': 'HAHAadmin',
+            'name': 'admin',
             'avatar': 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
             'userid': '00000001',
             'email': 'antdesign@alipay.com',
@@ -58,13 +55,13 @@ def currentUser(request):
                  'label': '专注设计',
                  },
                 {'key': '2',
-                 'label': '辣~',
+                 'label': 'adafaf',
                  },
                 {'key': '3',
-                 'label': '大长腿',
+                 'label': 'dsfgfdsh',
                  },
                 {'key': '4',
-                 'label': '川妹子',
+                 'label': 'ghfjh',
                  },
                 {'key': '5',
                  'label': '海纳百川',
@@ -89,33 +86,5 @@ def currentUser(request):
         }
         return JsonResponse(res)
     else:
-        res = {}
+        res = dict()
         return JsonResponse(res)
-
-
-@csrf_exempt
-def ad_user():
-    res = {}
-    return JsonResponse(res)
-
-
-@csrf_exempt
-def bugs(current):
-    '''查询bug信息列表
-    '''
-    print('后端查询bugs')
-    res = {
-        'code': 0,
-        'message': '操作成功',
-        'body': [
-            {'id': 8, 'title': 'AntD pro v5组件个性化开发', },
-            {'id': 7, 'title': 'AntD pro v5组件学习与使用', },
-            {'id': 6, 'title': 'AntD pro v5开发业务接口', },
-            {'id': 5, 'title': 'AntD pro v5增加菜单', 'status': 1},
-            {'id': 4, 'title': 'AAntD pro v5用户接口后端实现', },
-            {'id': 3, 'title': 'AntD pro v5搭建配置', },
-            {'id': 2, 'title': 'React基础', },
-            {'id': 1, 'title': 'JS基础', }
-        ]
-    }
-    return JsonResponse(res)
