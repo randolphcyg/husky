@@ -474,47 +474,51 @@ class VisualPage extends Component {
         dataIndex: 'num',
         hideInForm: true,
         fixed: 'left',
-        width: 70,
+        width: '10%',
       },
       {
         title: '标题',
         dataIndex: 'title',
-        width: 300,
+        width: '20%',
       },
       {
         title: '优先级',
         dataIndex: 'level',
         hideInForm: true,
-        width: 100,
+        width: '10%',
       },
       {
         title: '状态',
         dataIndex: 'status',
         hideInForm: true,
-        width: 100,
+        width: '10%',
       },
       {
         title: '经办人',
         dataIndex: 'manager',
         hideInForm: true,
-        width: 100,
+        width: '10%',
       },
       {
         title: '经办人流转',
         dataIndex: 'managers',
+        width: '10%',
+        hideInSearch: true,
         hideInForm: true,
       },
       {
         title: '经办人停留时间',
         dataIndex: 'managers_delay',
+        width: '10%',
         hideInForm: true,
       },
       {
         title: '操作',
         dataIndex: 'options',
-        // hideInForm: true,
+        hideInForm: true,
+        hideInSearch: true,
         fixed: 'right',
-        width: 100,
+        width: '20%',
         render: () => <a>动作</a>,
       },
     ];
@@ -523,7 +527,7 @@ class VisualPage extends Component {
       <PageHeaderWrapper>
         <ProTable
           headerTitle="数据列表"
-          rowKey="id"
+          rowKey="num"
           toolBarRender={() => [
             <Button type="primary" key='btn-modal' onClick={() => this.handleModalVisible(true)}>可视化图表</Button>,
           ]}
