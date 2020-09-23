@@ -139,3 +139,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# AD服务器连接信息
+AD_IP = '192.168.1.62'                                          # IP
+AD_ADMIN = 'CN=Administrator,CN=Users,DC=GOING-LINK,DC=com'     # 管理员
+AD_ADMIN_PWD = 'MIv8YqCmE1a5J5wL'                               # 管理员密码
+USER_SEARCH_FILTER = '(objectclass=user)'                       # 只获取用户对象 过滤条件
+OU_SEARCH_FILTER = '(objectclass=organizationalUnit)'           # 只获取OU对象 过滤条件
+DISABLED_BASE_DN = 'OU=disabled,DC=GOING-LINK,DC=com'           # 离职账户所在OU
+ENABLED_BASE_DN = 'OU=甄云科技,DC=GOING-LINK,DC=com'            # 甄云汉得员工所在位置  

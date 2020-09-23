@@ -97,6 +97,7 @@ class ADUserPage extends Component {
           pagination={true}     // 分页
           toolBarRender={() => [
             <Button type="primary" key='btn-addADUser' onClick={() => this.addADUser()}>增加用户</Button>,
+            <Divider key='divider-addADUser' type="vertical" />,
             <Button type="default" key='btn-batchAddADUser' onClick={() => this.batchAddADUser()}>批量增加用户</Button>,
           ]}
         />

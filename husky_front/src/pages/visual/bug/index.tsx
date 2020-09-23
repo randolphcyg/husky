@@ -556,7 +556,9 @@ class VisualPage extends Component {
             </Spin>
           </div>
           <Button type="primary" key='btn-generateHistogram' onClick={() => this.generateHistogram()}>柱状图</Button>,
+          <Divider key='divider-generateHistogram' type="vertical" />
           <Button type="ghost" key='btn-generatePieChart' onClick={() => this.generatePieChart()}>扇形图</Button>,
+          <Divider key='divider-generatePieChart' type="vertical" />
           <Button type="default" key='btn-generateLineChart' onClick={() => this.generateLineChart()}>折线图</Button>,
         </Modal>
       </PageHeaderWrapper>);
