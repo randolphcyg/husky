@@ -43,7 +43,7 @@ class ADUserPage extends Component {
       {
         title: '姓名',
         dataIndex: 'name',
-        width: '10%',
+        width: '8%',
       },
       {
         title: '部门',
@@ -51,21 +51,21 @@ class ADUserPage extends Component {
         copyable: true,    //多出来一个蓝色的复制icon，点击就直接进行复制
         ellipsis: true,   //用...代替没有显示的文本，并且在鼠标移到相应的文本上会显示全部的相应文本
         hideInForm: true,
-        width: '20%',
+        width: '22%',
       },
       {
         title: '邮箱',
         dataIndex: 'email',
         copyable: true,
         hideInForm: true,
-        width: '15%',
+        width: '20%',
       },
       {
         title: '手机号',
         dataIndex: 'telphone',
         copyable: true,
         hideInForm: true,
-        width: '15%',
+        width: '10%',
       },
       {
         title: '职位',

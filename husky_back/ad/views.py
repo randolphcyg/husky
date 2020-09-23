@@ -39,38 +39,47 @@ def accessADServer() -> object:
 
 
 @csrf_exempt
-def fetchADUserList(request) -> json:       # , page_size: int = 5
+def fetchADUserList(request) -> json:
     '''查询AD域的用户列表,页数由前端传参,之后改成分页类型的
     '''
     if request.method == 'GET':
-        conn = accessADServer()     # 连接AD域
-        body = []
-        body.append(
-            {
-                'sam': 'Z029354',
-                'name': '小明',
-                'department': '甄云科技/上海总部/研发中心/采购协同',
-                'email': 'XXX@hand-china.com',
-                'telphone': '15002510343',
-                'title': '技术顾问',
-            }
-        )
+        # 连接AD域
+        conn = accessADServer()
+        # 查询AD服务器
+        attr = ['sAMAccountName',
+                'displayName',
+                'distinguishedName',
+                'mail',
+                'telephoneNumber',
+                'title',
+                # 'whenCreated',
+                ]
+        entry_list = conn.extend.standard.paged_search(
+            search_filter=settings.USER_SEARCH_FILTER,
+            search_base=settings.ENABLED_BASE_DN,
+            search_scope=SUBTREE,
+            attributes=attr,
+            paged_size=100,
+            generator=False)        # 关闭生成器，结果为列表
+        # 处理查询结果
+        body = list()
+        for user in entry_list:
+            body.append(
+                {
+                    'sam': user['attributes']['sAMAccountName'],
+                    'name': user['attributes']['displayName'],
+                    'department': '/'.join([x.replace('OU=', '') for x in user['attributes']['distinguishedName'].split(',', 1)[1].rsplit(',', 2)[0].split(',')][::-1]), 
+                    'email': user['attributes']['mail'],
+                    'telphone': user['attributes']['telephoneNumber'],
+                    'title': user['attributes']['title'],
+                }
+            )
+        # 组装返回结果
         res = {
             'code': 0,
             'message': '成功',
             'body': body
         }
-
-        # 查询AD服务器
-        page_size = 5
-        entry_list = conn.extend.standard.paged_search(
-            search_filter=settings.USER_SEARCH_FILTER,
-            search_base=settings.ENABLED_BASE_DN,
-            search_scope=SUBTREE,
-            attributes=ALL_ATTRIBUTES,
-            paged_size=page_size,
-            generator=False)        # 关闭生成器，结果为列表
-        print(entry_list)
         return JsonResponse(res)
 
 
