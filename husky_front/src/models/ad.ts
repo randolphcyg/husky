@@ -5,7 +5,7 @@ export default {
   namespace: 'ad',
   state: {
     ADUserList: [],
-    loading: true,
+    loading: true, // 表格加载标记，初始化值为true
   },
   effects: {
     *fetchADUserList({ payload }, { call, put }) {
@@ -15,14 +15,12 @@ export default {
         yield put({
           type: 'setUserList',
           payload: response.body,
-          loading: true, // 表格加载标记
         });
       } else {
         message.error(response.message);
         yield put({
           type: 'setUserList',
           payload: [],
-          loading: false, // 表格加载标记
         });
       }
     },
@@ -32,7 +30,7 @@ export default {
       return {
         ...state,
         ADUserList: action.payload,
-        loading: false, // 表格加载标记,数据载入完毕设为false
+        loading: false, // 表格加载标记，数据载入完毕设为false
       };
     },
   },
