@@ -5,23 +5,24 @@ export default {
   namespace: 'ad',
   state: {
     ADUserList: [],
+    loading: true,
   },
   effects: {
     *fetchADUserList({ payload }, { call, put }) {
       console.log('model-effects-fetchADUserList');
-      
       const response = yield call(fetchADUserList, payload);
-      console.log(response.body)
       if (response.code === 0) {
         yield put({
           type: 'setUserList',
           payload: response.body,
+          loading: true, // 表格加载标记
         });
       } else {
         message.error(response.message);
         yield put({
           type: 'setUserList',
           payload: [],
+          loading: false, // 表格加载标记
         });
       }
     },
@@ -31,6 +32,7 @@ export default {
       return {
         ...state,
         ADUserList: action.payload,
+        loading: false, // 表格加载标记,数据载入完毕设为false
       };
     },
   },

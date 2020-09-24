@@ -466,7 +466,7 @@ class VisualPage extends Component {
 
   render() {
     const { visual } = this.props;
-    const { bugList } = visual;
+    const { bugList, loading } = visual;
     const { modalVisible } = this.state;
     const columns = [
       {
@@ -536,6 +536,7 @@ class VisualPage extends Component {
           search={true}         // 搜索
           scroll={{ x: 1300 }}  // 滑动轴
           pagination={true}     // 分页
+          loading={loading}     // 加载中
         />
         <Modal
           destroyOnClose

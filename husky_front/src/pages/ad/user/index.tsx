@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
-import { Card, Typography, Button, Divider, Alert, Modal, message, Spin, Pagination } from 'antd';
+import { Button, Divider, Alert, Modal, message, Pagination } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'umi';
 
 class ADUserPage extends Component {
 
+  constructor(props) {
+    super(props);
+  }
   componentDidMount() {
-    this.loadData();
+    this.loadData();  // 加载数据
   }
 
   //获取AD域用户列表
@@ -15,7 +18,7 @@ class ADUserPage extends Component {
     console.log('页面方法 loadData');
     //使用connect后，dispatch通过props传给了组件
     const { dispatch } = this.props;
-    dispatch({ type: 'ad/fetchADUserList', payload: null });
+    dispatch({ type: 'ad/fetchADUserList', payload: [] });
   }
 
   // 增加用户
@@ -29,9 +32,8 @@ class ADUserPage extends Component {
   }
 
   render() {
-
     const { ad } = this.props;
-    const { ADUserList } = ad;
+    const { ADUserList, loading } = ad;
     const columns = [
       {
         title: '账号',
@@ -90,11 +92,12 @@ class ADUserPage extends Component {
         <ProTable
           headerTitle="AD域用户列表"
           rowKey="sam"
-          columns={columns}     // 列名
-          dataSource={ADUserList}  // 数据源
-          search={true}         // 搜索
-          scroll={{ x: 1300 }}  // 滑动轴
-          pagination={true}     // 分页
+          columns={columns}         // 列名
+          dataSource={ADUserList}   // 数据源
+          search={true}             // 搜索
+          scroll={{ x: 1300 }}      // 滑动轴
+          pagination={true}         // 分页
+          loading={loading}         // 加载中
           toolBarRender={() => [
             <Button type="primary" key='btn-addADUser' onClick={() => this.addADUser()}>增加用户</Button>,
             <Divider key='divider-addADUser' type="vertical" />,
