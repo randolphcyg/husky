@@ -152,3 +152,9 @@ BASE_DN = 'DC=GOING-LINK,DC=com'                                # AD域基础路
 ZHENYUN_SAM_PREFIX = 'Z'
 HAND_SAM_PREFIX = 'HAND'
 HAND_BASE_DN = 'OU=汉得信息,OU=上海总部,OU=甄云科技'
+
+# 邮件服务器配置
+MAIL_HOST = "smtp.exmail.qq.com"            # 设置服务器
+MAIL_USER = "devops@sys.going-link.com"     # 用户名
+MAIL_PWD = "Q$Lw0B9u$mNO0sy@"               # 口令
+SENDER = 'devops@sys.going-link.com'        # 发送者邮箱
