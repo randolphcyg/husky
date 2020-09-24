@@ -6,6 +6,7 @@ export default {
   state: {
     bugList: [],
     loading: true, // 表格加载标记，初始化值为true
+    modalVisible: false,
   },
   effects: {
     *fetchBugList({ payload }, { call, put }) {

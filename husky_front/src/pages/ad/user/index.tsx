@@ -3,6 +3,10 @@ import { Button, Divider, Alert, Modal, message, Pagination } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'umi';
+import ProForm, { ProFormText, ProFormRate } from '@ant-design/pro-form';
+import ProCard from '@ant-design/pro-card';
+import { ADUserParamsType, addADUser } from '@/services/ad';
+
 
 class ADUserPage extends Component {
 
@@ -13,6 +17,14 @@ class ADUserPage extends Component {
     this.loadData();  // 加载数据
   }
 
+  state = {
+    modalVisible: false,
+  }
+  // 模态框控制
+  handleModalVisible(visible: boolean) {
+    this.setState({ modalVisible: visible });
+  }
+
   //获取AD域用户列表
   loadData() {
     console.log('页面方法 loadData');
@@ -21,19 +33,41 @@ class ADUserPage extends Component {
     dispatch({ type: 'ad/fetchADUserList', payload: [] });
   }
 
-  // 增加用户
-  addADUser() {
-    console.log('这里调增加用户的后端接口')
+  // 创建用户
+  addADUser(reqData) {
+    console.log('这里调创建用户的后端接口')
+    const { dispatch } = this.props;
+    dispatch({ type: 'ad/addADUser', payload: [] });
   }
 
-  // 批量增加用户
+  // 批量创建用户
   batchAddADUser() {
-    console.log('这里调批量增加用户的后端接口')
+    console.log('这里调批量创建用户的后端接口')
   }
+
+  handleSubmit = async (values: ADUserParamsType) => {
+    console.log(values)
+    // setSubmitting(true);
+    try {
+      // 提交创建申请
+      const msg = await addADUser({ ...values });
+      if (msg.code === 0) {
+        message.success(msg.message);
+      } else {
+        message.error(msg.message);
+      }
+      return;
+    }
+    // 如果提交失败
+    catch (error) {
+      message.error('创建失败，请重试!');
+    }
+  };
 
   render() {
     const { ad } = this.props;
     const { ADUserList, loading } = ad;
+    const { modalVisible } = this.state;
     const columns = [
       {
         title: '账号',
@@ -99,11 +133,82 @@ class ADUserPage extends Component {
           pagination={true}         // 分页
           loading={loading}         // 加载中
           toolBarRender={() => [
-            <Button type="primary" key='btn-addADUser' onClick={() => this.addADUser()}>增加用户</Button>,
+            <Button type="primary" key='btn-addADUser' onClick={() => this.handleModalVisible(true)}>创建用户</Button>,
             <Divider key='divider-addADUser' type="vertical" />,
-            <Button type="default" key='btn-batchAddADUser' onClick={() => this.batchAddADUser()}>批量增加用户</Button>,
+            <Button type="default" key='btn-batchAddADUser' disabled onClick={() => this.batchAddADUser()}>批量创建用户</Button>,
           ]}
         />
+        <Modal
+          destroyOnClose
+          title="创建用户"
+          visible={modalVisible}
+          onCancel={() => this.handleModalVisible(false)}
+          footer={null}
+          width={700}
+        >
+          <ProCard>
+            <ProForm onFinish={(values) => this.handleSubmit(values)}
+            >
+              <ProForm.Group>
+                <ProFormText width="xs" name="eid" label="工号" placeholder="25578"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请填写工号!'
+                    },
+                    {
+                      pattern: /^[^\s]*$/,
+                      message: '禁止输入空格!'
+                    }]} />
+                <ProFormText width="xs" name="name" label="姓名" placeholder="甄小明"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请填写姓名!'
+                    },
+                    {
+                      pattern: /^[^\s]*$/,
+                      message: '禁止输入空格!'
+                    }]} />
+                <ProFormText width="s" name="department" label="部门" placeholder="甄云科技.产品研发中心.产品技术中心.供应商和协议部"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请填写部门!'
+                    },
+                    {
+                      pattern: /^[^\s]*$/,
+                      message: '禁止输入空格!'
+                    }]} />
+                <ProFormText width="xs" name="title" label="岗位" initialValue="技术顾问" rules={[{ required: true, message: '请填写岗位!' }]} />
+                <ProFormText width="s" name="email" label="邮箱" placeholder="XXX@hand-china.com"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请填写邮箱!'
+                    },
+                    {
+                      pattern: /^[^\s]*$/,
+                      message: '禁止输入空格!'
+                    }]} />
+                <ProFormText width="s" name="tel" label="手机" placeholder="手机号"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请填写手机号!'
+                    },
+                    {
+                      pattern: /^1[3456789]\d{9}$/,
+                      message: '手机格式错误!',
+                    }]}
+                  getValueFromEvent={(e) => {
+                    return e.target.value.replace(/[^0-9]/ig, "");
+                  }} />
+                <ProFormRate name="rate" label="打分" />
+              </ProForm.Group>
+            </ProForm>
+          </ProCard>
+        </Modal>
       </PageHeaderWrapper>
     );
   }

@@ -147,4 +147,8 @@ AD_ADMIN_PWD = 'MIv8YqCmE1a5J5wL'                               # 管理员密�
 USER_SEARCH_FILTER = '(objectclass=user)'                       # 只获取用户对象 过滤条件
 OU_SEARCH_FILTER = '(objectclass=organizationalUnit)'           # 只获取OU对象 过滤条件
 DISABLED_BASE_DN = 'OU=disabled,DC=GOING-LINK,DC=com'           # 离职账户所在OU
-ENABLED_BASE_DN = 'OU=甄云科技,DC=GOING-LINK,DC=com'            # 甄云汉得员工所在位置  
+ENABLED_BASE_DN = 'OU=甄云科技,DC=GOING-LINK,DC=com' 
+BASE_DN = 'DC=GOING-LINK,DC=com'                                # AD域基础路径  
+ZHENYUN_SAM_PREFIX = 'Z'
+HAND_SAM_PREFIX = 'HAND'
+HAND_BASE_DN = 'OU=汉得信息,OU=上海总部,OU=甄云科技'

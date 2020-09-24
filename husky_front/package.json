@@ -45,6 +45,7 @@
   ],
   "dependencies": {
     "@ant-design/icons": "^4.0.0",
+    "@ant-design/pro-card": "^1.2.1",
     "@ant-design/pro-field": "^0.3.1",
     "@ant-design/pro-layout": "^6.2.5",
     "@ant-design/pro-provider": "^0.1.0",
