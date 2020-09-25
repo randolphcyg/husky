@@ -5,7 +5,7 @@ export default {
   'menu.login': '登錄',
   'menu.ad': 'AD域管理',  // AD域管理
   'menu.ad.server': 'AD域服務器',  // AD域管理-服务器
-  'menu.ad.user': 'AD域用戶',  // AD域管理-用户
+  'menu.ad.account': 'AD域账户',  // AD域管理-账户
   'menu.visual': '可視化',  // 可视化
   'menu.visual.bug': 'BUG可視化',  // 可视化-bug
   'menu.demo': '示例',  // 示例

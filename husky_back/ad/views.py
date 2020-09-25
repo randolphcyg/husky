@@ -46,8 +46,8 @@ def accessADServer() -> object:
 
 
 @csrf_exempt
-def fetchADUserList(request) -> json:
-    '''查询AD域的用户列表,页数由前端传参,之后改成分页类型的
+def fetchAdAccountList(request) -> json:
+    '''查询AD域的账户列表,页数由前端传参,之后改成分页类型的
     '''
     if request.method == 'GET':
         # 连接AD域
@@ -91,11 +91,12 @@ def fetchADUserList(request) -> json:
 
 
 @csrf_exempt
-def addADUser(request):
-    '''新建AD域用户
+def addAdAccount(request):
+    '''新建AD域账户
     '''
     if request.method == 'POST':
         data_req = json.loads(request.body)
+        print(data_req)
         # 接受前端请求数据
         eid = data_req.get('eid')
         name = data_req.get('name')
@@ -118,9 +119,9 @@ def addADUser(request):
 
         create_res_code = create_obj(info=user_info)     # 创建对象结果，创建成功返回数值0
         res_code_map = {
-            0: '创建用户成功!',
+            0: '创建账户成功!',
             1: '新增对象【' + dn + '】成功! 但是发送初始化账号密码失败!',
-            68: '用户已经存在,请勿重复创建! 忘记密码?',
+            68: '账户已经存在,请勿重复创建! 忘记密码?',
             32: '对象不存在OU,且未创建成功OU错误',
             -1: '创建对象: ' + dn + ' 失败!其他未知错误',
             -2: '检查并创建OU失败，未知原因!',
@@ -170,8 +171,8 @@ def create_obj(dn=None, type='user', info=None):
                 old_pwd = ''
                 conn.extend.microsoft.modify_password(dn, new_pwd, old_pwd)                # 初始化密码
                 # 此处将生成的账号密码邮件发送给对应人员
-                save_res = send_create_ad_user_init_info_mail(sam, new_pwd, email)
-                if save_res == 0:
+                send_mail_res = send_create_ad_user_init_info_mail(sam, new_pwd, email)
+                if send_mail_res == 0:
                     return 0
                 else:
                     return 1

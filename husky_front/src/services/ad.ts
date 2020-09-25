@@ -1,6 +1,6 @@
 import { request } from 'umi';
 
-export interface ADUserParamsType {
+export interface AdAccountParamsType {
   eip: string;
   name: string;
   department: string;
@@ -10,19 +10,18 @@ export interface ADUserParamsType {
 }
 
 /**
- * @summary 获取AD域用户列表
+ * @summary 获取AD域账户列表
  * @description 获取列表
  */
-export async function fetchADUserList() {
-  console.log('触发service fetchADUserList');
-  return request('/api/fetchADUserList', {
+export async function fetchAdAccountList() {
+  console.log('触发service fetchAdAccountList');
+  return request('/api/fetchAdAccountList', {
     method: 'GET',
   });
 }
-// service 新增AD域用户接口
-export async function addADUser(params: ADUserParamsType) {
-  console.log('触发service addADUser');
-  return request('/api/addADUser', {
+// service 创建AD域账户接口
+export async function addAdAccount(params: AdAccountParamsType) {
+  return request('/api/addAdAccount', {
     method: 'POST',
     data: params,
   });

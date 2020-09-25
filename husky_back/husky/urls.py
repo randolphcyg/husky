@@ -18,7 +18,7 @@ from django.urls import path
 from django.conf.urls import include, url
 from user.views import login_view, currentUser
 from visual.views import bugs
-from ad.views import fetchADUserList, addADUser
+from ad.views import fetchAdAccountList, addAdAccount
 
 
 urlpatterns = [
@@ -26,6 +26,6 @@ urlpatterns = [
     url(r'^api/login', login_view, name='login'),
     url(r'^api/currentUser', currentUser, name='currentUser'),
     url(r'^api/items', bugs, name='items'),
-    url(r'^api/fetchADUserList', fetchADUserList, name='fetchADUserList'),
-    url(r'^api/addADUser', addADUser, name='addADUser'),
+    url(r'^api/fetchAdAccountList', fetchAdAccountList, name='fetchAdAccountList'),
+    url(r'^api/addAdAccount', addAdAccount, name='addAdAccount'),
 ]

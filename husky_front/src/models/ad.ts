@@ -1,35 +1,35 @@
-import { fetchADUserList } from '@/services/ad';
+import { fetchAdAccountList } from '@/services/ad';
 import { message } from 'antd';
 
 export default {
   namespace: 'ad',
   state: {
-    ADUserList: [],
+    adAccountList: [],
     loading: true, // 表格加载标记，初始化值为true
   },
   effects: {
-    *fetchADUserList({ payload }, { call, put }) {
-      console.log('model-effects-fetchADUserList');
-      const response = yield call(fetchADUserList, payload);
+    *fetchAdAccountList({ payload }, { call, put }) {
+      console.log('model-effects-fetchAdAccountList');
+      const response = yield call(fetchAdAccountList, payload);
       if (response.code === 0) {
         yield put({
-          type: 'setUserList',
+          type: 'setAccountList',
           payload: response.body,
         });
       } else {
         message.error(response.message);
         yield put({
-          type: 'setUserList',
+          type: 'setAccountList',
           payload: [],
         });
       }
     },
   },
   reducers: {
-    setUserList(state, action) {
+    setAccountList(state, action) {
       return {
         ...state,
-        ADUserList: action.payload,
+        adAccountList: action.payload,
         loading: false, // 表格加载标记，数据载入完毕设为false
       };
     },

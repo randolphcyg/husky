@@ -49,7 +49,7 @@ export default defineConfig({
       icon: 'smile',
       component: './Welcome',
     },
-    // ad域
+    // AD域
     {
       path: '/ad',
       name: 'ad',
@@ -62,9 +62,9 @@ export default defineConfig({
           component: './ad/server',
         },
         {
-          path: '/ad/user',
-          name: 'user',
-          component: './ad/user',
+          path: '/ad/account',
+          name: 'account',
+          component: './ad/account',
         },
       ],
     },

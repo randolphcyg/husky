@@ -4,7 +4,7 @@ export default {
   'menu.home': 'Home',
   'menu.ad': 'AD service',  // AD域管理
   'menu.ad.server': 'AD server',  // AD域管理-服务器
-  'menu.ad.user': 'AD user',  // AD域管理-用户
+  'menu.ad.account': 'AD account',  // AD域管理-账户
   'menu.visual': 'visual',  // 可视化
   'menu.visual.bug': 'bug visual',  // 可视化-bug
   'menu.demo': 'demo',  // 示例

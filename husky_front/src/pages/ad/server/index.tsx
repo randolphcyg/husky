@@ -1,7 +1,8 @@
 import React from 'react';
-import { HeartTwoTone, SmileTwoTone } from '@ant-design/icons';
 import { Card, Typography, Alert } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
+import { HeartTwoTone, SmileTwoTone } from '@ant-design/icons';
+
 export default (): React.ReactNode => (
   <PageContainer content="服务器页面简介：用来配置本地或者远程待管理的AD服务器">
     <Card>
