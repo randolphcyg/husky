@@ -1,41 +1,166 @@
-import React from 'react';
-import { Card, Typography, Alert } from 'antd';
-import { PageContainer } from '@ant-design/pro-layout';
-import { HeartTwoTone, SmileTwoTone } from '@ant-design/icons';
+import React, { Component } from 'react';
 
-export default (): React.ReactNode => (
-  <PageContainer content="服务器页面简介：用来配置本地或者远程待管理的AD服务器">
-    <Card>
-      <Alert
-        message="更多功能正在开发中，未来都会集成到此平台来！"
-        type="success"
-        showIcon
-        banner
-        style={{
-          margin: -12,
-          marginBottom: 48,
-        }}
-      />
-      <Typography.Title
-        level={2}
-        style={{
-          textAlign: 'center',
-        }}
-      >
-        <SmileTwoTone /> Randolph <HeartTwoTone twoToneColor="#eb2f96" /> You
-      </Typography.Title>
-    </Card>
-    <p
-      style={{
-        textAlign: 'center',
-        marginTop: 24,
-      }}
-    >
-      想添加更多页面? 请参考{' '}
-      <a href="https://pro.ant.design/docs/block-cn" target="_blank" rel="noopener noreferrer">
-        使用 块
-      </a>
-      。
-    </p>
-  </PageContainer>
-);
+import { FormattedMessage, Dispatch, connect } from 'umi';
+import { GridContent } from '@ant-design/pro-layout';
+import { Menu } from 'antd';
+import AccountView from './components/AccountView';
+import MailServerView from './components/MailServerView';
+import { CurrentUser } from './data.d';
+import AdServerView from './components/AdServerView';
+import styles from './style.less';
+
+const { Item } = Menu;
+
+interface SettingsProps {
+  dispatch: Dispatch;
+  currentUser: CurrentUser;
+}
+
+type SettingsStateKeys = 'account' | 'ad' | 'mail';
+interface SettingsState {
+  mode: 'inline' | 'horizontal';
+  menuMap: {
+    [key: string]: React.ReactNode;
+  };
+  selectKey: SettingsStateKeys;
+}
+
+class Settings extends Component<SettingsProps, SettingsState> {
+  main: HTMLDivElement | undefined = undefined;
+
+  constructor(props: SettingsProps) {
+    super(props);
+    // 菜单映射
+    const menuMap = {
+      account: (
+        <FormattedMessage
+          id="accountandsettings.menuMap.account-basic"
+          defaultMessage="Basic Account Settings" />
+      ),
+      ad: (
+        <FormattedMessage
+          id="accountandsettings.menuMap.ad-server-basic"
+          defaultMessage="Basic Ad Server Settings"
+        />
+      ),
+      mail: (
+        <FormattedMessage
+          id="accountandsettings.menuMap.mail-basic"
+          defaultMessage="Mail Server Settings"
+        />
+      ),
+    };
+    this.state = {
+      mode: 'inline',
+      menuMap,
+      selectKey: 'account', // 默认选中的tab页
+    };
+  }
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'accountAndsettings/fetchCurrent',
+    });
+    window.addEventListener('resize', this.resize);
+    this.resize();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resize);
+  }
+
+  getMenu = () => {
+    const { menuMap } = this.state;
+    return Object.keys(menuMap).map((item) => <Item key={item}>{menuMap[item]}</Item>);
+  };
+
+  getRightTitle = () => {
+    const { selectKey, menuMap } = this.state;
+    return menuMap[selectKey];
+  };
+
+  selectKey = (key: SettingsStateKeys) => {
+    this.setState({
+      selectKey: key,
+    });
+  };
+
+  resize = () => {
+    if (!this.main) {
+      return;
+    }
+    requestAnimationFrame(() => {
+      if (!this.main) {
+        return;
+      }
+      let mode: 'inline' | 'horizontal' = 'inline';
+      const { offsetWidth } = this.main;
+      if (this.main.offsetWidth < 641 && offsetWidth > 400) {
+        mode = 'horizontal';
+      }
+      if (window.innerWidth < 768 && offsetWidth > 400) {
+        mode = 'horizontal';
+      }
+      this.setState({
+        mode,
+      });
+    });
+  };
+
+  renderChildren = () => {
+    const { selectKey } = this.state;
+    switch (selectKey) {
+      case 'account':
+        return <AccountView />;
+      case 'ad':
+        return <AdServerView />;
+      case 'mail':
+        return <MailServerView />;
+      default:
+        break;
+    }
+
+    return null;
+  };
+
+  render() {
+    const { currentUser } = this.props;
+    if (!currentUser.userid) {
+      return '';
+    }
+    const { mode, selectKey } = this.state;
+    return (
+      <GridContent>
+        <div
+          className={styles.main}
+          ref={(ref) => {
+            if (ref) {
+              this.main = ref;
+            }
+          }}
+        >
+          <div className={styles.leftMenu}>
+            <Menu
+              mode={mode}
+              selectedKeys={[selectKey]}
+              onClick={({ key }) => this.selectKey(key as SettingsStateKeys)}
+            >
+              {this.getMenu()}
+            </Menu>
+          </div>
+          <div className={styles.right}>
+            <div className={styles.title}>{this.getRightTitle()}</div>
+            {this.renderChildren()}
+          </div>
+        </div>
+      </GridContent>
+    );
+  }
+}
+
+export default connect(
+  ({ accountAndsettings }: { accountAndsettings: { currentUser: CurrentUser } }) => ({
+    currentUser: accountAndsettings.currentUser,
+  }),
+)(Settings);
