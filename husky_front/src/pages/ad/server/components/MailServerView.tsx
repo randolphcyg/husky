@@ -1,59 +1,81 @@
-import { FormattedMessage, formatMessage } from 'umi';
-import { AlipayOutlined, DingdingOutlined, TaobaoOutlined } from '@ant-design/icons';
-import { List } from 'antd';
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
+import { Button, Divider, Modal, message, Card } from 'antd';
+import { connect } from 'umi';
+import ProCard from '@ant-design/pro-card';
+import ProTable from '@ant-design/pro-table';
+import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import ProForm, { ProFormText } from '@ant-design/pro-form';
+
+
+
+interface MailServerFormItemProps {
+  mailServerSmtp: string;
+  mailServerAdmin: string;
+  mailServerAdminPwd: string;
+  mailServerSender: string;
+}
 
 class MailServerView extends Component {
-  getData = () => [
-    {
-      title: formatMessage({ id: 'accountandsettings.binding.taobao' }, {}),
-      description: formatMessage({ id: 'accountandsettings.binding.taobao-description' }, {}),
-      actions: [
-        <a key="Bind">
-          <FormattedMessage id="accountandsettings.binding.bind" defaultMessage="Bind" />
-        </a>,
-      ],
-      avatar: <TaobaoOutlined className="taobao" />,
-    },
-    {
-      title: formatMessage({ id: 'accountandsettings.binding.alipay' }, {}),
-      description: formatMessage({ id: 'accountandsettings.binding.alipay-description' }, {}),
-      actions: [
-        <a key="Bind">
-          <FormattedMessage id="accountandsettings.binding.bind" defaultMessage="Bind" />
-        </a>,
-      ],
-      avatar: <AlipayOutlined className="alipay" />,
-    },
-    {
-      title: formatMessage({ id: 'accountandsettings.binding.dingding' }, {}),
-      description: formatMessage({ id: 'accountandsettings.binding.dingding-description' }, {}),
-      actions: [
-        <a key="Bind">
-          <FormattedMessage id="accountandsettings.binding.bind" defaultMessage="Bind" />
-        </a>,
-      ],
-      avatar: <DingdingOutlined className="dingding" />,
-    },
-  ];
-
   render() {
+    // const [proForm] = ProForm.useForm();
+    const onCheckMailServerConnect = async () => {
+      console.log('onCheckMailServerConnect');
+      // try {
+      //   const values = await proForm.validateFields();
+      //   console.log('成功:', values);
+      // } catch (errorInfo) {
+      //   console.log('失败:', errorInfo);
+      // }
+    };
     return (
-      <Fragment>
-        <List
-          itemLayout="horizontal"
-          dataSource={this.getData()}
-          renderItem={(item) => (
-            <List.Item actions={item.actions}>
-              <List.Item.Meta
-                avatar={item.avatar}
-                title={item.title}
-                description={item.description}
-              />
-            </List.Item>
-          )}
-        />
-      </Fragment>
+      <Card>
+        <ProForm
+          // form={proForm}
+          layout={'horizontal'}   // 垂直布局
+          hideRequiredMark={true} // 隐藏必选标记
+          scrollToFirstError={true}
+          submitter={false}   // 去除表单自带提交按钮
+        >
+          <ProForm.Group title="连接配置">
+            <ProFormText width="m" name="mailServerSmtp" label="邮件服务器" placeholder="smtp.exmail.qq.com"
+              rules={[
+                // 这里需要正则格式化判断
+                {
+                  required: true,
+                  message: '请填写邮件服务器!'
+                },
+              ]} />
+            <ProFormText width="m" name="mailServerAdmin" label="用户名" placeholder="devops@sys.xxx.com"
+              rules={[
+                {
+                  required: true,
+                  message: '请填写邮件服务器管理员用户名!'
+                },
+                {
+                  pattern: /^[^\s]*$/,
+                  message: '禁止输入空格!'
+                }]} />
+            <ProFormText width="m" name="mailServerAdminPwd" label="管理员口令" placeholder="xxxxxxxxxx"
+              rules={[
+                {
+                  required: true,
+                  message: '请填写邮件服务器管理员口令!'
+                }]} />
+            <ProFormText width="m" name="mailServerSender" label="发件人" placeholder="devops@sys.xxx.com"
+              rules={[
+                {
+                  required: true,
+                  message: '请填写发件人!'
+                }]} />
+            {/* // 需要加邮件发送测试按钮 */}
+          </ProForm.Group>
+          <ProForm.Group title="消息通知个性化配置">
+            <ProFormText width="l" name="adAccountHelpFile" label="AD域账号使用说明文档地址" placeholder="https://xxxx" />
+            <ProFormText width="l" name="blank" label="留空字段" placeholder="" />
+          </ProForm.Group>
+          <Button type="primary" onClick={onCheckMailServerConnect}>测试连接</Button>
+        </ProForm>
+      </Card>
     );
   }
 }

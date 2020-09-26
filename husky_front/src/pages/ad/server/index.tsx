@@ -53,7 +53,7 @@ class Settings extends Component<SettingsProps, SettingsState> {
     this.state = {
       mode: 'inline',
       menuMap,
-      selectKey: 'account', // 默认选中的tab页
+      selectKey: 'ad', // 默认选中的tab页 开发时注意换成方便的
     };
   }
 

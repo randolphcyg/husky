@@ -1,103 +1,66 @@
-import { FormattedMessage, formatMessage } from 'umi';
 import React, { Component } from 'react';
-
-import { List } from 'antd';
-
-type Unpacked<T> = T extends (infer U)[] ? U : T;
-
-const passwordStrength = {
-  strong: (
-    <span className="strong">
-      <FormattedMessage id="accountandsettings.security.strong" defaultMessage="Strong" />
-    </span>
-  ),
-  medium: (
-    <span className="medium">
-      <FormattedMessage id="accountandsettings.security.medium" defaultMessage="Medium" />
-    </span>
-  ),
-  weak: (
-    <span className="weak">
-      <FormattedMessage id="accountandsettings.security.weak" defaultMessage="Weak" />
-      Weak
-    </span>
-  ),
-};
+import { Button, Divider, Modal, message, Card } from 'antd';
+import { connect } from 'umi';
+import ProCard from '@ant-design/pro-card';
+import ProTable from '@ant-design/pro-table';
+import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import ProForm, { ProFormText } from '@ant-design/pro-form';
 
 class AdServerView extends Component {
-  getData = () => [
-    {
-      title: formatMessage({ id: 'accountandsettings.security.password' }, {}),
-      description: (
-        <>
-          {formatMessage({ id: 'accountandsettings.security.password-description' })}：
-          {passwordStrength.strong}
-        </>
-      ),
-      actions: [
-        <a key="Modify">
-          <FormattedMessage id="accountandsettings.security.modify" defaultMessage="Modify" />
-        </a>,
-      ],
-    },
-    {
-      title: formatMessage({ id: 'accountandsettings.security.phone' }, {}),
-      description: `${formatMessage(
-        { id: 'accountandsettings.security.phone-description' },
-        {},
-      )}：138****8293`,
-      actions: [
-        <a key="Modify">
-          <FormattedMessage id="accountandsettings.security.modify" defaultMessage="Modify" />
-        </a>,
-      ],
-    },
-    {
-      title: formatMessage({ id: 'accountandsettings.security.question' }, {}),
-      description: formatMessage({ id: 'accountandsettings.security.question-description' }, {}),
-      actions: [
-        <a key="Set">
-          <FormattedMessage id="accountandsettings.security.set" defaultMessage="Set" />
-        </a>,
-      ],
-    },
-    {
-      title: formatMessage({ id: 'accountandsettings.security.email' }, {}),
-      description: `${formatMessage(
-        { id: 'accountandsettings.security.email-description' },
-        {},
-      )}：ant***sign.com`,
-      actions: [
-        <a key="Modify">
-          <FormattedMessage id="accountandsettings.security.modify" defaultMessage="Modify" />
-        </a>,
-      ],
-    },
-    {
-      title: formatMessage({ id: 'accountandsettings.security.mfa' }, {}),
-      description: formatMessage({ id: 'accountandsettings.security.mfa-description' }, {}),
-      actions: [
-        <a key="bind">
-          <FormattedMessage id="accountandsettings.security.bind" defaultMessage="Bind" />
-        </a>,
-      ],
-    },
-  ];
-
+  // 在这定义一些表单需要的变量
   render() {
-    const data = this.getData();
     return (
-      <>
-        <List<Unpacked<typeof data>>
-          itemLayout="horizontal"
-          dataSource={data}
-          renderItem={(item) => (
-            <List.Item actions={item.actions}>
-              <List.Item.Meta title={item.title} description={item.description} />
-            </List.Item>
-          )}
-        />
-      </>
+      <Card>
+        <ProForm
+          layout={'horizontal'}   // 垂直布局
+          hideRequiredMark={true} // 隐藏必选标记
+          scrollToFirstError={true}
+        >
+          <ProForm.Group title="连接配置">
+            <ProFormText width="s" name="adServerIp" label="服务器IP" placeholder="192.168.255.233"
+              rules={[
+                // 这里需要正则格式化判断
+                {
+                  required: true,
+                  message: '请正确填写服务器IP!'
+                },
+                {
+                  pattern: /^[^\s]*$/,
+                  message: '禁止输入空格!'
+                }]} />
+            <ProFormText width="l" name="baseDn" label="BASE_DN" placeholder="DC=GOING-LINK,DC=com"
+              rules={[
+                {
+                  required: true,
+                  message: '请填写AD服务器的distinguishName!'
+                },
+                {
+                  pattern: /^[^\s]*$/,
+                  message: '禁止输入空格!'
+                }]} />
+            <ProFormText width="l" name="adminAccount" label="管理员账户" initialValue="CN=Administrator,CN=Users,DC=XXX,DC=com"
+              rules={[{
+                required: true,
+                message: '请填写AD服务器管理员账户!'
+              }]} />
+            <ProFormText width="s" name="adminPwd" label="管理员密码" placeholder=""
+              rules={[
+                {
+                  required: true,
+                  message: 'AD服务器管理员密码不可为空!'
+                },
+                {
+                  pattern: /^[^\s]*$/,
+                  message: '禁止输入空格!'
+                }]} />
+            {/* // 需要加测试通过按钮 */}
+          </ProForm.Group>
+          <ProForm.Group title="AD服务器个性化配置">
+            <ProFormText width="s" name="zyPrefix" label="SAM账号前缀-子公司" placeholder="Z" />
+            <ProFormText width="s" name="handPrefix" label="SAM账号前缀-母公司" placeholder="HAND" />
+          </ProForm.Group>
+        </ProForm>
+      </Card>
     );
   }
 }
