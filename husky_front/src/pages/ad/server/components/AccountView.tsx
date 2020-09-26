@@ -2,6 +2,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { Button, Input, Select, Upload, Form, message } from 'antd';
 import { connect, FormattedMessage, formatMessage } from 'umi';
 import React, { Component } from 'react';
+import ProForm, { ProFormText } from '@ant-design/pro-form';
 
 import { CurrentUser } from '../data.d';
 import GeographicView from './GeographicView';
@@ -99,13 +100,13 @@ class AccountView extends Component<AccountViewProps> {
     return (
       <div className={styles.AccountView} ref={this.getViewDom}>
         <div className={styles.left}>
-          <Form
+          <ProForm
             layout="vertical"
             onFinish={this.handleFinish}
             initialValues={currentUser}
             hideRequiredMark
           >
-            <Form.Item
+            <ProFormText
               name="email"
               label={formatMessage({ id: 'accountandsettings.basic.email' })}
               rules={[
@@ -116,8 +117,8 @@ class AccountView extends Component<AccountViewProps> {
               ]}
             >
               <Input />
-            </Form.Item>
-            <Form.Item
+            </ProFormText>
+            <ProFormText
               name="name"
               label={formatMessage({ id: 'accountandsettings.basic.nickname' })}
               rules={[
@@ -128,8 +129,8 @@ class AccountView extends Component<AccountViewProps> {
               ]}
             >
               <Input />
-            </Form.Item>
-            <Form.Item
+            </ProFormText>
+            <ProFormText
               name="profile"
               label={formatMessage({ id: 'accountandsettings.basic.profile' })}
               rules={[
@@ -143,8 +144,8 @@ class AccountView extends Component<AccountViewProps> {
                 placeholder={formatMessage({ id: 'accountandsettings.basic.profile-placeholder' })}
                 rows={4}
               />
-            </Form.Item>
-            <Form.Item
+            </ProFormText>
+            <ProFormText
               name="country"
               label={formatMessage({ id: 'accountandsettings.basic.country' })}
               rules={[
@@ -157,8 +158,8 @@ class AccountView extends Component<AccountViewProps> {
               <Select style={{ maxWidth: 220 }}>
                 <Option value="China">中国</Option>
               </Select>
-            </Form.Item>
-            <Form.Item
+            </ProFormText>
+            <ProFormText
               name="geographic"
               label={formatMessage({ id: 'accountandsettings.basic.geographic' })}
               rules={[
@@ -172,8 +173,8 @@ class AccountView extends Component<AccountViewProps> {
               ]}
             >
               <GeographicView />
-            </Form.Item>
-            <Form.Item
+            </ProFormText>
+            <ProFormText
               name="address"
               label={formatMessage({ id: 'accountandsettings.basic.address' })}
               rules={[
@@ -184,8 +185,8 @@ class AccountView extends Component<AccountViewProps> {
               ]}
             >
               <Input />
-            </Form.Item>
-            <Form.Item
+            </ProFormText>
+            <ProFormText
               name="phone"
               label={formatMessage({ id: 'accountandsettings.basic.phone' })}
               rules={[
@@ -197,16 +198,16 @@ class AccountView extends Component<AccountViewProps> {
               ]}
             >
               <PhoneView />
-            </Form.Item>
-            <Form.Item>
+            </ProFormText>
+            <ProFormText>
               <Button htmlType="submit" type="primary">
                 <FormattedMessage
                   id="accountandsettings.basic.update"
                   defaultMessage="Update Information"
                 />
               </Button>
-            </Form.Item>
-          </Form>
+            </ProFormText>
+          </ProForm>
         </div>
         <div className={styles.right}>
           <AvatarView avatar={this.getAvatarURL()} />

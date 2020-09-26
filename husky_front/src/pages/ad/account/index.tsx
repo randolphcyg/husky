@@ -8,6 +8,7 @@ import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { ProColumnType } from '@ant-design/pro-table/es/Table'   // 最先进的antd pro protable 泛型
 // import { CommonFormProps } from '@ant-design/pro-form/es/BaseForm'; // 最先进的antd pro form 泛型
 import { AdAccountParamsType, addAdAccount } from "@/services/ad";
+
 // 模态框表单数据项接口
 interface ModalFormItemProps {
   eid: string;
@@ -15,13 +16,15 @@ interface ModalFormItemProps {
   department: string;
   email: string;
   tel: string;
-}
+};
+
 // 模态框表单接口
 interface ModalFormProps {
   visible: boolean;
   onCreate: (values: ModalFormItemProps) => void;
   onCancel: () => void;
-}
+};
+
 // AD域账户信息数据项接口
 interface AdAccountInfoItemProps {
   sam: string;
@@ -31,7 +34,7 @@ interface AdAccountInfoItemProps {
   telphone: string;
   title: string;
   options: any;
-}
+};
 
 const AdAccountPage: React.FC<ModalFormProps> = (props) => {
   const [visible, setVisible] = useState(false);
