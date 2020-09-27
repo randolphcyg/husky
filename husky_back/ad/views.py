@@ -26,18 +26,17 @@ def test_send_mail(request):
     if request.method == 'POST':
         # 接受前端请求数据
         data_req = json.loads(request.body)
-        res = dict()
         mailServerSmtpServer = data_req['mailServerSmtpServer']
         mailServerAdmin = data_req['mailServerAdmin']
         mailServerAdminPwd = data_req['mailServerAdminPwd']
         mailServerSender = data_req['mailServerSender']
         adAccountHelpFile = data_req['adAccountHelpFile']
         testMailReceiver = data_req['testMailReceiver']
+        res = dict()
         try:
             test_send_res = test_send_create_ad_user_init_info_mail(
                 sam='Z66666',
                 pwd='test6666',
-                rcv_mail=testMailReceiver,
                 mail_host=mailServerSmtpServer,
                 mail_user=mailServerAdmin,
                 mail_pwd=mailServerAdminPwd,
@@ -45,19 +44,18 @@ def test_send_mail(request):
                 ad_help_file_url=adAccountHelpFile,
                 mail_rcv=testMailReceiver,
             )
-            print(test_send_res)
-            if test_send_res:
-                # 组装返回结果
+            # 组装返回结果
+            if test_send_res == 0:
                 res = {
-                    'code': 0,
+                    'code': test_send_res,
                     'message': '发送邮件成功!',
                 }
             else:
                 res = {
-                    'code': 1,
+                    'code': test_send_res,
                     'message': '发送邮件失败!',
                 }
-        except BaseException:
+        except:
             # 组装返回结果
             res = {
                 'code': -1,
@@ -1025,7 +1023,6 @@ def send_create_ad_user_init_info_mail(sam: string, pwd: string, rcv_mail: strin
 @csrf_exempt
 def test_send_create_ad_user_init_info_mail(sam: string,
                                             pwd: string,
-                                            rcv_mail: string,
                                             mail_host: string,
                                             mail_user: string,
                                             mail_pwd: string,
@@ -1037,32 +1034,22 @@ def test_send_create_ad_user_init_info_mail(sam: string,
     sam: AD账号
     pwd: AD账号密码
     '''
-    # 邮件测试
-    # MAIL_HOST = "smtp.exmail.qq.com"            # 设置服务器
-    # MAIL_USER = "devops@sys.going-link.com"     # 用户名
-    # MAIL_PWD = "Q$Lw0B9u$mNO0sy@"               # 口令
-    # SENDER = 'devops@sys.going-link.com'        # 发送者邮箱
-    # smtpObj.connect(MAIL_HOST, 25)    # 25 为 SMTP 端口号
-    # smtpObj.login(MAIL_USER, MAIL_PWD)
-
     # 邮件标题
-    mail_title = '【AD域初始账号密码创建通知】'
+    mail_title = '【测试邮件-AD域初始账号密码创建通知】'
     # 邮件内容链接
     UUAP_URL = "https://ldap.going-link.net/RDWeb/Pages/zh-CN/password.aspx"
-    UUAP_MANUAL_URL = "https://open-console.going-link.com/#/knowledge/project/doc/3?baseName=SRM%E7%9F%A5%E8%AF%86%E5%BA%93&id=16&name=SRM%E4%BA%A7%E5%93%81%E5%B9%B3%E5%8F%B0&orgId=1&organizationId=1&spaceId=105&type=project"
+    UUAP_MANUAL_URL = ad_help_file_url
     # 登录
     smtpObj = smtplib.SMTP()
     smtpObj.connect(mail_host, 25)    # 25 为 SMTP 端口号
     smtpObj.login(mail_user, mail_pwd)
-
     try:
         message = MIMEMultipart('related')            # 消息基础
         message["Subject"] = Header(mail_title, 'utf-8')
         message['From'] = Header(mail_sender, 'utf-8')
-        message['To'] = Header(rcv_mail, 'utf-8')
+        message['To'] = Header(mail_rcv, 'utf-8')
         msgAlternative = MIMEMultipart('alternative')
         message.attach(msgAlternative)
-        # message['From'] = Header(SENDER, 'utf-8')
         mail_msg = """
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><!--[if IE]><html xmlns="http://www.w3.org/1999/xhtml" class="ie"><![endif]--><!--[if !IE]><!--><html style="margin: 0;padding: 0;" xmlns="http://www.w3.org/1999/xhtml"><!--<![endif]--><head>
             <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -1608,6 +1595,7 @@ def test_send_create_ad_user_init_info_mail(sam: string,
             </div></td></tr></tbody></table>
         </body></html>
         """
+        print(mail_host, mail_user, mail_pwd, mail_sender, mail_rcv)
         msgAlternative.attach(MIMEText(mail_msg, 'html', 'utf-8'))
         fp = open('images\\zy.png', 'rb')       # 图片位置
         msgImage = MIMEImage(fp.read())
@@ -1616,11 +1604,14 @@ def test_send_create_ad_user_init_info_mail(sam: string,
         msgImage.add_header('Content-ID', '<zy>')
         message.attach(msgImage)
         smtpObj.sendmail(mail_user, [mail_rcv], str(message))
-        # smtpObj.sendmail(MAIL_USER, [rcv_mail], str(message))
+        print('测试邮件发送成功!')
         return 0
     except smtplib.SMTPException:
+        print('发送邮件失败')
         return 1
     smtpObj.quit()
+
+
 # if __name__ == '__main__':
 #     send_res = send_create_ad_user_init_info_mail(sam='Z025576', pwd='QQqq#123', rcv_mail='cyg0504@outlook.com')
 #     print(send_res)
