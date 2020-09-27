@@ -55,7 +55,7 @@ def test_send_mail(request):
                     'code': test_send_res,
                     'message': '发送邮件失败!',
                 }
-        except:
+        except BaseException:
             # 组装返回结果
             res = {
                 'code': -1,
@@ -1015,7 +1015,8 @@ def send_create_ad_user_init_info_mail(sam: string, pwd: string, rcv_mail: strin
         smtpObj.sendmail(settings.MAIL_USER, [rcv_mail], str(message))
         # smtpObj.sendmail(MAIL_USER, [rcv_mail], str(message))
         return 0
-    except smtplib.SMTPException:
+    except smtplib.SMTPException as e:
+        print(str(e))
         return 1
     smtpObj.quit()
 
@@ -1595,7 +1596,6 @@ def test_send_create_ad_user_init_info_mail(sam: string,
             </div></td></tr></tbody></table>
         </body></html>
         """
-        print(mail_host, mail_user, mail_pwd, mail_sender, mail_rcv)
         msgAlternative.attach(MIMEText(mail_msg, 'html', 'utf-8'))
         fp = open('images\\zy.png', 'rb')       # 图片位置
         msgImage = MIMEImage(fp.read())
@@ -1603,11 +1603,10 @@ def test_send_create_ad_user_init_info_mail(sam: string,
         # 定义图片 ID，在 HTML 文本中引用
         msgImage.add_header('Content-ID', '<zy>')
         message.attach(msgImage)
-        smtpObj.sendmail(mail_user, [mail_rcv], str(message))
-        print('测试邮件发送成功!')
+        smtpObj.sendmail(from_addr=mail_user, to_addrs=[mail_rcv], msg=str(message))
         return 0
-    except smtplib.SMTPException:
-        print('发送邮件失败')
+    except smtplib.SMTPException as e:
+        print(str(e))
         return 1
     smtpObj.quit()
 
