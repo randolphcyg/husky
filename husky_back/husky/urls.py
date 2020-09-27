@@ -22,7 +22,10 @@ from ad.views import (fetch_ad_account_list,
                       add_ad_account,
                       save_ad_server_config,
                       test_ad_server_config_is_connect,
-                      loadFormData
+                      load_ad_server_config_form_data,
+                      load_mail_server_config_form_data,
+                      save_mail_server_config,
+                      test_send_mail,
                       )
 
 
@@ -35,5 +38,8 @@ urlpatterns = [
     url(r'^api/addAdAccount', add_ad_account, name='addAdAccount'),       # 创建AD服务器账号
     url(r'api/saveAdServerConfig', save_ad_server_config, name='saveAdServerConfig'),      # 保存AD服务器配置
     url(r'api/testAdServerConfigIsConnect', test_ad_server_config_is_connect, name='testAdServerConfigIsConnect'),       # 测试AD域服务器配置连通
-    url(r'api/loadFormData', loadFormData, name='loadFormData')
+    url(r'api/loadAdServerConfigFormData', load_ad_server_config_form_data, name='loadAdServerConfigFormData'),
+    url(r'api/saveMailServerConfig', save_mail_server_config, name='saveMailServerConfig'),      # 保存邮件服务器配置
+    url(r'api/loadMailServerConfigFormData', load_mail_server_config_form_data, name='loadMailServerConfigFormData'),
+    url(r'api/testSendMail', test_send_mail, name='testSendMail')   # 测试发送邮件
 ]

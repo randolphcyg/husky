@@ -4,15 +4,10 @@ import { connect } from 'umi';
 import { Button, Divider, message } from 'antd';
 import ProCard from '@ant-design/pro-card';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
-import { saveAdServerConfig, AdServerFormProps, AdServerFormItemProps, testAdServerConfigIsConnect, loadFormData } from "@/services/ad";
+import { saveAdServerConfig, AdServerFormProps, AdServerFormItemProps, testAdServerConfigIsConnect, loadAdServerConfigFormData } from "@/services/ad";
 
 const AdServerView: React.FC<AdServerFormProps> = (props) => {
   const [proForm] = ProForm.useForm();
-  // 测试AD服务器配置是否连通
-  const onCheckAdServerConfigConnect = (values: AdServerFormItemProps) => {
-    handleSubmitTest(values);   // 调用提交测试
-  };
-
   const [initialFormValues, setValues] = useState({});    // 表单数据初始化
   const [loading, setLoading] = useState(false);    // 表单loading
 
@@ -24,7 +19,7 @@ const AdServerView: React.FC<AdServerFormProps> = (props) => {
   async function initForm() {
     setLoading(true);
     try {
-      const msg = await loadFormData();
+      const msg = await loadAdServerConfigFormData();
       if (msg.code === 0) {
         setValues(msg.body);
       } else {
@@ -37,6 +32,11 @@ const AdServerView: React.FC<AdServerFormProps> = (props) => {
     }
     setLoading(false);
   }
+
+  // 测试AD服务器配置是否连通
+  const onCheckAdServerConfigConnect = (values: AdServerFormItemProps) => {
+    handleSubmitTest(values);   // 调用提交测试
+  };
 
   // 测试AD服务器
   async function handleSubmitTest(values: AdServerFormItemProps) {

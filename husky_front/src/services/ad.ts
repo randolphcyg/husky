@@ -88,8 +88,8 @@ export async function saveAdServerConfig(params: AdServerFormItemProps) {
 }
 
 // service 从redis加载AD域服务器配置方法
-export async function loadFormData() {
-  return request('/api/loadFormData', {
+export async function loadAdServerConfigFormData() {
+  return request('/api/loadAdServerConfigFormData', {
     method: 'GET',
   });
 }
