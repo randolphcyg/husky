@@ -35,7 +35,7 @@ def login_view(request):
 
 
 @csrf_exempt
-def currentUser(request):
+def current_user(request):
     '''暂时用户表没拓展这么多属性，先不做权限
     '''
     if request.method == 'GET':

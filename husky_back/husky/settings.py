@@ -91,16 +91,46 @@ DATABASES = {
         'HOST': '127.0.0.1',                    # mysql服务主机ip
         'PORT': '3306',                         # mysql服务端口
     },
-    'srm':{                           # 远程数据库节点
+    'srm': {                           # 远程数据库节点
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'agile_service', 
+        'NAME': 'agile_service',
         'USER': 'readonly',
         'PASSWORD': 'lp4c8nN7@@CNuqe9',
-        'HOST':'192.168.120.170',
-        'PORT':'3306',
+        'HOST': '192.168.120.170',
+        'PORT': '3306',
     }
 }
 
+# redis缓存服务器
+CACHES = {
+    # 默认缓存库
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/0",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # "PASSWORD": "V%xw1xZqDK",   # 密码
+        }
+    },
+    # 配置信息缓存库
+    "configs_cache": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # "PASSWORD": "V%xw1xZqDK",   # 密码
+        }
+    },
+    # AD域账号信息缓存库
+    "ad_accounts_cache": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # "PASSWORD": "V%xw1xZqDK",   # 密码
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -147,8 +177,8 @@ AD_ADMIN_PWD = 'MIv8YqCmE1a5J5wL'                               # 管理员密�
 USER_SEARCH_FILTER = '(objectclass=user)'                       # 只获取用户对象 过滤条件
 OU_SEARCH_FILTER = '(objectclass=organizationalUnit)'           # 只获取OU对象 过滤条件
 DISABLED_BASE_DN = 'OU=disabled,DC=GOING-LINK,DC=com'           # 离职账户所在OU
-ENABLED_BASE_DN = 'OU=甄云科技,DC=GOING-LINK,DC=com' 
-BASE_DN = 'DC=GOING-LINK,DC=com'                                # AD域基础路径  
+ENABLED_BASE_DN = 'OU=甄云科技,DC=GOING-LINK,DC=com'
+BASE_DN = 'DC=GOING-LINK,DC=com'                                # AD域基础路径
 ZHENYUN_SAM_PREFIX = 'Z'
 HAND_SAM_PREFIX = 'HAND'
 HAND_BASE_DN = 'OU=汉得信息,OU=上海总部,OU=甄云科技'

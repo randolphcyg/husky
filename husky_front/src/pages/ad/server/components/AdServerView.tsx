@@ -1,60 +1,95 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { connect } from 'umi';
-import { Button, Divider } from 'antd';
+import { Button, Divider, message } from 'antd';
 import ProCard from '@ant-design/pro-card';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
-
-// AD服务器表单数据项接口
-interface AdServerFormItemProps {
-  adServerIp: string;
-  baseDn: string;
-  adminAccount: string;
-  adminPwd: string;
-  zyPrefix: string;
-  handPrefix: string;
-};
-
-// AD服务器表单接口
-interface AdServerFormProps {
-  onCheckAdServerConfigConnect: (values: AdServerFormItemProps) => void;
-  onSaveAdServerConfig: (values: AdServerFormItemProps) => void;
-};
+import { saveAdServerConfig, AdServerFormProps, AdServerFormItemProps, testAdServerConfigIsConnect, loadFormData } from "@/services/ad";
 
 const AdServerView: React.FC<AdServerFormProps> = (props) => {
   const [proForm] = ProForm.useForm();
   // 测试AD服务器配置是否连通
-  const onCheckAdServerConfigConnect = async () => {
-    console.log('onCheckAdServerConfigConnect AD服务器连通性测试，一个系统允许配置一个AD域服务器');
+  const onCheckAdServerConfigConnect = (values: AdServerFormItemProps) => {
+    handleSubmitTest(values);   // 调用提交测试
+  };
+
+  const [initialFormValues, setValues] = useState({});    // 表单数据初始化
+  const [loading, setLoading] = useState(false);    // 表单loading
+
+  useEffect(() => {
+    initForm();
+  }, []);
+
+  // 初始化表单数据
+  async function initForm() {
+    setLoading(true);
     try {
-      const values = await proForm.validateFields();
-      console.log('成功:', values);
-    } catch (errorInfo) {
-      console.log('失败:', errorInfo);
+      const msg = await loadFormData();
+      if (msg.code === 0) {
+        setValues(msg.body);
+      } else {
+        message.error(msg.message);
+      }
+    }
+    // 如果操作失败
+    catch (error) {
+      message.error('获取AD配置失败，请重试!');
+    }
+    setLoading(false);
+  }
+
+  // 测试AD服务器
+  async function handleSubmitTest(values: AdServerFormItemProps) {
+    try {
+      // 提交测试申请 到service方法
+      const msg = await testAdServerConfigIsConnect({ ...values });
+      if (msg.code === 0) {
+        message.success(msg.message);
+      } else {
+        message.error(msg.message);
+      }
+      return;
+    }
+    // 如果提交失败
+    catch (error) {
+      message.error('创建失败，请重试!');
     }
   };
 
   // 保存AD服务器配置信息
-  const onSaveAdServerConfig = async () => {
-    console.log('onSaveAdServerConfig 保存AD服务器配置');
+  const onSaveAdServerConfig = (values: AdServerFormItemProps) => {
+    handleSubmit(values);   // 调用保存判断
+  };
+
+  async function handleSubmit(values: AdServerFormItemProps) {
     try {
-      const values = await proForm.validateFields();
-      console.log('成功:', values);
-    } catch (errorInfo) {
-      console.log('失败:', errorInfo);
+      // 提交创建申请 到service方法
+      const msg = await saveAdServerConfig({ ...values });
+      if (msg.code === 0) {
+        message.success(msg.message);
+      } else {
+        message.error(msg.message);
+      }
+      return;
+    }
+    // 如果提交失败
+    catch (error) {
+      message.error('创建失败，请重试!');
     }
   };
 
   return (
-    <ProCard bordered={true}>
+    <ProCard bordered={true} loading={loading}>
       <ProForm
         form={proForm}          // 表单数据
         hideRequiredMark={true} // 隐藏必选标记
         scrollToFirstError={true}
         submitter={false}   // 去除表单自带提交按钮
+        // 表单初始值从redis读取
+        initialValues={initialFormValues}
       >
         <ProForm.Group title="1.连接配置">
-          <ProFormText name="adServerIp" label="服务器IP" placeholder="192.168.255.233"
+          <ProFormText name="adServerIp" label="服务器IP" placeholder="192.168.xxx.xxx"
             rules={[
               {
                 required: true,
@@ -64,7 +99,7 @@ const AdServerView: React.FC<AdServerFormProps> = (props) => {
                 pattern: /^((25[0-5]|2[0-4]\d|[01]?\d\d?)($|(?!\.$)\.)){4}$/,
                 message: 'IP格式错误!'
               }]} />
-          <ProFormText name="baseDn" label="BASE_DN" placeholder="DC=GOING-LINK,DC=com"
+          <ProFormText name="baseDn" label="BASE_DN" placeholder="DC=xxx,DC=com"
             rules={[
               {
                 required: true,
@@ -74,12 +109,12 @@ const AdServerView: React.FC<AdServerFormProps> = (props) => {
                 pattern: /^[^\s]*$/,
                 message: '禁止输入空格!'
               }]} />
-          <ProFormText name="adminAccount" label="管理员账户" initialValue="CN=Administrator,CN=Users,DC=XXX,DC=com"
+          <ProFormText name="adminAccount" label="管理员账户" placeholder="CN=Administrator,CN=Users,DC=XXX,DC=com"
             rules={[{
               required: true,
               message: '请填写AD服务器管理员账户!'
             }]} />
-          <ProFormText name="adminPwd" label="管理员密码" placeholder=""
+          <ProFormText name="adminPwd" label="管理员密码" placeholder="********"
             rules={[
               {
                 required: true,
@@ -95,9 +130,25 @@ const AdServerView: React.FC<AdServerFormProps> = (props) => {
           <ProFormText name="zyPrefix" label="SAM账号前缀-子公司" placeholder="Z" />
           <ProFormText name="handPrefix" label="SAM账号前缀-母公司" placeholder="HAND" />
         </ProForm.Group>
-        <Button type="default" onClick={onCheckAdServerConfigConnect}>测试连接</Button>
+        <Button type="default" onClick={() => {
+          proForm.validateFields()
+            .then(values => {
+              onCheckAdServerConfigConnect(values);
+            })
+            .catch(info => {
+              console.log('验证模态框表单失败:', info);
+            });
+        }}>测试连接</Button>
         <Divider key='divider-onCheckAdServerConfigConnect' dashed={true} type="vertical" />
-        <Button type='primary' onClick={onSaveAdServerConfig}>保存配置</Button>
+        <Button type='primary' onClick={() => {
+          proForm.validateFields()
+            .then(values => {
+              onSaveAdServerConfig(values);
+            })
+            .catch(info => {
+              console.log('验证模态框表单失败:', info);
+            });
+        }}>保存配置</Button>
       </ProForm>
     </ProCard>
   );

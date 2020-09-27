@@ -11,16 +11,122 @@ import random
 import re
 import string
 import smtplib
-import string
 from email.header import Header
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+# redis
+import redis
+from django_redis import get_redis_connection
 # Create your views here.
 
 
 @csrf_exempt
-def accessADServer() -> object:
+def loadFormData(request):
+    '''默认从redis读取AD服务器配置信息
+    '''
+    res = dict()
+    try:
+        # 从redis取配置信息
+        conn = get_redis_connection("configs_cache")
+        str_data = conn.get('AdServerConfig')
+        json_data = json.loads(str_data)
+        res = {
+            'code': 0,
+            'message': '获取AD域服务器连接配置信息成功!',
+            'body': json_data
+        }
+    except BaseException:
+        res = {
+            'code': -1,
+            'message': '获取AD域服务器连接配置信息失败!请配置AD服务器信息!',
+        }
+    return JsonResponse(res)
+
+
+@csrf_exempt
+def test_access_ad_server(json_data) -> object:
+    '''连接生产AD域服务器，返回连接对象
+    '''
+    SERVER = Server(host=json_data['adServerIp'],
+                    port=636,               # 636安全端口
+                    use_ssl=True,
+                    get_info=ALL,
+                    connect_timeout=3)      # 连接超时为3秒
+    try:
+        conn = Connection(
+            server=SERVER,
+            user=json_data['adminAccount'],
+            password=json_data['adminPwd'],
+            auto_bind=True,
+            read_only=False,                # 禁止修改数据True
+            receive_timeout=3)             # 10秒内没返回消息则触发超时异常
+        print("distinguishedName:%s res: %s" % (settings.AD_ADMIN, conn.bind()))
+        return 0
+    except BaseException:
+        return -1
+    finally:
+        conn.closed
+
+
+@csrf_exempt
+def test_ad_server_config_is_connect(request):
+    '''测试前端AD服务器配置连通性
+    '''
+    if request.method == 'POST':
+        # 接受前端请求数据 前端表单初始化数据从redis中读出来，可以经过修改-测试并保存到redis
+        # 然后其他的地方修改逻辑，凡是使用到AD服务器配置的地方都从redis中读取；先将上述流程改好，再改第二条
+        data_req = json.loads(request.body)
+        res = dict()
+        try:
+            # 测试连接
+            access_ad_res = test_access_ad_server(data_req)
+            if access_ad_res == 0:
+                res = {
+                    'code': access_ad_res,
+                    'message': 'AD域服务器连接成功!',
+                }
+            else:
+                res = {
+                    'code': access_ad_res,
+                    'message': 'AD域服务器连接失败!',
+                }
+        except BaseException:
+            res = {
+                'code': -1,
+                'message': 'AD域服务器连接失败!',
+            }
+        return JsonResponse(res)
+
+
+@csrf_exempt
+def save_ad_server_config(request):
+    '''保存AD域配置信息
+    '''
+    if request.method == 'POST':
+        # 接受前端请求数据
+        data_req = json.loads(request.body)
+        res = dict()
+        try:
+            conn = get_redis_connection("configs_cache")
+            tmp = json.dumps(data_req)
+            conn.set('AdServerConfig', tmp)
+            # 组装返回结果
+            res = {
+                'code': 0,
+                'message': '保存AD域服务器配置成功!',
+            }
+        except BaseException:
+            # 组装返回结果
+            res = {
+                'code': -1,
+                'message': '保存AD域服务器配置失败!',
+            }
+        return JsonResponse(res)
+
+
+@csrf_exempt
+def access_ad_server() -> object:
     '''连接生产AD域服务器，返回连接对象
     '''
     SERVER = Server(host=settings.AD_IP,
@@ -46,12 +152,12 @@ def accessADServer() -> object:
 
 
 @csrf_exempt
-def fetchAdAccountList(request) -> json:
+def fetch_ad_account_list(request) -> json:
     '''查询AD域的账户列表,页数由前端传参,之后改成分页类型的
     '''
     if request.method == 'GET':
         # 连接AD域
-        conn = accessADServer()
+        conn = access_ad_server()
         # 查询AD服务器
         attr = ['sAMAccountName',
                 'displayName',
@@ -91,7 +197,7 @@ def fetchAdAccountList(request) -> json:
 
 
 @csrf_exempt
-def addAdAccount(request):
+def add_ad_account(request):
     '''新建AD域账户
     '''
     if request.method == 'POST':
@@ -157,7 +263,7 @@ def create_obj(dn=None, type='user', info=None):
     # 创建之前需要对dn中的OU部分进行判断，如果没有需要创建
     dn_base = dn.split(',', 1)[1]
     # 用到的时候连接AD服务器
-    conn = accessADServer()
+    conn = access_ad_server()
     check_ou_res = check_ou(conn, dn_base)
     if not check_ou_res:
         return -2

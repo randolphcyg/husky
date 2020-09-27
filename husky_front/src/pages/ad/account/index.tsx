@@ -7,34 +7,7 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { ProColumnType } from '@ant-design/pro-table/es/Table'   // 最先进的antd pro protable 泛型
 // import { CommonFormProps } from '@ant-design/pro-form/es/BaseForm'; // 最先进的antd pro form 泛型
-import { AdAccountParamsType, addAdAccount } from "@/services/ad";
-
-// 模态框表单数据项接口
-interface ModalFormItemProps {
-  eid: string;
-  name: string;
-  department: string;
-  email: string;
-  tel: string;
-};
-
-// 模态框表单接口
-interface ModalFormProps {
-  visible: boolean;
-  onCreate: (values: ModalFormItemProps) => void;
-  onCancel: () => void;
-};
-
-// AD域账户信息数据项接口
-interface AdAccountInfoItemProps {
-  sam: string;
-  name: string;
-  department: string;
-  email: number;
-  telphone: string;
-  title: string;
-  options: any;
-};
+import { AdAccountParamsType, addAdAccount, ModalFormProps, ModalFormItemProps, AdAccountInfoItemProps } from "@/services/ad";
 
 const AdAccountPage: React.FC<ModalFormProps> = (props) => {
   const [visible, setVisible] = useState(false);
@@ -101,7 +74,7 @@ const AdAccountPage: React.FC<ModalFormProps> = (props) => {
     const { dispatch } = props;
     dispatch({ type: 'ad/fetchAdAccountList', payload: [] });
   }
-//函数组件
+  //函数组件
   useEffect(() => {
     loadData();
   }, [])
@@ -124,7 +97,7 @@ const AdAccountPage: React.FC<ModalFormProps> = (props) => {
   };
 
   // 创建账号
-  const onCreate = values => {
+  const onCreate = (values:AdAccountParamsType) => {
     handleSubmit(values);
     setVisible(false);
   };
