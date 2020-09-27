@@ -18,6 +18,8 @@ from email.mime.text import MIMEText
 # redis
 import redis
 from django_redis import get_redis_connection
+import demjson
+import pickle
 # Create your views here.
 
 
@@ -248,37 +250,51 @@ def fetch_ad_account_list(request) -> json:
     '''查询AD域的账户列表,页数由前端传参,之后改成分页类型的
     '''
     if request.method == 'GET':
-        # 连接AD域
-        conn = access_ad_server()
-        # 查询AD服务器
-        attr = ['sAMAccountName',
-                'displayName',
-                'distinguishedName',
-                'mail',
-                'telephoneNumber',
-                'title',
-                # 'whenCreated',
-                ]
-        entry_list = conn.extend.standard.paged_search(
-            search_filter=settings.USER_SEARCH_FILTER,
-            search_base=settings.ENABLED_BASE_DN,
-            search_scope=SUBTREE,
-            attributes=attr,
-            paged_size=100,
-            generator=False)        # 关闭生成器，结果为列表
-        # 处理查询结果
-        body = list()
-        for user in entry_list:
-            body.append(
-                {
-                    'sam': user['attributes']['sAMAccountName'],
-                    'name': user['attributes']['displayName'],
-                    'department': '/'.join([x.replace('OU=', '') for x in user['attributes']['distinguishedName'].split(',', 1)[1].rsplit(',', 2)[0].split(',')][::-1]),
-                    'email': user['attributes']['mail'],
-                    'telphone': user['attributes']['telephoneNumber'],
-                    'title': user['attributes']['title'],
-                }
-            )
+        # 从redis取配置信息
+        redis_conn = get_redis_connection("ad_accounts_cache")
+        str_data = redis_conn.get('AdServerAccounts')
+        if str_data is not None:
+            # 直接从redis取数据
+            json_data = json.loads(str_data)
+            body = json_data['result']
+        else:
+            # 连接AD域
+            conn = access_ad_server()
+            # 查询AD服务器
+            attr = ['sAMAccountName',
+                    'displayName',
+                    'distinguishedName',
+                    'mail',
+                    'telephoneNumber',
+                    'title',
+                    'whenCreated',
+                    ]
+            entry_list = conn.extend.standard.paged_search(
+                search_filter=settings.USER_SEARCH_FILTER,
+                search_base=settings.ENABLED_BASE_DN,
+                search_scope=SUBTREE,
+                attributes=attr,
+                paged_size=100,
+                generator=False)        # 关闭生成器，结果为列表
+            # 存入数据库
+            body = list()
+            for user in entry_list:
+                body.append(
+                    {
+                        'sam': user['attributes']['sAMAccountName'],
+                        'name': user['attributes']['displayName'],
+                        'department': '/'.join([x.replace('OU=', '') for x in user['attributes']['distinguishedName'].split(',', 1)[1].rsplit(',', 2)[0].split(',')][::-1]),
+                        'email': user['attributes']['mail'],
+                        'telphone': user['attributes']['telephoneNumber'],
+                        'title': user['attributes']['title'],
+                    }
+                )
+            # 将最新的数据覆盖过来
+            AdServerAccounts = dict()
+            AdServerAccounts['result'] = body
+            json_object = json.dumps(AdServerAccounts)
+            redis_conn.set('AdServerAccounts', json_object)
+            print('*********更新redis********')
         # 组装返回结果
         res = {
             'code': 0,
@@ -369,7 +385,24 @@ def create_obj(dn=None, type='user', info=None):
                 old_pwd = ''
                 conn.extend.microsoft.modify_password(dn, new_pwd, old_pwd)                # 初始化密码
                 # 此处将生成的账号密码邮件发送给对应人员
-                send_mail_res = send_create_ad_user_init_info_mail(sam, new_pwd, email)
+                # 从redis取配置信息
+                conn = get_redis_connection("configs_cache")
+                str_data = conn.get('MailServerConfig')
+                json_data = json.loads(str_data)
+                mailServerSmtpServer = json_data['mailServerSmtpServer']
+                mailServerAdmin = json_data['mailServerAdmin']
+                mailServerAdminPwd = json_data['mailServerAdminPwd']
+                mailServerSender = json_data['mailServerSender']
+                adAccountHelpFile = json_data['adAccountHelpFile']
+                send_mail_res = send_create_ad_user_init_info_mail(sam=sam,
+                                                                   pwd=new_pwd,
+                                                                   mail_host=mailServerSmtpServer,
+                                                                   mail_user=mailServerAdmin,
+                                                                   mail_pwd=mailServerAdminPwd,
+                                                                   mail_sender=mailServerSender,
+                                                                   ad_help_file_url=adAccountHelpFile,
+                                                                   mail_rcv=email,
+                                                                   )
                 if send_mail_res == 0:
                     return 0
                 else:
@@ -429,37 +462,37 @@ def check_ou(conn, ou, ou_list=None):
 
 
 @csrf_exempt
-def send_create_ad_user_init_info_mail(sam: string, pwd: string, rcv_mail: string) -> bool:
+def send_create_ad_user_init_info_mail(sam: string,
+                                       pwd: string,
+                                       mail_host: string,
+                                       mail_user: string,
+                                       mail_pwd: string,
+                                       mail_sender: string,
+                                       ad_help_file_url: str,
+                                       mail_rcv: string,
+                                       ) -> int:
     '''创建账户成功，给该用户邮箱发送邮件
     sam: AD账号
     pwd: AD账号密码
     '''
-    # 邮件测试
-    # MAIL_HOST = "smtp.exmail.qq.com"            # 设置服务器
-    # MAIL_USER = "devops@sys.going-link.com"     # 用户名
-    # MAIL_PWD = "Q$Lw0B9u$mNO0sy@"               # 口令
-    # SENDER = 'devops@sys.going-link.com'        # 发送者邮箱
-    # smtpObj.connect(MAIL_HOST, 25)    # 25 为 SMTP 端口号
-    # smtpObj.login(MAIL_USER, MAIL_PWD)
-
     # 邮件标题
     mail_title = '【AD域初始账号密码创建通知】'
     # 邮件内容链接
     UUAP_URL = "https://ldap.going-link.net/RDWeb/Pages/zh-CN/password.aspx"
-    UUAP_MANUAL_URL = "https://open-console.going-link.com/#/knowledge/project/doc/3?baseName=SRM%E7%9F%A5%E8%AF%86%E5%BA%93&id=16&name=SRM%E4%BA%A7%E5%93%81%E5%B9%B3%E5%8F%B0&orgId=1&organizationId=1&spaceId=105&type=project"
+    UUAP_MANUAL_URL = ad_help_file_url
     # 登录
     smtpObj = smtplib.SMTP()
-    smtpObj.connect(settings.MAIL_HOST, 25)    # 25 为 SMTP 端口号
-    smtpObj.login(settings.MAIL_USER, settings.MAIL_PWD)
+    smtpObj.connect(mail_host, 25)    # 25 为 SMTP 端口号
+    smtpObj.login(mail_user, mail_pwd)
 
     try:
         message = MIMEMultipart('related')            # 消息基础
         message["Subject"] = Header(mail_title, 'utf-8')
-        message['From'] = Header(settings.SENDER, 'utf-8')
-        message['To'] = Header(rcv_mail, 'utf-8')
+        sender = ("%s<" + mail_sender + ">") % (Header(mail_sender, 'utf-8'),)
+        message['From'] = Header(sender, 'utf-8')
+        message['To'] = Header(mail_rcv, 'utf-8')
         msgAlternative = MIMEMultipart('alternative')
         message.attach(msgAlternative)
-        # message['From'] = Header(SENDER, 'utf-8')
         mail_msg = """
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><!--[if IE]><html xmlns="http://www.w3.org/1999/xhtml" class="ie"><![endif]--><!--[if !IE]><!--><html style="margin: 0;padding: 0;" xmlns="http://www.w3.org/1999/xhtml"><!--<![endif]--><head>
             <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -1012,8 +1045,7 @@ def send_create_ad_user_init_info_mail(sam: string, pwd: string, rcv_mail: strin
         # 定义图片 ID，在 HTML 文本中引用
         msgImage.add_header('Content-ID', '<zy>')
         message.attach(msgImage)
-        smtpObj.sendmail(settings.MAIL_USER, [rcv_mail], str(message))
-        # smtpObj.sendmail(MAIL_USER, [rcv_mail], str(message))
+        smtpObj.sendmail(from_addr=mail_user, to_addrs=[mail_rcv], msg=str(message))
         return 0
     except smtplib.SMTPException as e:
         print(str(e))
@@ -1030,8 +1062,8 @@ def test_send_create_ad_user_init_info_mail(sam: string,
                                             mail_sender: string,
                                             ad_help_file_url: str,
                                             mail_rcv: string,
-                                            ) -> bool:
-    '''创建账户成功，给该用户邮箱发送邮件
+                                            ) -> int:
+    '''给指定邮箱邮箱发送测试邮件
     sam: AD账号
     pwd: AD账号密码
     '''
@@ -1609,8 +1641,3 @@ def test_send_create_ad_user_init_info_mail(sam: string,
         print(str(e))
         return 1
     smtpObj.quit()
-
-
-# if __name__ == '__main__':
-#     send_res = send_create_ad_user_init_info_mail(sam='Z025576', pwd='QQqq#123', rcv_mail='cyg0504@outlook.com')
-#     print(send_res)
