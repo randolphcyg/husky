@@ -1,22 +1,25 @@
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from django.db import connections
 import json
-from ldap3 import (ALL, ALL_ATTRIBUTES, MODIFY_REPLACE, NTLM, SASL, SIMPLE,
-                   SUBTREE, SYNC, Connection, Server)
-import winrm
+import logging
+import os
 import random
 import re
-import string
 import smtplib
+import string
 from email.header import Header
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+import winrm
+from django.conf import settings
+from django.db import connections
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 # redis
 from django_redis import get_redis_connection
-import logging
+from ldap3 import (ALL, ALL_ATTRIBUTES, MODIFY_REPLACE, NTLM, SASL, SIMPLE,
+                   SUBTREE, SYNC, Connection, Server)
 
 logger = logging.getLogger("info_logger")
 error_logger = logging.getLogger("error_logger")
@@ -257,18 +260,54 @@ def access_ad_server() -> object:
         conn_ad.closed
 
 
+def back_ad_account_to_redis(searchFilterUser, baseDnEnabled, conn_redis_accounts) -> list:
+    '''从AD服务器获取账号数据并存储到redis
+    '''
+    # 连接AD域
+    conn_ad = access_ad_server()
+    # 查询AD服务器
+    attr = ['sAMAccountName',
+            'displayName',
+            'distinguishedName',
+            'mail',
+            'telephoneNumber',
+            'title',
+            'whenCreated',
+            ]
+    entry_list = conn_ad.extend.standard.paged_search(
+        search_filter=searchFilterUser,
+        search_base=baseDnEnabled,
+        search_scope=SUBTREE,
+        attributes=attr,
+        paged_size=100,
+        generator=False)        # 关闭生成器，结果为列表
+    # 存入数据库
+    body = list()
+    for user in entry_list:
+        body.append(
+            {
+                'sam': user['attributes']['sAMAccountName'],
+                'name': user['attributes']['displayName'],
+                'department': '/'.join([x.replace('OU=', '') for x in user['attributes']['distinguishedName'].split(',', 1)[1].rsplit(',', 2)[0].split(',')][::-1]),
+                'email': user['attributes']['mail'],
+                'telphone': user['attributes']['telephoneNumber'],
+                'title': user['attributes']['title'],
+            }
+        )
+    # 将最新的数据覆盖过来
+    AdServerAccounts = dict()
+    AdServerAccounts['result'] = body
+    json_object = json.dumps(AdServerAccounts)
+    conn_redis_accounts.set('AdServerAccounts', json_object)
+    logger.info('*********更新redis********')
+    return body
+
+
 @csrf_exempt
 def fetch_ad_account_list(request) -> json:
     '''查询AD域的账户列表,页数由前端传参,之后改成分页类型的
     '''
     if request.method == 'GET':
-        # 从redis的配置库读取AD配置
-        conn_redis_configs = get_redis_connection("configs_cache")
-        str_data_config = conn_redis_configs.get('AdServerConfig')
-        json_data = json.loads(str_data_config)
-        searchFilterUser = json_data['searchFilterUser']
-        baseDnEnabled = json_data['baseDnEnabled']
-
         # 从redis的账号库读取数据
         conn_redis_accounts = get_redis_connection("ad_accounts_cache")
         str_data = conn_redis_accounts.get('AdServerAccounts')
@@ -277,43 +316,13 @@ def fetch_ad_account_list(request) -> json:
             json_data = json.loads(str_data)
             body = json_data['result']
         else:
-            # 连接AD域
-            conn_ad = access_ad_server()
-            # 查询AD服务器
-            attr = ['sAMAccountName',
-                    'displayName',
-                    'distinguishedName',
-                    'mail',
-                    'telephoneNumber',
-                    'title',
-                    'whenCreated',
-                    ]
-            entry_list = conn_ad.extend.standard.paged_search(
-                search_filter=searchFilterUser,
-                search_base=baseDnEnabled,
-                search_scope=SUBTREE,
-                attributes=attr,
-                paged_size=100,
-                generator=False)        # 关闭生成器，结果为列表
-            # 存入数据库
-            body = list()
-            for user in entry_list:
-                body.append(
-                    {
-                        'sam': user['attributes']['sAMAccountName'],
-                        'name': user['attributes']['displayName'],
-                        'department': '/'.join([x.replace('OU=', '') for x in user['attributes']['distinguishedName'].split(',', 1)[1].rsplit(',', 2)[0].split(',')][::-1]),
-                        'email': user['attributes']['mail'],
-                        'telphone': user['attributes']['telephoneNumber'],
-                        'title': user['attributes']['title'],
-                    }
-                )
-            # 将最新的数据覆盖过来
-            AdServerAccounts = dict()
-            AdServerAccounts['result'] = body
-            json_object = json.dumps(AdServerAccounts)
-            conn_redis_accounts.set('AdServerAccounts', json_object)
-            logger.info('*********更新redis********')
+            # 从redis的配置库读取AD配置 数据由AD服务器返回
+            conn_redis_configs = get_redis_connection("configs_cache")
+            str_data_config = conn_redis_configs.get('AdServerConfig')
+            json_data = json.loads(str_data_config)
+            searchFilterUser = json_data['searchFilterUser']
+            baseDnEnabled = json_data['baseDnEnabled']
+            body = back_ad_account_to_redis(searchFilterUser, baseDnEnabled, conn_redis_accounts)
         # 组装返回结果
         res = {
             'code': 0,
@@ -399,36 +408,41 @@ def create_obj(dn=None, type='user', info=None):
     # 创建之前需要对dn中的OU部分进行判断，如果没有需要创建
     dn_base = dn.split(',', 1)[1]
     # 用到的时候连接AD服务器
-    conn = access_ad_server()
-    check_ou_res = check_ou(conn, dn_base)
+    conn_ad = access_ad_server()
+    check_ou_res = check_ou(conn_ad, dn_base)
     if not check_ou_res:
         return -2
     else:
-        conn.add(dn=dn, object_class=object_class[type], attributes=user_attr)
-        add_result = conn.result
+        conn_ad.add(dn=dn, object_class=object_class[type], attributes=user_attr)
+        add_result = conn_ad.result
         if add_result['result'] == 0:
             if type == 'user':          # 若是新增用户对象，则需要一些初始化操作
-                conn.modify(dn, {'userAccountControl': [('MODIFY_REPLACE', 512)]})         # 激活用户                                                               # 如果是用户时
+                conn_ad.modify(dn, {'userAccountControl': [('MODIFY_REPLACE', 512)]})         # 激活用户                                                               # 如果是用户时
                 new_pwd = generate_pwd(8)
                 old_pwd = ''
-                conn.extend.microsoft.modify_password(dn, new_pwd, old_pwd)                # 初始化密码
+                conn_ad.extend.microsoft.modify_password(dn, new_pwd, old_pwd)                # 初始化密码
+                # 密码设置为下次登录需要修改密码
+                # conn_ad.modify(dn, {'pwdLastSet': (2, [0])})                                # 设置第一次登录必须修改密码
+                # 此时账号已经创建，则需要从AD域向redis更新账号信息
+                # 从redis的配置库读取AD配置 数据由AD服务器返回
+                conn_redis_configs = get_redis_connection("configs_cache")
+                str_data_config = conn_redis_configs.get('AdServerConfig')
+                json_data = json.loads(str_data_config)
+                back_ad_account_to_redis(searchFilterUser=json_data['searchFilterUser'],
+                                         baseDnEnabled=json_data['baseDnEnabled'],
+                                         conn_redis_accounts=get_redis_connection("ad_accounts_cache"))
                 # 此处将生成的账号密码邮件发送给对应人员
                 # 从redis取配置信息
-                conn = get_redis_connection("configs_cache")
-                str_data = conn.get('MailServerConfig')
+                conn_redis = get_redis_connection("configs_cache")
+                str_data = conn_redis.get('MailServerConfig')
                 json_data = json.loads(str_data)
-                mailServerSmtpServer = json_data['mailServerSmtpServer']
-                mailServerAdmin = json_data['mailServerAdmin']
-                mailServerAdminPwd = json_data['mailServerAdminPwd']
-                mailServerSender = json_data['mailServerSender']
-                adAccountHelpFile = json_data['adAccountHelpFile']
                 send_mail_res = send_create_ad_user_init_info_mail(sam=sam,
                                                                    pwd=new_pwd,
-                                                                   mail_host=mailServerSmtpServer,
-                                                                   mail_user=mailServerAdmin,
-                                                                   mail_pwd=mailServerAdminPwd,
-                                                                   mail_sender=mailServerSender,
-                                                                   ad_help_file_url=adAccountHelpFile,
+                                                                   mail_host=json_data['mailServerSmtpServer'],
+                                                                   mail_user=json_data['mailServerAdmin'],
+                                                                   mail_pwd=json_data['mailServerAdminPwd'],
+                                                                   mail_sender=json_data['mailServerSender'],
+                                                                   ad_help_file_url=json_data['adAccountHelpFile'],
                                                                    mail_rcv=email,
                                                                    )
                 if send_mail_res == 0:
@@ -437,8 +451,6 @@ def create_obj(dn=None, type='user', info=None):
                     # 此时密码请保留一份
                     error_logger.log("发送邮件失败，保留账号: " + sam + "密码: " + new_pwd)
                     return 1
-                # 密码设置为下次登录需要修改密码
-                # conn.modify(dn, {'pwdLastSet': (2, [0])})                                  # 设置第一次登录必须修改密码
         else:
             return add_result['result']
 
@@ -1074,7 +1086,7 @@ def send_create_ad_user_init_info_mail(sam: string,
         </body></html>
         """
         msgAlternative.attach(MIMEText(mail_msg, 'html', 'utf-8'))
-        fp = open('static\\images\\zy.png', 'rb')       # 图片位置
+        fp = open(os.path.join(settings.BASE_DIR, r"static\images\zy.png"), 'rb')       # 图片位置
         msgImage = MIMEImage(fp.read())
         fp.close()
         # 定义图片 ID，在 HTML 文本中引用
@@ -1664,7 +1676,7 @@ def test_send_create_ad_user_init_info_mail(sam: string,
         </body></html>
         """
         msgAlternative.attach(MIMEText(mail_msg, 'html', 'utf-8'))
-        fp = open('static\\images\\zy.png', 'rb')       # 图片位置
+        fp = open(os.path.join(settings.BASE_DIR, r"static\images\zy.png"), 'rb')       # 图片位置
         msgImage = MIMEImage(fp.read())
         fp.close()
         # 定义图片 ID，在 HTML 文本中引用

@@ -172,7 +172,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (BASE_DIR, 'static')
 
 # 日志
-LOG_PATH = './'
 LOGGING = {
     # version 值只能为1
     'version': 1,
@@ -197,7 +196,7 @@ LOGGING = {
             # 指定日志文件大小，若超过指定的文件大小，会再生成一个新的日志文件保存日志信息
             'class': 'logging.handlers.RotatingFileHandler',
             # 文件地址
-            'filename': '%s/info.log' % LOG_PATH,
+            'filename': '%s/info.log' % BASE_DIR,
             # 指定保存格式
             'formatter': 'simple',
             'encoding': 'utf-8',
@@ -205,21 +204,21 @@ LOGGING = {
         'info_handlers': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '%s/info.log' % LOG_PATH,
+            'filename': '%s/info.log' % BASE_DIR,
             'formatter': 'simple',
             'encoding': 'utf-8',
         },
         'warning_handlers': {
             'level': 'WARNING',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '%s/info.log' % LOG_PATH,
+            'filename': '%s/info.log' % BASE_DIR,
             'formatter': 'simple',
             'encoding': 'utf-8',
         },
         'error_handlers': {
             'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '%s/error.log' % LOG_PATH,
+            'filename': '%s/error.log' % BASE_DIR,
             'formatter': 'standard',
             'encoding': 'utf-8',
         },
