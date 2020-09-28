@@ -6,7 +6,6 @@ import json
 from ldap3 import (ALL, ALL_ATTRIBUTES, MODIFY_REPLACE, NTLM, SASL, SIMPLE,
                    SUBTREE, SYNC, Connection, Server)
 import winrm
-from django.conf import settings
 import random
 import re
 import string
@@ -16,15 +15,19 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 # redis
-import redis
 from django_redis import get_redis_connection
-import demjson
-import pickle
+import logging
+
+logger = logging.getLogger("info_logger")
+error_logger = logging.getLogger("error_logger")
+
 # Create your views here.
 
 
 @csrf_exempt
 def test_send_mail(request):
+    '''测试邮件连通性
+    '''
     if request.method == 'POST':
         # 接受前端请求数据
         data_req = json.loads(request.body)
@@ -155,9 +158,10 @@ def test_access_ad_server(json_data) -> object:
             auto_bind=True,
             read_only=False,                # 禁止修改数据True
             receive_timeout=3)             # 10秒内没返回消息则触发超时异常
-        print("distinguishedName:%s res: %s" % (settings.AD_ADMIN, conn.bind()))
+        logger.info("测试连接AD域服务器成功! distinguishedName:%s res: %s" % (json_data['adminAccount'], conn.bind()))
         return 0
     except BaseException:
+        error_logger.error("测试连接AD域服务器失败! distinguishedName:%s res: %s" % (json_data['adminAccount'], conn.bind()))
         return -1
     finally:
         conn.closed
@@ -223,26 +227,33 @@ def save_ad_server_config(request):
 def access_ad_server() -> object:
     '''连接生产AD域服务器，返回连接对象
     '''
-    SERVER = Server(host=settings.AD_IP,
-                    port=636,               # 636安全端口
-                    use_ssl=True,
-                    get_info=ALL,
-                    connect_timeout=3)      # 连接超时为3秒
+    # 从redis读取AD配置
+    conn_redis = get_redis_connection("configs_cache")
+    str_data = conn_redis.get('AdServerConfig')
+    json_data = json.loads(str_data)
+    adServerIp = json_data['adServerIp']
+    adminAccount = json_data['adminAccount']
+    adminPwd = json_data['adminPwd']
+
+    server_ad = Server(host=adServerIp,
+                       port=636,               # 636安全端口
+                       use_ssl=True,
+                       get_info=ALL,
+                       connect_timeout=3)      # 连接超时为3秒
     try:
-        conn = Connection(
-            server=SERVER,
-            user=settings.AD_ADMIN,
-            password=settings.AD_ADMIN_PWD,
+        conn_ad = Connection(
+            server=server_ad,
+            user=adminAccount,
+            password=adminPwd,
             auto_bind=True,
             read_only=False,                # 禁止修改数据True
             receive_timeout=3)             # 10秒内没返回消息则触发超时异常
-        print("distinguishedName:%s res: %s" % (settings.AD_ADMIN, conn.bind()))
-        return conn
+        logger.info("distinguishedName:%s res: %s" % (adminAccount, conn_ad.bind()))
+        return conn_ad
     except BaseException as e:
-        print(e)
-        print("AD域连接失败，请检查IP/账户/密码")
-    # finally:
-    #     conn.closed
+        error_logger.error(str(e))
+    finally:
+        conn_ad.closed
 
 
 @csrf_exempt
@@ -250,16 +261,23 @@ def fetch_ad_account_list(request) -> json:
     '''查询AD域的账户列表,页数由前端传参,之后改成分页类型的
     '''
     if request.method == 'GET':
-        # 从redis取配置信息
-        redis_conn = get_redis_connection("ad_accounts_cache")
-        str_data = redis_conn.get('AdServerAccounts')
+        # 从redis的配置库读取AD配置
+        conn_redis_configs = get_redis_connection("configs_cache")
+        str_data_config = conn_redis_configs.get('AdServerConfig')
+        json_data = json.loads(str_data_config)
+        searchFilterUser = json_data['searchFilterUser']
+        baseDnEnabled = json_data['baseDnEnabled']
+
+        # 从redis的账号库读取数据
+        conn_redis_accounts = get_redis_connection("ad_accounts_cache")
+        str_data = conn_redis_accounts.get('AdServerAccounts')
         if str_data is not None:
             # 直接从redis取数据
             json_data = json.loads(str_data)
             body = json_data['result']
         else:
             # 连接AD域
-            conn = access_ad_server()
+            conn_ad = access_ad_server()
             # 查询AD服务器
             attr = ['sAMAccountName',
                     'displayName',
@@ -269,9 +287,9 @@ def fetch_ad_account_list(request) -> json:
                     'title',
                     'whenCreated',
                     ]
-            entry_list = conn.extend.standard.paged_search(
-                search_filter=settings.USER_SEARCH_FILTER,
-                search_base=settings.ENABLED_BASE_DN,
+            entry_list = conn_ad.extend.standard.paged_search(
+                search_filter=searchFilterUser,
+                search_base=baseDnEnabled,
                 search_scope=SUBTREE,
                 attributes=attr,
                 paged_size=100,
@@ -293,8 +311,8 @@ def fetch_ad_account_list(request) -> json:
             AdServerAccounts = dict()
             AdServerAccounts['result'] = body
             json_object = json.dumps(AdServerAccounts)
-            redis_conn.set('AdServerAccounts', json_object)
-            print('*********更新redis********')
+            conn_redis_accounts.set('AdServerAccounts', json_object)
+            logger.info('*********更新redis********')
         # 组装返回结果
         res = {
             'code': 0,
@@ -310,7 +328,6 @@ def add_ad_account(request):
     '''
     if request.method == 'POST':
         data_req = json.loads(request.body)
-        print(data_req)
         # 接受前端请求数据
         eid = data_req.get('eid')
         name = data_req.get('name')
@@ -319,15 +336,24 @@ def add_ad_account(request):
         tel = data_req.get('tel')
         title = data_req.get('title')
         # 准备AD域创建用户所需要的数据
+        # 从redis的配置库读取AD配置
+        conn_redis_configs = get_redis_connection("configs_cache")
+        str_data_config = conn_redis_configs.get('AdServerConfig')
+        json_data = json.loads(str_data_config)
+        baseDn = json_data['baseDn']
+        zyPrefix = json_data['zyPrefix']
+        handPrefix = json_data['handPrefix']
+        baseDnHand = json_data['baseDnHand']
+
         # 用户组织判断
         if department.split('.')[0] == '甄云科技':
-            sam_prefix = settings.ZHENYUN_SAM_PREFIX
+            sam_prefix = zyPrefix
             department_list = department.split('.')
             department_list.insert(1, '上海总部')
-            dn = 'CN=' + str(name + str(eid)) + ',' + 'OU=' + ',OU='.join(department_list[::-1]) + ',' + settings.BASE_DN
+            dn = 'CN=' + str(name + str(eid)) + ',' + 'OU=' + ',OU='.join(department_list[::-1]) + ',' + baseDn
         else:
-            sam_prefix = settings.HAND_SAM_PREFIX
-            dn = settings.HAND_BASE_DN + ',' + settings.BASE_DN
+            sam_prefix = handPrefix
+            dn = baseDnHand + ',' + baseDn
         sam = sam_prefix + str(eid).zfill(6)
         user_info = [sam, dn, name, email, tel, title]
 
@@ -345,6 +371,7 @@ def add_ad_account(request):
             'code': create_res_code,
             'message': res_code_map[create_res_code],
         }
+        logger.info(res_code_map[create_res_code] + dn)
         return JsonResponse(res)
 
 
@@ -406,8 +433,9 @@ def create_obj(dn=None, type='user', info=None):
                 if send_mail_res == 0:
                     return 0
                 else:
-                    return 1
                     # 此时密码请保留一份
+                    error_logger.log("发送邮件失败，保留账号: " + sam + "密码: " + new_pwd)
+                    return 1
                 # 密码设置为下次登录需要修改密码
                 # conn.modify(dn, {'pwdLastSet': (2, [0])})                                  # 设置第一次登录必须修改密码
         else:
@@ -445,9 +473,15 @@ def check_ou(conn, ou, ou_list=None):
     不管是新建还是修改了名字，都会将人员转移到新的OU下面：需要新建OU则创建OU后再添加/转移人员
     check_ou的作用是为人员的变动准备好OU
     '''
+    # 从redis的配置库读取AD配置
+    conn_redis_configs = get_redis_connection("configs_cache")
+    str_data_config = conn_redis_configs.get('AdServerConfig')
+    json_data = json.loads(str_data_config)
+    searchFilterOu = json_data['searchFilterOu']
+
     if ou_list is None:
         ou_list = []
-    conn.search(ou, settings.OU_SEARCH_FILTER)      # 判断OU存在性
+    conn.search(ou, searchFilterOu)      # 判断OU存在性
 
     while conn.result['result'] == 0:
         if ou_list:
@@ -1048,7 +1082,7 @@ def send_create_ad_user_init_info_mail(sam: string,
         smtpObj.sendmail(from_addr=mail_user, to_addrs=[mail_rcv], msg=str(message))
         return 0
     except smtplib.SMTPException as e:
-        print(str(e))
+        error_logger(str(e))
         return 1
     smtpObj.quit()
 
@@ -1636,8 +1670,9 @@ def test_send_create_ad_user_init_info_mail(sam: string,
         msgImage.add_header('Content-ID', '<zy>')
         message.attach(msgImage)
         smtpObj.sendmail(from_addr=mail_user, to_addrs=[mail_rcv], msg=str(message))
+        logger.info("测试发送邮件成功!" + "测试发件人: " + mail_user + "测试收件人: " + mail_rcv)
         return 0
     except smtplib.SMTPException as e:
-        print(str(e))
+        error_logger(str(e))
         return 1
     smtpObj.quit()

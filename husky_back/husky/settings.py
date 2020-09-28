@@ -170,15 +170,75 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# AD服务器连接信息
-AD_IP = '192.168.1.62'                                          # IP
-AD_ADMIN = 'CN=Administrator,CN=Users,DC=GOING-LINK,DC=com'     # 管理员
-AD_ADMIN_PWD = 'MIv8YqCmE1a5J5wL'                               # 管理员密码
-USER_SEARCH_FILTER = '(objectclass=user)'                       # 只获取用户对象 过滤条件
-OU_SEARCH_FILTER = '(objectclass=organizationalUnit)'           # 只获取OU对象 过滤条件
-DISABLED_BASE_DN = 'OU=disabled,DC=GOING-LINK,DC=com'           # 离职账户所在OU
-ENABLED_BASE_DN = 'OU=甄云科技,DC=GOING-LINK,DC=com'
-BASE_DN = 'DC=GOING-LINK,DC=com'                                # AD域基础路径
-ZHENYUN_SAM_PREFIX = 'Z'
-HAND_SAM_PREFIX = 'HAND'
-HAND_BASE_DN = 'OU=汉得信息,OU=上海总部,OU=甄云科技'
+# 日志
+LOG_PATH = './'
+LOGGING = {
+    # version 值只能为1
+    'version': 1,
+    # True 表示禁用loggers
+    'disable_existing_loggers': False,
+    # < 格式化 >
+    'formatters': {
+        # 可以设置多种格式，根据需要选择保存的格式
+        'simple': {
+            'format': '%(levelname)s %(asctime)s pathname:%(pathname)s %(message)s'
+        },
+        'standard': {
+            'format': '%(levelname)s %(asctime)s pathname:%(pathname)s function:%(funcName)s lineno:%(lineno)s %(message)s'
+        }
+    },
+    'filters': {
+    },
+    # < 处理信息 >
+    'handlers': {
+        'debug_handlers': {
+            'level': 'DEBUG',
+            # 指定日志文件大小，若超过指定的文件大小，会再生成一个新的日志文件保存日志信息
+            'class': 'logging.handlers.RotatingFileHandler',
+            # 文件地址
+            'filename': '%s/info.log' % LOG_PATH,
+            # 指定保存格式
+            'formatter': 'simple',
+            'encoding': 'utf-8',
+        },
+        'info_handlers': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '%s/info.log' % LOG_PATH,
+            'formatter': 'simple',
+            'encoding': 'utf-8',
+        },
+        'warning_handlers': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '%s/info.log' % LOG_PATH,
+            'formatter': 'simple',
+            'encoding': 'utf-8',
+        },
+        'error_handlers': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '%s/error.log' % LOG_PATH,
+            'formatter': 'standard',
+            'encoding': 'utf-8',
+        },
+    },
+    'loggers': {
+        'debug_logger': {
+            'handlers': ['debug_handlers'],
+            'level': 'DEBUG'
+        },
+        'info_logger': {
+            'handlers': ['info_handlers'],
+            'level': 'INFO'
+        },
+        'warning_logger': {
+            'handlers': ['warning_handlers'],
+            'level': 'WARNING'
+        },
+        'error_logger': {
+            'handlers': ['error_handlers'],
+            'level': 'ERROR'
+        }
+    }
+}

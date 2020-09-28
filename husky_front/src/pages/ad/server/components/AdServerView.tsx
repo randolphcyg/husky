@@ -129,6 +129,11 @@ const AdServerView: React.FC<AdServerFormProps> = (props) => {
           {/* 需要改成下拉搜索框组件，存储 XX公司: XX公司账号前缀 常量键值对 */}
           <ProFormText name="zyPrefix" label="SAM账号前缀-子公司" placeholder="Z" />
           <ProFormText name="handPrefix" label="SAM账号前缀-母公司" placeholder="HAND" />
+          <ProFormText name="searchFilterUser" label="用户对象过滤条件" placeholder="(objectclass=user)" />
+          <ProFormText name="searchFilterOu" label="OU对象过滤条件" placeholder="(objectclass=organizationalUnit)" />
+          <ProFormText name="baseDnDisabled" label="离职账户OU" placeholder="OU=disabled,DC=GOING-LINK,DC=com" />
+          <ProFormText name="baseDnEnabled" label="在职账户OU" placeholder="OU=甄云科技,DC=GOING-LINK,DC=com" />
+          <ProFormText name="baseDnHand" label="HAND账户OU" placeholder="OU=汉得信息,OU=上海总部,OU=甄云科技" />
         </ProForm.Group>
         <Button type="default" onClick={() => {
           proForm.validateFields()

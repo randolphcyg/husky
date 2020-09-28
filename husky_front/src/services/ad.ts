@@ -18,6 +18,11 @@ export interface AdServerFormItemProps {
   adminPwd: string;
   zyPrefix: string;
   handPrefix: string;
+  searchFilterUser: string;
+  searchFilterOu: string;
+  baseDnDisabled: string;
+  baseDnEnabled: string;
+  baseDnHand: string;
 }
 
 // AD服务器表单接口
