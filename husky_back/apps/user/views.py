@@ -16,14 +16,14 @@ def login_view(request):
         req_data = json.loads(request.body)
         username = req_data.get("username")
         password = req_data.get("password")
-        type = req_data.get("type")
+        type_req = req_data.get("type")
         user = authenticate(username=username, password=password)
         if user:
             login(request, user)        # 后端登录
             res = {'name': 'admin',
                    'password': 'admin',
                    'status': 'ok',
-                   'type': 'account'}
+                   'type': str(type_req)}
         else:       # 数据库校验失败
             res = {'status': 'error',
                    'type': '', }

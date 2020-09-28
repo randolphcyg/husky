@@ -16,24 +16,24 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include, url
-from user.views import login_view, current_user
-from visual.views import bugs
-from ad.views import (fetch_ad_account_list,
-                      add_ad_account,
-                      save_ad_server_config,
-                      test_ad_server_config_is_connect,
-                      load_ad_server_config_form_data,
-                      load_mail_server_config_form_data,
-                      save_mail_server_config,
-                      test_send_mail,
-                      )
+from apps.user.views import login_view, current_user
+from apps.visual.views import bugs
+from apps.ad.views import (fetch_ad_account_list,
+                           add_ad_account,
+                           save_ad_server_config,
+                           test_ad_server_config_is_connect,
+                           load_ad_server_config_form_data,
+                           load_mail_server_config_form_data,
+                           save_mail_server_config,
+                           test_send_mail,
+                           )
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
     url(r'^api/login', login_view, name='login'),
     url(r'^api/currentUser', current_user, name='currentUser'),
-    url(r'^api/items', bugs, name='items'),
+    url(r'^api/items', bugs, name='items'),     # bug可视化暂时接口
     url(r'^api/fetchAdAccountList', fetch_ad_account_list, name='fetchAdAccountList'),     # 读取AD服务器账号列表
     url(r'^api/addAdAccount', add_ad_account, name='addAdAccount'),       # 创建AD服务器账号
     url(r'api/saveAdServerConfig', save_ad_server_config, name='saveAdServerConfig'),      # 保存AD服务器配置
