@@ -160,4 +160,4 @@ const AdServerView: React.FC<AdServerFormProps> = (props) => {
 }
 
 // export default AdServerView;
-export default connect(({ }) => ({}))(AdServerView);
+export default connect(({ }) => ({ }))(AdServerView);

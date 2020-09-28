@@ -49,6 +49,14 @@ export default defineConfig({
       icon: 'smile',
       component: './Welcome',
     },
+    // 配置中心
+    {
+      path: '/config',
+      name: 'config',
+      icon: 'setting',
+      access: 'canAdmin',
+      component: './config',
+    },
     // AD域
     {
       path: '/ad',
@@ -57,14 +65,14 @@ export default defineConfig({
       access: 'canAdmin',
       routes: [
         {
-          path: '/ad/server',
-          name: 'server',
-          component: './ad/server',
-        },
-        {
           path: '/ad/account',
           name: 'account',
           component: './ad/account',
+        },
+        {
+          path: '/ad/server',
+          name: 'server',
+          component: './ad/server',
         },
       ],
     },
