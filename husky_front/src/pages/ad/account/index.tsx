@@ -1,46 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Divider, Modal, message } from 'antd';
-import { connect } from 'umi';
+import { AdAccountInfoItemProps, AdAccountParamsType, addAdAccount, ModalFormProps } from "@/services/ad";
 import ProCard from '@ant-design/pro-card';
-import ProTable from '@ant-design/pro-table';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
-import { ProColumnType } from '@ant-design/pro-table/es/Table'   // 最先进的antd pro protable 泛型
-// import { CommonFormProps } from '@ant-design/pro-form/es/BaseForm'; // 最先进的antd pro form 泛型
-import { AdAccountParamsType, addAdAccount, ModalFormProps, ModalFormItemProps, AdAccountInfoItemProps } from "@/services/ad";
+import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import ProTable from '@ant-design/pro-table';
+import { ProColumnType } from '@ant-design/pro-table/es/Table'; // 最先进的antd pro protable 泛型
+import { Button, Divider, message, Modal } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { request } from 'umi';
 
-const AdAccountPage: React.FC<ModalFormProps> = (props) => {
-  const [visible, setVisible] = useState(false);
+const AdAccountPage: React.FC<ModalFormProps> = () => {
   const [proForm] = ProForm.useForm();
-  const { ad } = props;
-  const { adAccountList, loading } = ad;
+  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [visibleOption, setVisibleOption] = useState(false);
 
   const columns: Array<ProColumnType<AdAccountInfoItemProps>> = [
     {
       title: '账号',
       dataIndex: 'sam',
       hideInForm: true,
-      fixed: 'left',
+      fixed: 'left',      // 固定左侧
       width: '10%',
     },
     {
       title: '姓名',
       dataIndex: 'name',
       width: '8%',
-    },
-    {
-      title: '部门',
-      dataIndex: 'department',
-      copyable: true,    //多出来一个蓝色的复制icon，点击就直接进行复制
-      ellipsis: true,   //用...代替没有显示的文本，并且在鼠标移到相应的文本上会显示全部的相应文本
-      hideInForm: true,
-      width: '22%',
+      copyable: true,
     },
     {
       title: '邮箱',
       dataIndex: 'email',
       copyable: true,
       hideInForm: true,
+      hideInSearch: true,
       width: '20%',
     },
     {
@@ -48,14 +41,23 @@ const AdAccountPage: React.FC<ModalFormProps> = (props) => {
       dataIndex: 'telphone',
       copyable: true,
       hideInForm: true,
+      hideInSearch: true,
       width: '10%',
     },
     {
       title: '职位',
       dataIndex: 'title',
-      copyable: true,
       hideInForm: true,
+      hideInSearch: true,
       width: '10%',
+    },
+    {
+      title: '部门',
+      dataIndex: 'department',
+      copyable: true,           // 可复制
+      ellipsis: true,           // 省略过长文本
+      hideInForm: true,
+      width: '22%',
     },
     {
       title: '操作',
@@ -64,19 +66,12 @@ const AdAccountPage: React.FC<ModalFormProps> = (props) => {
       hideInSearch: true,
       fixed: 'right',
       width: '20%',
-      render: () => <a>重设密码</a>,
+      render: () => <Button danger onClick={resetPwd} disabled>重设密码</Button>,
     },
   ]
 
-  //获取AD域账户列表
-  function loadData() {
-    //使用connect后，dispatch通过props传给了组件
-    const { dispatch } = props;
-    dispatch({ type: 'ad/fetchAdAccountList', payload: [] });
-  }
   //函数组件
   useEffect(() => {
-    loadData();
   }, [])
 
   async function handleSubmit(values: AdAccountParamsType) {
@@ -97,7 +92,7 @@ const AdAccountPage: React.FC<ModalFormProps> = (props) => {
   };
 
   // 创建账号
-  const onCreate = (values:AdAccountParamsType) => {
+  const onCreate = (values: AdAccountParamsType) => {
     handleSubmit(values);
     setVisible(false);
   };
@@ -106,17 +101,59 @@ const AdAccountPage: React.FC<ModalFormProps> = (props) => {
     console.log('批量创建账号会提供一个表格模板，填写后上传校验并批量创建账号')
   }
 
+  // 重设密码
+  function resetPwd() {
+    setVisibleOption(true)
+    console.log('重设密码')
+  }
+
   return (
     <PageHeaderWrapper>
       <ProTable
         headerTitle="AD域用户列表"
         rowKey="sam"
-        columns={columns}         // 列名
-        dataSource={adAccountList}   // 数据源
-        loading={loading}         // 加载中
-        scroll={{ x: 1300 }}      // 滑动轴
-        search={true}             // 搜索
-        pagination={true}         // 分页
+        columns={columns}             // 列名
+        loading={loading}             // 加载中
+        onLoad={() => setLoading(false)}  // 数据加载完操作
+        scroll={{ x: 1300 }}          // 滑动轴
+        pagination={{                 // 分页
+          showQuickJumper: true,
+        }}
+        // 表格请求数据
+        request={async (params = {}) =>
+          request<{
+            data: AdAccountInfoItemProps[];
+          }>('/api/fetchAdAccountList', {
+            params,
+          })
+        }
+        // 表格搜索
+        search={{
+          defaultCollapsed: false,
+          defaultColsNumber: 1,
+          span: 6,
+          optionRender: ({ searchText, resetText }, { form }) => {
+            return [
+              <a
+                key="searchText"
+                onClick={() => {
+                  form?.submit();
+                }}
+              >
+                {searchText}
+              </a>,
+              <a
+                key="resetText"
+                onClick={() => {
+                  form?.resetFields();
+                }}
+              >
+                {resetText}
+              </a>,
+              // <a key="out">导出</a>,
+            ];
+          },
+        }}
         toolBarRender={() => [
           <Button type="primary" key='btn-addAdAccount' onClick={() => setVisible(true)}>创建账号</Button>,
           <Divider key='divider-addAdAccount' type="vertical" />,
@@ -213,8 +250,21 @@ const AdAccountPage: React.FC<ModalFormProps> = (props) => {
           </ProForm>
         </ProCard>
       </Modal>
+      <Modal
+        title="操作提醒"
+        visible={visibleOption}
+        onOk={() => setVisibleOption(false)}
+        onCancel={() => setVisibleOption(false)}
+        okText="确认"
+        cancelText="取消"
+      >
+        <p>原密码忘记</p>
+        <p>管理员重改随机密码[做]</p>
+        <p>并发送邮件</p>
+        <p>或者用户自己修改指定密码[不做]</p>
+      </Modal>
     </PageHeaderWrapper>
   );
 };
 
-export default connect(({ ad }) => ({ ad }))(AdAccountPage);
+export default AdAccountPage;

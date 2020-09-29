@@ -327,7 +327,7 @@ def fetch_ad_account_list(request) -> json:
         res = {
             'code': 0,
             'message': '成功',
-            'body': body
+            'data': body
         }
         return JsonResponse(res)
 

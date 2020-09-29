@@ -63,7 +63,6 @@ export interface ModalFormProps {
  * @description 获取列表
  */
 export async function fetchAdAccountList() {
-  console.log('触发service fetchAdAccountList');
   return request('/api/fetchAdAccountList', {
     method: 'GET',
   });
