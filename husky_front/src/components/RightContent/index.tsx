@@ -52,11 +52,11 @@ const GlobalHeaderRight: React.FC<{}> = () => {
       //   //console.log('input', value);
       // }}
       />
-      <Tooltip title="平台使用说明文档">
+      <Tooltip title="husky说明文档">
         <span
           className={styles.action}
           onClick={() => {
-            window.location.href = 'https://blog.csdn.net/qq_33997198/article/details/108515387';
+            window.location.href = 'https://blog.csdn.net/qq_33997198/article/details/107937956';
           }}
         >
           <QuestionCircleOutlined />

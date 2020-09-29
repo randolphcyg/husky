@@ -43,6 +43,7 @@ export default defineConfig({
         },
       ],
     },
+    // 欢迎页
     {
       path: '/welcome',
       name: 'welcome',

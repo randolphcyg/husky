@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import { FormattedMessage, Dispatch, connect } from 'umi';
-import { GridContent } from '@ant-design/pro-layout';
+import { PageContainer } from '@ant-design/pro-layout';
 import { Menu } from 'antd';
 import MailServerView from './components/MailServerView';
 import AdServerView from './components/AdServerView';
@@ -114,7 +114,7 @@ class Settings extends Component<SettingsProps, SettingsState> {
   render() {
     const { mode, selectKey } = this.state;
     return (
-      <GridContent>
+      <PageContainer title='配置中心'>
         <div
           className={styles.main}
           ref={(ref) => {
@@ -137,11 +137,11 @@ class Settings extends Component<SettingsProps, SettingsState> {
             {this.renderChildren()}
           </div>
         </div>
-      </GridContent>
+      </PageContainer>
     );
   }
 }
 
 export default connect(
-  ({ accountAndsettings }: { accountAndsettings: { } }) => ({ }),
+  ({ accountAndsettings }: { accountAndsettings: {} }) => ({}),
 )(Settings);
