@@ -28,6 +28,20 @@ error_logger = logging.getLogger("error_logger")
 
 
 @csrf_exempt
+def modify_ad_account_pwd(dn: str) -> str:
+    '''AD域自动修改密码方法
+    '''
+    conn_ad = access_ad_server()
+    new_pwd = generate_pwd(8)
+    old_pwd = ''
+    modify_pwd_res = conn_ad.extend.microsoft.modify_password(dn, new_pwd, old_pwd)          # 初始化密码
+    # 密码设置为下次登录需要修改密码
+    # conn_ad.modify(dn, {'pwdLastSet': (2, [0])})                          # 设置第一次登录必须修改密码
+    print(modify_pwd_res)
+    return new_pwd
+
+
+@csrf_exempt
 def test_send_mail(request):
     '''测试邮件连通性
     '''
@@ -255,6 +269,7 @@ def access_ad_server() -> object:
         logger.info("distinguishedName:%s res: %s" % (adminAccount, conn_ad.bind()))
         return conn_ad
     except BaseException as e:
+        # 如果AD服务器连接超时,则需要返回网络错误，不能返回程序错误
         error_logger.error(str(e))
     finally:
         conn_ad.closed
@@ -363,7 +378,7 @@ def add_ad_account(request):
             dn = 'CN=' + str(name + str(eid)) + ',' + 'OU=' + ',OU='.join(department_list[::-1]) + ',' + baseDn
         else:
             sam_prefix = handPrefix
-            dn = baseDnHand + ',' + baseDn
+            dn = 'CN=' + str(name + str(eid)) + ',' + baseDnHand
         sam = sam_prefix + str(eid).zfill(6)
         user_info = [sam, dn, name, email, tel, title]
 
@@ -410,19 +425,14 @@ def create_obj(dn=None, type='user', info=None):
     # 用到的时候连接AD服务器
     conn_ad = access_ad_server()
     check_ou_res = check_ou(conn_ad, dn_base)
-    if not check_ou_res:
+    if not check_ou_res:        # 判断是否有这个OU路径 没有则返回-2
         return -2
     else:
         conn_ad.add(dn=dn, object_class=object_class[type], attributes=user_attr)
         add_result = conn_ad.result
         if add_result['result'] == 0:
             if type == 'user':          # 若是新增用户对象，则需要一些初始化操作
-                conn_ad.modify(dn, {'userAccountControl': [('MODIFY_REPLACE', 512)]})         # 激活用户                                                               # 如果是用户时
-                new_pwd = generate_pwd(8)
-                old_pwd = ''
-                conn_ad.extend.microsoft.modify_password(dn, new_pwd, old_pwd)                # 初始化密码
-                # 密码设置为下次登录需要修改密码
-                # conn_ad.modify(dn, {'pwdLastSet': (2, [0])})                                # 设置第一次登录必须修改密码
+                new_pwd = modify_ad_account_pwd(dn=dn)
                 # 此时账号已经创建，则需要从AD域向redis更新账号信息
                 # 从redis的配置库读取AD配置 数据由AD服务器返回
                 conn_redis_configs = get_redis_connection("configs_cache")
