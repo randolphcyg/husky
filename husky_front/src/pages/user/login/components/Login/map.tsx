@@ -30,7 +30,7 @@ export default {
       prefix: <LockTwoTone className={styles.prefixIcon} />,
       type: 'password',
       id: 'password',
-      placeholder: '888888',
+      placeholder: 'admin',
     },
     rules: [
       {
@@ -43,16 +43,12 @@ export default {
     props: {
       size: 'large',
       prefix: <MobileTwoTone className={styles.prefixIcon} />,
-      placeholder: 'mobile number',
+      placeholder: 'ldap account',
     },
     rules: [
       {
         required: true,
-        message: 'Please enter mobile number!',
-      },
-      {
-        pattern: /^1\d{10}$/,
-        message: 'Wrong mobile number format!',
+        message: 'Please enter ldap account!',
       },
     ],
   },
@@ -60,12 +56,12 @@ export default {
     props: {
       size: 'large',
       prefix: <MailTwoTone className={styles.prefixIcon} />,
-      placeholder: 'captcha',
+      placeholder: 'ldap pwd',
     },
     rules: [
       {
         required: true,
-        message: 'Please enter Captcha!',
+        message: 'Please enter ldap pwd!',
       },
     ],
   },

@@ -2,7 +2,7 @@ import { Alert, Checkbox, message } from 'antd';
 import React, { useState } from 'react';
 import { Link, SelectLang, useModel, history, History } from 'umi';
 import logo from '@/assets/logo.svg';
-import { LoginParamsType, fakeAccountLogin } from '@/services/login';
+import { LoginParamsType, huskyAccountLogin } from '@/services/login';
 import Footer from '@/components/Footer';
 import LoginFrom from './components/Login';
 import styles from './style.less';
@@ -44,10 +44,12 @@ const Login: React.FC<{}> = () => {
   const [autoLogin, setAutoLogin] = useState(true);
   const [type, setType] = useState<string>('account');
   const handleSubmit = async (values: LoginParamsType) => {
+    console.log(values)
     setSubmitting(true);
     try {
       // 登录
-      const msg = await fakeAccountLogin({ ...values, type });
+      console.log('huskyAccountLogin')
+      const msg = await huskyAccountLogin({ ...values, type });
       if (msg.status === 'ok' && initialState) {
         message.success('登录成功！');
         const currentUser = await initialState?.fetchUserInfo();
@@ -86,7 +88,7 @@ const Login: React.FC<{}> = () => {
 
         <div className={styles.main}>
           <LoginFrom activeKey={type} onTabChange={setType} onSubmit={handleSubmit}>
-            <Tab key="account" tab="账户密码登录">
+            <Tab key="account" tab="husky账户密码登录">
               {status === 'error' && loginType === 'account' && !submitting && (
                 <LoginMessage content="账户或密码错误!" />
               )}
@@ -112,34 +114,30 @@ const Login: React.FC<{}> = () => {
                 ]}
               />
             </Tab>
-            <Tab key="mobile" tab="手机号登录">
+            <Tab key="mobile" tab="ldap登录">
               {status === 'error' && loginType === 'mobile' && !submitting && (
                 <LoginMessage content="验证码错误" />
               )}
               <Mobile
                 name="mobile"
-                placeholder="手机号"
+                placeholder="ldap账号"
                 rules={[
                   {
                     required: true,
-                    message: '请输入手机号！',
-                  },
-                  {
-                    pattern: /^1\d{10}$/,
-                    message: '手机号格式错误！',
+                    message: '请输入ldap账号！',
                   },
                 ]}
               />
               <Captcha
                 name="captcha"
-                placeholder="验证码"
+                placeholder="ldap密码"
                 countDown={120}
                 getCaptchaButtonText=""
                 getCaptchaSecondText="秒"
                 rules={[
                   {
                     required: true,
-                    message: '请输入验证码！',
+                    message: '请输入ldap密码！',
                   },
                 ]}
               />

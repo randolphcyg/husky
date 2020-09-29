@@ -8,7 +8,8 @@ export interface LoginParamsType {
   type: string;
 }
 
-export async function fakeAccountLogin(params: LoginParamsType) {
+// husky系统自带登录方法
+export async function huskyAccountLogin(params: LoginParamsType) {
   return request<API.LoginStateType>('/api/login/', {
     method: 'POST',
     data: params,
@@ -21,4 +22,12 @@ export async function getFakeCaptcha(mobile: string) {
 
 export async function outLogin() {
   return request('/api/login/outLogin');
+}
+
+// ldap登录方式
+export async function ldapAccountLogin(params: LoginParamsType) {
+  return request<API.LoginStateType>('/api/ldapLogin/', {
+    method: 'POST',
+    data: params,
+  });
 }
