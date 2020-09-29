@@ -1086,7 +1086,8 @@ def send_create_ad_user_init_info_mail(sam: string,
         </body></html>
         """
         msgAlternative.attach(MIMEText(mail_msg, 'html', 'utf-8'))
-        fp = open(os.path.join(settings.BASE_DIR, r"static\images\zy.png"), 'rb')       # 图片位置
+        img_url = os.path.join(settings.BASE_DIR, r"static\images\zy.png")
+        fp = open(img_url, 'rb')       # 图片位置
         msgImage = MIMEImage(fp.read())
         fp.close()
         # 定义图片 ID，在 HTML 文本中引用
@@ -1676,7 +1677,8 @@ def test_send_create_ad_user_init_info_mail(sam: string,
         </body></html>
         """
         msgAlternative.attach(MIMEText(mail_msg, 'html', 'utf-8'))
-        fp = open(os.path.join(settings.BASE_DIR, r"static\images\zy.png"), 'rb')       # 图片位置
+        img_url = os.path.join(settings.BASE_DIR, r"static\images\zy.png")
+        fp = open(img_url, 'rb')       # 图片位置
         msgImage = MIMEImage(fp.read())
         fp.close()
         # 定义图片 ID，在 HTML 文本中引用
