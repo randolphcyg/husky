@@ -6,8 +6,18 @@ import { LoginParamsType, huskyAccountLogin } from '@/services/login';
 import Footer from '@/components/Footer';
 import LoginFrom from './components/Login';
 import styles from './style.less';
+import LoginTab from './components/Login/LoginTab';
+import LoginSubmit from './components/Login/LoginSubmit';
+import LoginItem from './components/Login/LoginItem';
 
-const { Tab, Username, Password, Mobile, Captcha, Submit } = LoginFrom;
+const Tab = LoginTab;
+const Submit = LoginSubmit;
+
+const Username = LoginItem.Username;
+const Password = LoginItem.Password;
+const Ldap = LoginItem.Ldap;
+const LdapPwd = LoginItem.LdapPwd;
+// const { Tab, Username, Password, Ldap, LdapPwd, Submit } = LoginFrom;
 
 const LoginMessage: React.FC<{
   content: string;
@@ -114,12 +124,12 @@ const Login: React.FC<{}> = () => {
                 ]}
               />
             </Tab>
-            <Tab key="mobile" tab="ldap登录">
-              {status === 'error' && loginType === 'mobile' && !submitting && (
-                <LoginMessage content="验证码错误" />
+            <Tab key="ldap" tab="ldap登录">
+              {status === 'error' && loginType === 'ldap' && !submitting && (
+                <LoginMessage content="ldap账号或密码错误!" />
               )}
-              <Mobile
-                name="mobile"
+              <Ldap
+                name="ldap"
                 placeholder="ldap账号"
                 rules={[
                   {
@@ -128,12 +138,9 @@ const Login: React.FC<{}> = () => {
                   },
                 ]}
               />
-              <Captcha
-                name="captcha"
+              <LdapPwd
+                name="ldapPwd"
                 placeholder="ldap密码"
-                countDown={120}
-                getCaptchaButtonText=""
-                getCaptchaSecondText="秒"
                 rules={[
                   {
                     required: true,

@@ -1,4 +1,4 @@
-import { LockTwoTone, MailTwoTone, MobileTwoTone, UserOutlined } from '@ant-design/icons';
+import { ContactsTwoTone, LockTwoTone, UnlockTwoTone, UserOutlined } from '@ant-design/icons';
 import React from 'react';
 import styles from './index.less';
 
@@ -39,10 +39,10 @@ export default {
       },
     ],
   },
-  Mobile: {
+  Ldap: {
     props: {
       size: 'large',
-      prefix: <MobileTwoTone className={styles.prefixIcon} />,
+      prefix: <ContactsTwoTone className={styles.prefixIcon} />,
       placeholder: 'ldap account',
     },
     rules: [
@@ -52,10 +52,11 @@ export default {
       },
     ],
   },
-  Captcha: {
+  LdapPwd: {
     props: {
       size: 'large',
-      prefix: <MailTwoTone className={styles.prefixIcon} />,
+      type: 'password',
+      prefix: <UnlockTwoTone className={styles.prefixIcon} />,
       placeholder: 'ldap pwd',
     },
     rules: [
