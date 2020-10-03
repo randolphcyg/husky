@@ -28,6 +28,77 @@ error_logger = logging.getLogger("error_logger")
 
 
 @csrf_exempt
+def ldap_login(request):
+    '''LDAP登录方式
+    '''
+    if request.method == 'POST':
+        req_data = json.loads(request.body)
+        ldap = req_data.get("ldap")
+        ldap_pwd = req_data.get("ldapPwd")
+        type_req = req_data.get("type")
+        print(ldap, ldap_pwd, type_req)
+        # 从redis读取AD配置
+        conn_redis = get_redis_connection("configs_cache")
+        str_data = conn_redis.get('AdServerConfig')
+        json_data = json.loads(str_data)
+        adServerIp = json_data['adServerIp']
+        baseDn = json_data['baseDn']
+        conn_ad = access_ad_server()
+        print('(sAMAccountName={})'.format(ldap))
+        res = conn_ad.search(
+            search_base=baseDn,
+            search_filter='(sAMAccountName={})'.format(ldap),
+            search_scope=SUBTREE,
+            attributes=['cn', 'givenName', 'mail', 'sAMAccountName'],
+            paged_size=5
+        )
+        print(res)
+
+        if res:
+            if hasattr(entry, 'attributes'):
+                entry = conn_ad.response[0]
+                attr_dict = entry['attributes']
+                # check password by dn
+                try:
+                    SERVER = Server(host=adServerIp,
+                                    port=636,               # 636安全端口
+                                    use_ssl=True,
+                                    get_info=ALL,
+                                    connect_timeout=3)      # 连接超时为3秒
+                    conn_ad_login = Connection(server=SERVER, password=ldap_pwd, check_names=True, lazy=False, raise_exceptions=False)
+                    conn_ad_login.bind()
+                    print(conn_ad_login.result)
+                    if conn_ad_login.result["result"] == 0:
+                        print((True, attr_dict["mail"], attr_dict["sAMAccountName"], attr_dict["givenName"]))
+                        res = {'code': 0,
+                               'message': '登录成功',
+                               'status': 'ok',
+                               }
+                        return JsonResponse(res)
+                    else:
+                        print("Auth Failed")
+                        res = {'code': -1,
+                               'message': '登录失败',
+                               'data': ''}
+                        return (False, None, None, None)
+                except Exception as e:
+                    print(str(e))
+                    print("Auth Failed")
+            # else:
+            #     res = {'code': -1,
+            #            'message': '登录失败',
+            #            'data': ''}
+                # return JsonResponse(res)
+        else:
+            res = {'code': -1,
+                   'message': 'LDAP用户未注册!',
+                   'data': ''}
+            return JsonResponse(res)
+
+        print(res)
+
+
+@csrf_exempt
 def modify_ad_account_pwd(dn: str) -> str:
     '''AD域自动修改密码方法
     '''

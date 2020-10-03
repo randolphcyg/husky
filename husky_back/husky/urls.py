@@ -26,12 +26,14 @@ from apps.ad.views import (fetch_ad_account_list,
                            load_mail_server_config_form_data,
                            save_mail_server_config,
                            test_send_mail,
+                           ldap_login,
                            )
 
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
     url(r'^api/login', login_view, name='login'),
+    url(r'^api/ldapLogin', ldap_login, name='ldapLogin'),
     url(r'^api/currentUser', current_user, name='currentUser'),
     url(r'^api/items', bugs, name='items'),     # bug可视化暂时接口
     url(r'^api/fetchAdAccountList', fetch_ad_account_list, name='fetchAdAccountList'),     # 读取AD服务器账号列表

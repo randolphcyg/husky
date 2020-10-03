@@ -2,7 +2,7 @@ import { Alert, Checkbox, message } from 'antd';
 import React, { useState } from 'react';
 import { Link, SelectLang, useModel, history, History } from 'umi';
 import logo from '@/assets/logo.svg';
-import { LoginParamsType, huskyAccountLogin } from '@/services/login';
+import { LoginParamsType, huskyAccountLogin, ldapAccountLogin } from '@/services/login';
 import Footer from '@/components/Footer';
 import LoginFrom from './components/Login';
 import styles from './style.less';
@@ -52,29 +52,54 @@ const Login: React.FC<{}> = () => {
   const [submitting, setSubmitting] = useState(false);
   const { initialState, setInitialState } = useModel('@@initialState');
   const [autoLogin, setAutoLogin] = useState(true);
-  const [type, setType] = useState<string>('account');
+  const [type, setType] = useState<string>('ldap');
   const handleSubmit = async (values: LoginParamsType) => {
-    console.log(values)
+    console.log(type, values)
     setSubmitting(true);
-    try {
-      // 登录
-      console.log('huskyAccountLogin')
-      const msg = await huskyAccountLogin({ ...values, type });
-      if (msg.status === 'ok' && initialState) {
-        message.success('登录成功！');
-        const currentUser = await initialState?.fetchUserInfo();
-        setInitialState({
-          ...initialState,
-          currentUser,
-        });
-        replaceGoto();
-        return;
+    if (type == 'ldap') {   // ldap登录方式
+      try {
+        // 登录 ldapAccountLogin
+        console.log('ldapAccountLogin')
+        const msg = await ldapAccountLogin({ ...values, type });
+        if (msg.status === 'ok' && initialState) {
+          message.success('LDAP用户登录成功!');
+          const currentUser = await initialState?.fetchUserInfo();
+          setInitialState({
+            ...initialState,
+            currentUser,
+          });
+          replaceGoto();
+          return;
+        } else {
+          message.error(msg.message);
+        }
+        // 如果失败去设置用户错误信息
+        setUserLoginState(msg);
+      } catch (error) {
+        message.error('登录失败，请重试!');
       }
-      // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
-    } catch (error) {
-      message.error('登录失败，请重试！');
+    } else if (type == 'account') {   // account登录方式
+      try {
+        // 登录 huskyAccountLogin 
+        console.log('huskyAccountLogin')
+        const msg = await huskyAccountLogin({ ...values, type });
+        if (msg.status === 'ok' && initialState) {
+          message.success('登录成功!');
+          const currentUser = await initialState?.fetchUserInfo();
+          setInitialState({
+            ...initialState,
+            currentUser,
+          });
+          replaceGoto();
+          return;
+        }
+        // 如果失败去设置用户错误信息
+        setUserLoginState(msg);
+      } catch (error) {
+        message.error('登录失败，请重试!');
+      }
     }
+    // 表单提交状态
     setSubmitting(false);
   };
 
@@ -98,11 +123,35 @@ const Login: React.FC<{}> = () => {
 
         <div className={styles.main}>
           <LoginFrom activeKey={type} onTabChange={setType} onSubmit={handleSubmit}>
-            <Tab key="account" tab="husky账户密码登录">
+            <Tab key="ldap" tab="ldap登录">
+              {status === 'error' && loginType === 'ldap' && !submitting && (
+                <LoginMessage content="ldap账号或密码错误!" />
+              )}
+              <Ldap
+                name="ldap"
+                placeholder="ldap账号"
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入ldap账号!',
+                  },
+                ]}
+              />
+              <LdapPwd
+                name="ldapPwd"
+                placeholder="ldap密码"
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入ldap密码!',
+                  },
+                ]}
+              />
+            </Tab>
+            <Tab key="account" tab="普通登录">
               {status === 'error' && loginType === 'account' && !submitting && (
                 <LoginMessage content="账户或密码错误!" />
               )}
-
               <Username
                 name="username"
                 placeholder="用户名"
@@ -119,32 +168,7 @@ const Login: React.FC<{}> = () => {
                 rules={[
                   {
                     required: true,
-                    message: '请输入密码！',
-                  },
-                ]}
-              />
-            </Tab>
-            <Tab key="ldap" tab="ldap登录">
-              {status === 'error' && loginType === 'ldap' && !submitting && (
-                <LoginMessage content="ldap账号或密码错误!" />
-              )}
-              <Ldap
-                name="ldap"
-                placeholder="ldap账号"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入ldap账号！',
-                  },
-                ]}
-              />
-              <LdapPwd
-                name="ldapPwd"
-                placeholder="ldap密码"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入ldap密码！',
+                    message: '请输入密码!',
                   },
                 ]}
               />

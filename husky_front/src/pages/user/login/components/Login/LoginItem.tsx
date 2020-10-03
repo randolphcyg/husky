@@ -14,18 +14,18 @@ export interface LoginItemType {
   LdapPwd: React.FC<WrappedLoginItemProps>;
 }
 
-// export interface LoginItemProps extends Partial<FormItemProps> {
-//   name?: string;
-//   style?: React.CSSProperties;
-//   placeholder?: string;
-//   buttonText?: React.ReactNode;
-//   updateActive?: LoginContextProps['updateActive'];
-//   type?: string;
-//   defaultValue?: string;
-//   customProps?: { [key: string]: unknown };
-//   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-//   tabUtil?: LoginContextProps['tabUtil'];
-// }
+export interface LoginItemProps extends Partial<FormItemProps> {
+  name?: string;
+  style?: React.CSSProperties;
+  placeholder?: string;
+  buttonText?: React.ReactNode;
+  updateActive?: LoginContextProps['updateActive'];
+  type?: string;
+  defaultValue?: string;
+  customProps?: { [key: string]: unknown };
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  tabUtil?: LoginContextProps['tabUtil'];
+}
 
 const FormItem = Form.Item;
 
