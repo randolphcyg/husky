@@ -82,7 +82,6 @@ const Login: React.FC<{}> = () => {
         const msg = await huskyAccountLogin({ ...values, type });
         if (msg.status === 'ok' && initialState) {
           message.success(msg.message);
-          console.log(values['ldap'])    // 登录成功
           const currentUser = await initialState?.fetchUserInfo(values['ldap']);
           setInitialState({
             ...initialState,
