@@ -19,21 +19,23 @@ def login_view(request):
         req_data = json.loads(request.body)
         username = req_data.get('username')
         password = req_data.get('password')
-        type_req = req_data.get('type')
         user = authenticate(username=username, password=password)
         if user:
             login(request, user)        # 后端登录
-            res = {'name': 'admin',
-                   'password': 'admin',
+            res = {'code': 0,
                    'status': 'ok',
-                   'type': str(type_req)}
+                   'message': 'account用户登录成功!'
+                   }
         else:       # 数据库校验失败
-            res = {'status': 'error',
-                   'type': '', }
+            res = {'code': -1,
+                   'status': 'error',
+                   'message': '用户账号密码错误!', }
         return JsonResponse(res)
     else:       # 请求出问题
-        res = {'status': 'error',
-               'type': ''}
+        res = {'code': -1,
+               'status': 'error',
+               'message': 'account用户登录失败!'
+               }
         return JsonResponse(res)
 
 
@@ -42,10 +44,8 @@ def current_user(request):
     '''获取当前登录用户信息
     '''
     if request.method == 'POST':
-        print('普通登录')
         # 前端传值
         ldap = str(request.body, 'utf8')        # ldap dn账号
-        print(ldap)
         if ldap:
             # 从redis读取AD配置
             conn_redis = get_redis_connection("configs_cache")

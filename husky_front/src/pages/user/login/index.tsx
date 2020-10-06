@@ -62,7 +62,6 @@ const Login: React.FC<{}> = () => {
         if (msg.status === 'ok' && initialState) {
           message.success(msg.message);
           const currentUser = await initialState?.fetchUserInfo(values['ldap']);
-          // console.log(currentUser)  // 查询结果
           setInitialState({
             ...initialState,
             currentUser,
@@ -70,7 +69,7 @@ const Login: React.FC<{}> = () => {
           replaceGoto();
           return;
         } else {
-          message.error(msg.message);     // 需要优化登录对象参数命名
+          message.error(msg.message);
         }
         // 如果失败去设置用户错误信息
         setUserLoginState(msg);
@@ -82,7 +81,7 @@ const Login: React.FC<{}> = () => {
         // 登录 huskyAccountLogin 
         const msg = await huskyAccountLogin({ ...values, type });
         if (msg.status === 'ok' && initialState) {
-          message.success('husky系统用户登录成功!');
+          message.success(msg.message);
           console.log(values['ldap'])    // 登录成功
           const currentUser = await initialState?.fetchUserInfo(values['ldap']);
           setInitialState({
@@ -91,6 +90,8 @@ const Login: React.FC<{}> = () => {
           });
           replaceGoto();
           return;
+        } else {
+          message.error(msg.message);
         }
         // 如果失败去设置用户错误信息
         setUserLoginState(msg);
