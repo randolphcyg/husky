@@ -1,11 +1,11 @@
 import { request } from 'umi';
 
 export interface LoginParamsType {
-  username: string;
-  password: string;
-  ldap: string;
-  ldapPwd: string;
-  type: string;
+  username: string; // 系统账号
+  password: string; // 系统密码
+  ldap: string; // LDAP账号
+  ldapPwd: string; // LDAP密码
+  type: string; // 登录类型
 }
 
 // ldap登录方式

@@ -11,11 +11,11 @@ import defaultSettings from '../config/defaultSettings';
 export async function getInitialState(): Promise<{
   settings?: LayoutSettings;
   currentUser?: API.CurrentUser;
-  fetchUserInfo: () => Promise<API.CurrentUser | undefined>;
+  fetchUserInfo: (ldap: string) => Promise<API.CurrentUser | undefined>;
 }> {
-  const fetchUserInfo = async () => {
+  const fetchUserInfo = async (ldap: string) => {
     try {
-      const currentUser = await queryCurrent();
+      const currentUser = await queryCurrent(ldap);
       return currentUser;
     } catch (error) {
       history.push('/user/login');

@@ -59,10 +59,11 @@ def ldap_login(request):
                 paged_size=5
             )
             # 如果有此用户
+            print(res)
             if res:
                 entry = conn_ad.response[0]
                 if 'attributes' in entry.keys():
-                    # attr_dict = entry['attributes']
+                    attr_dict = entry['attributes']
                     # 校验dn的密码
                     dn = entry['dn']
                     try:
@@ -75,20 +76,22 @@ def ldap_login(request):
                         conn_ad_login.bind()
                         if conn_ad_login.result["result"] == 0:
                             res = {'code': 0,
-                                   'message': '登录成功',
+                                   'message': 'LDAP用户登录成功!',
                                    'status': 'ok',
                                    }
                             return JsonResponse(res)
                         else:
                             res = {'code': -1,
                                    'message': '密码错误!',
-                                   'data': ''}
+                                   'status': 'error',
+                                   }
                             return JsonResponse(res)
                     except Exception:
                         message = conn_ad_login.result["message"]
                         res = {'code': -1,
                                'message': message,
-                               'data': ''}
+                               'status': 'error',
+                               }
                         return res
                 else:
                     res = {'code': -1,
@@ -332,7 +335,7 @@ def access_ad_server() -> object:
                        port=636,               # 636安全端口
                        use_ssl=True,
                        get_info=ALL,
-                       connect_timeout=3)      # 连接超时为3秒
+                       connect_timeout=20)      # 连接超时为3秒
     try:
         conn_ad = Connection(
             server=server_ad,
