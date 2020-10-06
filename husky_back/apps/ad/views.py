@@ -32,11 +32,11 @@ def ldap_login(request):
     '''LDAP登录方式
     '''
     if request.method == 'POST':
+        # 前端传值
         req_data = json.loads(request.body)
         ldap = req_data.get("ldap")
         ldap_pwd = req_data.get("ldapPwd")
         type_req = req_data.get("type")
-        print(ldap, ldap_pwd, type_req)
         # 从redis读取AD配置
         conn_redis = get_redis_connection("configs_cache")
         str_data = conn_redis.get('AdServerConfig')
@@ -44,58 +44,62 @@ def ldap_login(request):
         adServerIp = json_data['adServerIp']
         baseDn = json_data['baseDn']
         conn_ad = access_ad_server()
-        print('(sAMAccountName={})'.format(ldap))
-        res = conn_ad.search(
-            search_base=baseDn,
-            search_filter='(sAMAccountName={})'.format(ldap),
-            search_scope=SUBTREE,
-            attributes=['cn', 'givenName', 'mail', 'sAMAccountName'],
-            paged_size=5
-        )
-        print(res)
-
-        if res:
-            if hasattr(entry, 'attributes'):
-                entry = conn_ad.response[0]
-                attr_dict = entry['attributes']
-                # check password by dn
-                try:
-                    SERVER = Server(host=adServerIp,
-                                    port=636,               # 636安全端口
-                                    use_ssl=True,
-                                    get_info=ALL,
-                                    connect_timeout=3)      # 连接超时为3秒
-                    conn_ad_login = Connection(server=SERVER, password=ldap_pwd, check_names=True, lazy=False, raise_exceptions=False)
-                    conn_ad_login.bind()
-                    print(conn_ad_login.result)
-                    if conn_ad_login.result["result"] == 0:
-                        print((True, attr_dict["mail"], attr_dict["sAMAccountName"], attr_dict["givenName"]))
-                        res = {'code': 0,
-                               'message': '登录成功',
-                               'status': 'ok',
-                               }
-                        return JsonResponse(res)
-                    else:
-                        print("Auth Failed")
-                        res = {'code': -1,
-                               'message': '登录失败',
-                               'data': ''}
-                        return (False, None, None, None)
-                except Exception as e:
-                    print(str(e))
-                    print("Auth Failed")
-            # else:
-            #     res = {'code': -1,
-            #            'message': '登录失败',
-            #            'data': ''}
-                # return JsonResponse(res)
-        else:
+        if not conn_ad:
             res = {'code': -1,
-                   'message': 'LDAP用户未注册!',
-                   'data': ''}
+                   'message': 'LDAP服务器连接失败!',
+                   'status': 'error',
+                   }
             return JsonResponse(res)
-
-        print(res)
+        else:
+            res = conn_ad.search(
+                search_base=baseDn,
+                search_filter='(sAMAccountName={})'.format(ldap),
+                search_scope=SUBTREE,
+                attributes=['cn', 'givenName', 'mail', 'sAMAccountName'],
+                paged_size=5
+            )
+            # 如果有此用户
+            if res:
+                entry = conn_ad.response[0]
+                if 'attributes' in entry.keys():
+                    # attr_dict = entry['attributes']
+                    # 校验dn的密码
+                    dn = entry['dn']
+                    try:
+                        SERVER = Server(host=adServerIp,
+                                        port=636,               # 636安全端口
+                                        use_ssl=True,
+                                        get_info=ALL,
+                                        connect_timeout=3)      # 连接超时为3秒
+                        conn_ad_login = Connection(server=SERVER, user=dn, password=ldap_pwd, check_names=True, lazy=False, raise_exceptions=False)
+                        conn_ad_login.bind()
+                        if conn_ad_login.result["result"] == 0:
+                            res = {'code': 0,
+                                   'message': '登录成功',
+                                   'status': 'ok',
+                                   }
+                            return JsonResponse(res)
+                        else:
+                            res = {'code': -1,
+                                   'message': '密码错误!',
+                                   'data': ''}
+                            return JsonResponse(res)
+                    except Exception:
+                        message = conn_ad_login.result["message"]
+                        res = {'code': -1,
+                               'message': message,
+                               'data': ''}
+                        return res
+                else:
+                    res = {'code': -1,
+                           'message': '无此LDAP用户!',
+                           'data': ''}
+                    return JsonResponse(res)
+            else:
+                res = {'code': -1,
+                       'message': 'LDAP服务器错误!',
+                       'data': ''}
+                return JsonResponse(res)
 
 
 @csrf_exempt
@@ -108,7 +112,7 @@ def modify_ad_account_pwd(dn: str) -> str:
     modify_pwd_res = conn_ad.extend.microsoft.modify_password(dn, new_pwd, old_pwd)          # 初始化密码
     # 密码设置为下次登录需要修改密码
     # conn_ad.modify(dn, {'pwdLastSet': (2, [0])})                          # 设置第一次登录必须修改密码
-    print(modify_pwd_res)
+    # print(modify_pwd_res)
     return new_pwd
 
 
@@ -337,13 +341,16 @@ def access_ad_server() -> object:
             auto_bind=True,
             read_only=False,                # 禁止修改数据True
             receive_timeout=3)             # 10秒内没返回消息则触发超时异常
+        print(conn_ad)
         logger.info("distinguishedName:%s res: %s" % (adminAccount, conn_ad.bind()))
         return conn_ad
     except BaseException as e:
         # 如果AD服务器连接超时,则需要返回网络错误，不能返回程序错误
         error_logger.error(str(e))
-    finally:
-        conn_ad.closed
+        # LDAP服务器连接超时!请检查VPN是否连接!
+        return False
+    # finally:
+    #     return False
 
 
 def back_ad_account_to_redis(searchFilterUser, baseDnEnabled, conn_redis_accounts) -> list:
