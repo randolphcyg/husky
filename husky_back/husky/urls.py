@@ -16,8 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include, url
-from apps.user.views import login_view, current_user
 from apps.visual.views import bugs
+from apps.user.views import (login_view,
+                             current_user,
+                             load_account_config,
+                             save_account_config)
 from apps.ad.views import (fetch_ad_account_list,
                            add_ad_account,
                            save_ad_server_config,
@@ -43,5 +46,7 @@ urlpatterns = [
     url(r'api/loadAdServerConfigFormData', load_ad_server_config_form_data, name='loadAdServerConfigFormData'),
     url(r'api/saveMailServerConfig', save_mail_server_config, name='saveMailServerConfig'),      # 保存邮件服务器配置
     url(r'api/loadMailServerConfigFormData', load_mail_server_config_form_data, name='loadMailServerConfigFormData'),
-    url(r'api/testSendMail', test_send_mail, name='testSendMail')   # 测试发送邮件
+    url(r'api/testSendMail', test_send_mail, name='testSendMail'),   # 测试发送邮件
+    url(r'api/loadAccountConfigFormData', load_account_config, 'loadAccountConfigFormData'),     # 加载用户设置
+    url(r'api/saveAccountConfig', save_account_config, 'saveAccountConfig')     # 保存用户设置
 ]

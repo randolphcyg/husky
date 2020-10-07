@@ -1,14 +1,33 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
 import json
-from ad.views import access_ad_server, get_redis_connection
+
+from apps.ad.views import access_ad_server, get_redis_connection
+from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
+from django.views.decorators.csrf import csrf_exempt
 from ldap3 import (ALL, ALL_ATTRIBUTES, MODIFY_REPLACE, NTLM, SASL, SIMPLE,
                    SUBTREE, SYNC, Connection, Server)
 
 # Create your views here.
+
+
+@csrf_exempt
+def save_account_config(request):
+    res = {'code': 0,
+           'status': 'ok',
+           'message': '修改用户信息成功!',
+           }
+    return JsonResponse(res)
+
+
+@csrf_exempt
+def load_account_config(request):
+    res = {'code': 0,
+           'status': 'ok',
+           'message': '获取用户信息成功!',
+           'data': {},
+           }
+    return JsonResponse(res)
 
 
 @csrf_exempt
@@ -24,7 +43,7 @@ def login_view(request):
             login(request, user)        # 后端登录
             res = {'code': 0,
                    'status': 'ok',
-                   'message': 'account用户登录成功!'
+                   'message': 'account用户登录成功!',
                    }
         else:       # 数据库校验失败
             res = {'code': -1,
@@ -34,7 +53,7 @@ def login_view(request):
     else:       # 请求出问题
         res = {'code': -1,
                'status': 'error',
-               'message': 'account用户登录失败!'
+               'message': 'account用户登录失败!',
                }
         return JsonResponse(res)
 

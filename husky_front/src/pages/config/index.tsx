@@ -5,6 +5,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { Menu } from 'antd';
 import MailServerView from './components/MailServerView';
 import AdServerView from './components/AdServerView';
+import AccountView from './components/AccountView';
 import styles from './style.less';
 
 
@@ -14,7 +15,7 @@ interface SettingsProps {
   dispatch: Dispatch;
 }
 
-type SettingsStateKeys = 'ad' | 'mail';
+type SettingsStateKeys = 'account' | 'ad' | 'mail';
 interface SettingsState {
   mode: 'inline' | 'horizontal';
   menuMap: {
@@ -30,6 +31,12 @@ class Settings extends Component<SettingsProps, SettingsState> {
     super(props);
     // 菜单映射
     const menuMap = {
+      account: (
+        <FormattedMessage
+          id="accountandsettings.menuMap.account-basic"
+          defaultMessage="Basic Account Settings"
+        />
+      ),
       ad: (
         <FormattedMessage
           id="accountandsettings.menuMap.ad-server-basic"
@@ -46,7 +53,7 @@ class Settings extends Component<SettingsProps, SettingsState> {
     this.state = {
       mode: 'inline',
       menuMap,
-      selectKey: 'ad', // 默认选中的tab页 开发时注意换成方便的
+      selectKey: 'account', // 默认选中的tab页 开发时注意换成方便的
     };
   }
 
@@ -100,6 +107,8 @@ class Settings extends Component<SettingsProps, SettingsState> {
   renderChildren = () => {
     const { selectKey } = this.state;
     switch (selectKey) {
+      case 'account':
+        return <AccountView />;
       case 'ad':
         return <AdServerView />;
       case 'mail':
