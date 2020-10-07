@@ -23,7 +23,7 @@ const Welcome: React.FC<{}> = () => {
             <Statistic title="AD Users" value={366} valueStyle={{ color: '#3f8600' }} prefix={<UserOutlined />} />
             <Descriptions>
               <Descriptions.Item label="开发进度">
-                <Field text="37" valueType="progress" mode='read' plain={true} />
+                <Field text="41" valueType="progress" mode='read' plain={true} />
               </Descriptions.Item>
             </Descriptions>
             <Space size={1}>

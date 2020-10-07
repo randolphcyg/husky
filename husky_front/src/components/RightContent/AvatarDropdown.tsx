@@ -45,7 +45,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
         loginOut();
         return;
       }
-      history.push(`/${key}`);
+      history.push(`/${key}`);    // 推送路由
     },
     [],
   );
@@ -73,7 +73,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
   }
 
   const menuHeaderDropdown = (
-    <Menu className={styles.menu} selectedKeys={['center', 'settings',]} onClick={onMenuClick}>
+    <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
       {/* {menu && (
         <Menu.Item key="center">
           <UserOutlined />

@@ -404,6 +404,13 @@ def fetch_ad_account_list(request) -> json:
     '''查询AD域的账户列表,页数由前端传参,之后改成分页类型的
     '''
     if request.method == 'GET':
+        # 前端传值
+        # current = request.GET.get('current')        # 当前页数
+        # pageSize = request.GET.get('pageSize')        # 页数
+        sam = request.GET.get('sam')        # ldap账号
+        name = request.GET.get('name')        # 姓名
+        department = request.GET.get('department')        # 部门
+        # print(current, pageSize, sam, name, department)
         # 从redis的账号库读取数据
         conn_redis_accounts = get_redis_connection("ad_accounts_cache")
         str_data = conn_redis_accounts.get('AdServerAccounts')
@@ -412,17 +419,24 @@ def fetch_ad_account_list(request) -> json:
             json_data = json.loads(str_data)
             body = json_data['result']
         else:
-            # 从redis的配置库读取AD配置 数据由AD服务器返回
+            # 从redis的配置库读取AD配置 后数据由LDAP服务器返回
             conn_redis_configs = get_redis_connection("configs_cache")
             str_data_config = conn_redis_configs.get('AdServerConfig')
             json_data = json.loads(str_data_config)
             searchFilterUser = json_data['searchFilterUser']
             baseDnEnabled = json_data['baseDnEnabled']
             body = back_ad_account_to_redis(searchFilterUser, baseDnEnabled, conn_redis_accounts)
+        # 在这里对查询到的的数据进行查询过滤
+        if sam is not None and sam != '':       # 根据 ldap账号 模糊查询
+            body = [person for person in body if sam in person['sam']]
+        if name is not None and name != '':       # 根据 name 模糊查询
+            body = [person for person in body if name in person['name']]
+        if department is not None and department != '':       # 根据 department 模糊查询
+            body = [person for person in body if department in person['department']]
         # 组装返回结果
         res = {
             'code': 0,
-            'message': '成功',
+            'message': '查询成功!',
             'data': body
         }
         return JsonResponse(res)

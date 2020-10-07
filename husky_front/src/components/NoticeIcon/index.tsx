@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Tag, message } from 'antd';
+import { queryNotices } from '@/services/user';
+import { message, Tag } from 'antd';
 import { groupBy } from 'lodash';
 import moment from 'moment';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useModel } from 'umi';
-import { queryNotices } from '@/services/user';
-
-import NoticeIcon from './NoticeIcon';
 import styles from './index.less';
+import NoticeIcon from './NoticeIcon';
+
 
 const getNoticeData = (
   notices: API.NoticeIconData[],
