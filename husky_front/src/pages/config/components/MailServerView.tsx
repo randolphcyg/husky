@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-
-import { connect } from 'umi';
-import { Button, Divider, Form, Input, message } from 'antd';
+import { loadFormData, MailServerFormItemProps, MailServerFormProps, saveMailServerConfig, testSendMail } from "@/services/mail";
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import ProCard from '@ant-design/pro-card';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
-import { MailServerFormItemProps, MailServerFormProps, saveMailServerConfig, loadFormData, testSendMail } from "@/services/mail";
+import { Button, Divider, Form, Input, message, Popconfirm } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { connect } from 'umi';
+
 
 const MailServerView: React.FC<MailServerFormProps> = (props) => {
   const [proForm] = ProForm.useForm();
@@ -115,14 +116,13 @@ const MailServerView: React.FC<MailServerFormProps> = (props) => {
                 pattern: /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
                 message: '邮箱格式错误!'
               }]} />
-          {/* proform原子组件没有密码组件，源码已经添加了，需要github看下怎么用 */}
-          <ProFormText name="mailServerAdminPwd" label="管理员口令" placeholder="**********"
+          <Form.Item name="mailServerAdminPwd" label="管理员口令"
             rules={[
               {
                 required: true,
                 message: '请填写邮件服务器管理员口令!'
               }]} ><Input.Password />
-          </ProFormText>
+          </Form.Item>
         </ProForm.Group>
         <ProForm.Group title="2.通知配置">
           <ProFormText name="adAccountHelpFile" label="AD账号说明文档" placeholder="https://xxxx" />
@@ -140,15 +140,19 @@ const MailServerView: React.FC<MailServerFormProps> = (props) => {
             }]} />
         <Button type="default" onClick={onCheckMailServerConfigConnect}>测试邮件</Button>
         <Divider key='divider-onCheckMailServerConfigConnect' dashed={true} type="vertical" />
-        <Button type="primary" onClick={() => {
-          proForm.validateFields()
-            .then(values => {
-              onSaveMailServerConfig(values);
-            })
-            .catch(info => {
-              console.log('验证模态框表单失败:', info);
-            });
-        }}>保存配置</Button>
+        <Popconfirm title="确定修改？" okText="是" cancelText="否" icon={<ExclamationCircleOutlined />}
+          onConfirm={() => {
+            proForm.validateFields()
+              .then(values => {
+                onSaveMailServerConfig(values);
+              })
+              .catch(info => {
+                console.log('验证模态框表单失败:', info);
+              });
+          }}
+        >
+          <Button type='primary'>保存配置</Button>
+        </Popconfirm>
       </ProForm>
     </ProCard>
   );

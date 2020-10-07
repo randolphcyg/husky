@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-
-import { connect } from 'umi';
-import { Button, Divider, message } from 'antd';
+import { AdServerFormItemProps, AdServerFormProps, loadAdServerConfigFormData, saveAdServerConfig, testAdServerConfigIsConnect } from "@/services/ad";
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import ProCard from '@ant-design/pro-card';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
-import { saveAdServerConfig, AdServerFormProps, AdServerFormItemProps, testAdServerConfigIsConnect, loadAdServerConfigFormData } from "@/services/ad";
+import { Button, Divider, Form, Input, message, Popconfirm } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { connect } from 'umi';
 
 const AdServerView: React.FC<AdServerFormProps> = (props) => {
   const [proForm] = ProForm.useForm();
@@ -114,7 +114,7 @@ const AdServerView: React.FC<AdServerFormProps> = (props) => {
               required: true,
               message: '请填写AD服务器管理员账户!'
             }]} />
-          <ProFormText name="adminPwd" label="管理员密码" placeholder="********"
+          <Form.Item name="adminPwd" label="管理员密码"
             rules={[
               {
                 required: true,
@@ -123,7 +123,8 @@ const AdServerView: React.FC<AdServerFormProps> = (props) => {
               {
                 pattern: /^[^\s]*$/,
                 message: '禁止输入空格!'
-              }]} />
+              }]} ><Input.Password />
+          </Form.Item>
         </ProForm.Group>
         <ProForm.Group title="2.AD服务器个性化配置">
           {/* 需要改成下拉搜索框组件，存储 XX公司: XX公司账号前缀 常量键值对 */}
@@ -145,19 +146,23 @@ const AdServerView: React.FC<AdServerFormProps> = (props) => {
             });
         }}>测试连接</Button>
         <Divider key='divider-onCheckAdServerConfigConnect' dashed={true} type="vertical" />
-        <Button type='primary' onClick={() => {
-          proForm.validateFields()
-            .then(values => {
-              onSaveAdServerConfig(values);
-            })
-            .catch(info => {
-              console.log('验证模态框表单失败:', info);
-            });
-        }}>保存配置</Button>
+        <Popconfirm title="确定修改？" okText="是" cancelText="否" icon={<ExclamationCircleOutlined />}
+          onConfirm={() => {
+            proForm.validateFields()
+              .then(values => {
+                onSaveAdServerConfig(values);
+              })
+              .catch(info => {
+                console.log('验证模态框表单失败:', info);
+              });
+          }}
+        >
+          <Button type='primary'>保存配置</Button>
+        </Popconfirm>
       </ProForm>
     </ProCard>
   );
 }
 
 // export default AdServerView;
-export default connect(({ }) => ({ }))(AdServerView);
+export default connect(({ }) => ({}))(AdServerView);

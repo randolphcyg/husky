@@ -70,8 +70,7 @@ const GlobalHeaderRight: React.FC<{}> = () => {
           <Tag color={ENVTagColor[REACT_APP_ENV]}>{REACT_APP_ENV}</Tag>
         </span>
       )}
-      {/* 删除多语言组件 */}
-      {/* <SelectLang className={styles.action} /> */}
+      <SelectLang className={styles.action} />
     </Space>
   );
 };

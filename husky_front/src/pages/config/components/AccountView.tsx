@@ -1,8 +1,9 @@
-import { AccountFormItemProps, loadAccountConfigFormData, saveAccountConfig } from "@/services/user";
+import { AccountFormItemProps, saveAccountConfig } from "@/services/user";
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import ProCard from '@ant-design/pro-card';
 import Field, { ProFieldFCMode } from '@ant-design/pro-field';
 import ProForm from '@ant-design/pro-form';
-import { Button, Descriptions, Divider, message } from 'antd';
+import { Button, Descriptions, Divider, message, Popconfirm } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { connect } from 'umi';
 
@@ -42,6 +43,10 @@ const AccountView: React.FC<AccountFormItemProps> = (props) => {
         setState('edit')
         console.log(values)
         console.log('更新信息')
+    };
+    // 取消
+    const onCancel = () => {
+        setState('read')
     };
 
     // 提交修改
@@ -102,15 +107,20 @@ const AccountView: React.FC<AccountFormItemProps> = (props) => {
                     </Descriptions.Item>
                 </Descriptions>
 
-                <Button type="default" onClick={() => {
-                    proForm.validateFields()
-                        .then(values => {
-                            onUpdate(values);
-                        })
-                        .catch(info => {
-                            console.log('验证模态框表单失败:', info);
-                        });
-                }}>更新信息</Button>
+                <Popconfirm title="确定修改？" okText="是" cancelText="否" icon={ <ExclamationCircleOutlined />}
+                    onConfirm={() => {
+                        proForm.validateFields()
+                            .then(values => {
+                                onUpdate(values);
+                            })
+                            .catch(info => {
+                                console.log('验证模态框表单失败:', info);
+                            });
+                    }}
+                    onCancel={onCancel}
+                >
+                    <Button type="default">更新信息</Button>
+                </Popconfirm>
                 <Divider key='divider-onUpdate' dashed={true} type="vertical" />
                 <Button type='primary' onClick={() => {
                     proForm.validateFields()
@@ -120,7 +130,8 @@ const AccountView: React.FC<AccountFormItemProps> = (props) => {
                         .catch(info => {
                             console.log('验证模态框表单失败:', info);
                         });
-                }}>保存修改</Button>
+                }}
+                >保存修改</Button>
             </ProForm>
         </ProCard>
     );
