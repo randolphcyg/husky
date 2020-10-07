@@ -3,7 +3,7 @@ import ProCard from '@ant-design/pro-card';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
-import { ProColumnType } from '@ant-design/pro-table/es/Table'; // 最先进的antd pro protable 泛型
+import { ProColumnType } from '@ant-design/pro-table/es/Table';
 import { Button, Divider, message, Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { request } from 'umi';
@@ -70,7 +70,6 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
     },
   ]
 
-  //函数组件
   useEffect(() => {
   }, [])
 
