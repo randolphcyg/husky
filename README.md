@@ -12,7 +12,7 @@
 | ant design pro | v5 | ui |
 | echarts | 4.8.0 | 9月份将发布5.0版本 | 
 | mysql | 5.7 | 数据持久化 | 
-| echarts | 3.2.100 | 缓存不太修改但常读的内容 | 
+| redis | 3.2.100 | 缓存不太修改但常读的内容 | 
 
 2. 辅助工具
 
@@ -25,8 +25,7 @@
 3. 项目仓库
 
 [husky](https://gitee.com/RandolphCYG/husky)
-master分支只加入bug可视化的内容，正常管理bug可视化的代码提交到此分支;
-feature-ad分支将重点放在AD域账号管理功能模块上；
+master分支现在和feature-ad分支同步了，AD域账号管理功能模块上都有；
 
 # 2. 安装步骤
 ## 2.1. 配置python环境并运行Django项目(通识)
@@ -56,7 +55,7 @@ python manage.py migrate
 python manage.py createsuperuser
 # 然后会让你输入邮箱(可不输入)、密码(admin即可、强制同意)
 
-# 修改django配置文件...\husky\husky_back\husky\settings.py
+# 修改django配置文件 ...\husky\husky_back\husky\settings.py
 'default': {
     'ENGINE': 'django.db.backends.mysql',   # 数据库引擎
     'NAME': 'husky',                        # 数据库名
@@ -65,8 +64,37 @@ python manage.py createsuperuser
     'HOST': '127.0.0.1',                    # mysql服务主机ip
     'PORT': '3306',                         # mysql服务端口
     },
-# redis的还没加进去，加好之后会补充配置
-
+    
+# redis缓存服务器 ...\husky\husky_back\husky\settings.py
+CACHES = {
+    # 默认缓存库
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/0",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # "PASSWORD": "V%xw1xZqDK",   # 密码
+        }
+    },
+    # 配置信息缓存库
+    "configs_cache": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # "PASSWORD": "V%xw1xZqDK",   # 密码
+        }
+    },
+    # AD域账号信息缓存库
+    "ad_accounts_cache": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # "PASSWORD": "V%xw1xZqDK",   # 密码
+        }
+    }
+}
 # 然后就可以启动后端项目了
 
 ```
@@ -87,12 +115,11 @@ yarn run start:no-mock
 # 从前端项目进入网页即可
 ```
 # 3. 开发规划
-1. 正在开发优化的功能
-`AD域`组件支持分页查询，但是没有正确写好借口传递的对象参数，需要再看；更重要的是对于账户得搜索功能需要调出来；
+ - 正在开发优化的功能
 `可视化`一方面需要向上交流，另一方方面需要准备好前端的流程设计；
 `企业微信`对接，需要将之前开发过的weworkapi的代码融入使用下；
 
-2. 待开发功能
+ - 待开发功能
 
  - [ ] AD域账户管理模块——异常报错(网络原因报错细致)、异步任务前端后端一致(勿让用户等待)
  - [ ] 用户的批量管理逻辑(考虑到这个层面时候需要回头去优化单个的处理逻辑)
@@ -100,7 +127,7 @@ yarn run start:no-mock
  - [ ] django后端restful接口改造
  - [ ] echarts后端及数据库设计准备——需要将数据存储设计好，然后才可以接着去做
 
-3. 已完成功能
+ - 已完成功能
  - [x] 用户登录(LDAP)登出
 `详情`LDAP和普通方式均可登录，但是需要先配置好AD域账号方可使用AD域管理相关功能
  - [x] AD域账账号查询
@@ -114,23 +141,44 @@ AD域模块和消息通知配置存到redis；
 配置会报存在redis，目前设置的作用字段之后还可以再优化；
  - [x] 邮件服务器配置
  - [x] bug可视化前端echarts接入(前端阶段)
+ - [x] `LDAP账户`支持分页模糊查询；
  
 # 4. 功能演示
-1. 登录(LDAP)
+ - 登录(LDAP)
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201006220602300.png)
-
-2. 首页(可以换成更需要表达的组件)
+ - 首页(可以换成更需要表达的组件)
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201006220743836.png)
-3. 配置中心——AD域服务器配置
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201006220916497.png)
-4. 配置中心——邮件服务器配置
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20201006221032788.png)
+ - 配置中心——用户账户设置
 
-5. AD域管理——AD域账户
+ - [ ] 支持用户个人邮箱手机号和密码的修改
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20201008102922903.png)
+ - 配置中心——AD域服务器配置
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20201008102444455.png)
+
+ - 配置中心——邮件服务器配置
+![在这里插入图片描述](https://img-blog.csdnimg.cn/202010081023139.png)
+
+
+ - AD域管理——AD域账户
+
+ - [x] 支持账号/姓名/部门字段的模糊查询
+ - [x] 支持同步任务创建账号
+ - [ ] 支持管理员可修改用户密码
+ - [ ] 支持对架构改动的同事进行LDAP架构上的同步变动
+ - [ ] 支持将离职用户禁用状态(暂时搜索不到禁用用户，搜索范围不包含此部分)
+ - [ ] 支持显示用户状态 
+
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201006221233382.png)
 6. AD域管理——AD域服务器(留空待做)
+ - [ ] 支持树形显示LDAP的OU架构
+ - [ ] 支持在树上对OU架构进行调整修改
+ - [ ] 考虑用户和组织单位的策略的修改
+
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201006221303792.png)
 7. bug可视化(前端暂)
+ - [ ] 支持对数据的多级可视化展示和查询、根据框选数据生成可视化图表
+
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200927105652438.png)
 8. 可视化图表(待完善)
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200927105733688.png)
