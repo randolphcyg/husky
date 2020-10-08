@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
-
-import { FormattedMessage, Dispatch, connect } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Menu } from 'antd';
-import MailServerView from './components/MailServerView';
-import AdServerView from './components/AdServerView';
+import React, { Component } from 'react';
+import { connect, Dispatch, FormattedMessage } from 'umi';
 import AccountView from './components/AccountView';
+import AdServerView from './components/AdServerView';
+import MsgView from './components/MsgView';
 import styles from './style.less';
+
 
 
 const { Item } = Menu;
@@ -15,7 +15,7 @@ interface SettingsProps {
   dispatch: Dispatch;
 }
 
-type SettingsStateKeys = 'account' | 'ad' | 'mail';
+type SettingsStateKeys = 'account' | 'ad' | 'msg';
 interface SettingsState {
   mode: 'inline' | 'horizontal';
   menuMap: {
@@ -43,9 +43,9 @@ class Settings extends Component<SettingsProps, SettingsState> {
           defaultMessage="Basic Ad Server Settings"
         />
       ),
-      mail: (
+      msg: (
         <FormattedMessage
-          id="accountandsettings.menuMap.mail-basic"
+          id="accountandsettings.menuMap.msg-basic"
           defaultMessage="Mail Server Settings"
         />
       ),
@@ -53,7 +53,7 @@ class Settings extends Component<SettingsProps, SettingsState> {
     this.state = {
       mode: 'inline',
       menuMap,
-      selectKey: 'account', // 默认选中的tab页 开发时注意换成方便的
+      selectKey: 'msg', // 默认选中的tab页 开发时注意换成方便的
     };
   }
 
@@ -111,8 +111,8 @@ class Settings extends Component<SettingsProps, SettingsState> {
         return <AccountView />;
       case 'ad':
         return <AdServerView />;
-      case 'mail':
-        return <MailServerView />;
+      case 'msg':
+        return <MsgView />;
       default:
         break;
     }

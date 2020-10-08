@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'umi';
 
 
-const MailServerView: React.FC<MailServerFormProps> = (props) => {
+const MsgView: React.FC<MailServerFormProps> = (props) => {
   const [proForm] = ProForm.useForm();
   const [initialFormValues, setValues] = useState({});    // 表单数据初始化
   const [loading, setLoading] = useState(false);    // 表单loading
@@ -87,7 +87,7 @@ const MailServerView: React.FC<MailServerFormProps> = (props) => {
         // 表单初始值从redis读取
         initialValues={initialFormValues}
       >
-        <ProForm.Group title="1.连接配置">
+        <ProForm.Group title="1.邮件服务器配置">
           <ProFormText name="mailServerSmtpServer" label="邮件服务器" placeholder="smtp.exmail.qq.com"
             rules={[
               // 这里需要正则格式化判断
@@ -124,7 +124,7 @@ const MailServerView: React.FC<MailServerFormProps> = (props) => {
               }]} ><Input.Password />
           </Form.Item>
         </ProForm.Group>
-        <ProForm.Group title="2.通知配置">
+        <ProForm.Group title="2.邮件服务器测试配置">
           <ProFormText name="adAccountHelpFile" label="AD账号说明文档" placeholder="https://xxxx" />
           <ProFormText name="blank" label="留空字段" placeholder="" />
         </ProForm.Group>
@@ -138,8 +138,15 @@ const MailServerView: React.FC<MailServerFormProps> = (props) => {
               pattern: /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
               message: '邮箱格式错误!'
             }]} />
+        <Divider key='divider-secondPart' dashed={true} type="vertical" />
         <Button type="default" onClick={onCheckMailServerConfigConnect}>测试邮件</Button>
-        <Divider key='divider-onCheckMailServerConfigConnect' dashed={true} type="vertical" />
+        <Divider key='divider-testMail' dashed={true} type="horizontal" />
+        <ProForm.Group title="3.企业微信配置">
+          <ProFormText name="corpId" label="企业ID" placeholder="MM2795mnd4l2bahabc" />
+          <ProFormText name="contactSyncSecret" label="通讯录同步秘钥" placeholder="1m9bEHd2aMs5YmYnN3Dwcp6qbxbU7oPeQuyqVgxGRAB" />
+        </ProForm.Group>
+
+        <Divider key='divider-Popconfirm' dashed={true} type="vertical" />
         <Popconfirm title="确定修改？" okText="是" cancelText="否" icon={<ExclamationCircleOutlined />}
           onConfirm={() => {
             proForm.validateFields()
@@ -158,4 +165,4 @@ const MailServerView: React.FC<MailServerFormProps> = (props) => {
   );
 }
 
-export default connect(({ }) => ({}))(MailServerView);
+export default connect(({ }) => ({}))(MsgView);

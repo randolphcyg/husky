@@ -1,7 +1,7 @@
 export default {
   'accountandsettings.menuMap.account-basic': '用户账户设置',
   'accountandsettings.menuMap.ad-server-basic': 'AD服务器配置',
-  'accountandsettings.menuMap.mail-basic': '邮件服务器配置',
+  'accountandsettings.menuMap.msg-basic': '消息通知配置',
   'accountandsettings.menuMap.basic': '基本设置',
   'accountandsettings.menuMap.security': '安全设置',
   'accountandsettings.menuMap.binding': '账号绑定',
