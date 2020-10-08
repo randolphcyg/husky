@@ -10,6 +10,7 @@ export default {
   'menu.visual.bug': 'BUG可視化',  // 可视化-bug
   'menu.demo': '示例',  // 示例
   'menu.config': '配置中心',  // 配置中心
+  'menu.wework': '企業微信',  // 企业微信
   'menu.exception.403': '403',
   'menu.exception.404': '404',
   'menu.exception.500': '500',

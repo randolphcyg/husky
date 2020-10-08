@@ -144,6 +144,7 @@ const MsgView: React.FC<MailServerFormProps> = (props) => {
         <ProForm.Group title="3.企业微信配置">
           <ProFormText name="corpId" label="企业ID" placeholder="MM2795mnd4l2bahabc" />
           <ProFormText name="contactSyncSecret" label="通讯录同步秘钥" placeholder="1m9bEHd2aMs5YmYnN3Dwcp6qbxbU7oPeQuyqVgxGRAB" />
+          <ProFormText name="testMsgSendId" label="自建应用秘钥" placeholder="1mitT4RyQc-xLqvmwGJeQiJtjzlk4Xt9RsAN0Gvt-58" />
         </ProForm.Group>
 
         <Divider key='divider-Popconfirm' dashed={true} type="vertical" />

@@ -10,6 +10,7 @@ export default {
   'menu.visual.bug': 'bug visual',  // 可视化-bug
   'menu.demo': 'demo',  // 示例
   'menu.config': 'config',  // 配置中心
+  'menu.wework': 'wework',  // 企业微信
   'menu.register': 'Registro',
   'menu.register.result': 'Resultado de registro',
   'menu.dashboard': 'Dashboard',

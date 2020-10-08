@@ -31,6 +31,7 @@ from apps.ad.views import (fetch_ad_account_list,
                            test_send_mail,
                            ldap_login,
                            )
+from apps.wework.views import wework_contact, wework_ldap, featch_wework_user_list
 
 
 urlpatterns = [
@@ -47,6 +48,13 @@ urlpatterns = [
     url(r'api/saveMailServerConfig', save_mail_server_config, name='saveMailServerConfig'),      # 保存邮件服务器配置
     url(r'api/loadMailServerConfigFormData', load_mail_server_config_form_data, name='loadMailServerConfigFormData'),
     url(r'api/testSendMail', test_send_mail, name='testSendMail'),   # 测试发送邮件
-    url(r'api/loadAccountConfigFormData', load_account_config, 'loadAccountConfigFormData'),     # 加载用户设置
-    url(r'api/saveAccountConfig', save_account_config, 'saveAccountConfig')     # 保存用户设置
+    url(r'api/loadAccountConfigFormData', load_account_config, name='loadAccountConfigFormData'),     # 加载用户设置
+    url(r'api/saveAccountConfig', save_account_config, name='saveAccountConfig'),     # 保存用户设置
+    # 企业微信通讯录管理
+    url(r'api/weworkContact', wework_contact, name='weworkContact'),
+    # 企业微信自建应用
+    url(r'api/weworkLdap', wework_ldap, name='weworkLdap'),
+    # 企业微信自建应用
+    url(r'api/featchWeworkUserList', featch_wework_user_list, name='featchWeworkUserList'),
+    
 ]

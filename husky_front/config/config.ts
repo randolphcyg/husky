@@ -99,6 +99,14 @@ export default defineConfig({
       access: 'canAdmin',
       component: './demo',
     },
+    // 企业微信测试
+    {
+      path: '/wework',
+      name: 'wework',
+      icon: 'Wechat',
+      access: 'canAdmin',
+      component: './wework',
+    },
     {
       path: '/',
       redirect: '/welcome',

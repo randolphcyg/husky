@@ -1,9 +1,9 @@
+import { ClockCircleOutlined } from '@ant-design/icons';
+import ProCard from '@ant-design/pro-card';
+import { PageContainer } from '@ant-design/pro-layout';
+import { Timeline } from 'antd';
 import React from 'react';
 
-import { Timeline } from 'antd';
-import { ClockCircleOutlined } from '@ant-design/icons';
-import { PageContainer } from '@ant-design/pro-layout';
-import ProCard from '@ant-design/pro-card';
 
 export default () => {
     return (

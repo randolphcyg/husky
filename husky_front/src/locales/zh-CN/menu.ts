@@ -9,6 +9,7 @@ export default {
   'menu.visual.bug': 'BUG可视化',  // 可视化-bug
   'menu.demo': '示例',  // 示例
   'menu.config': '配置中心',  // 配置中心
+  'menu.wework': '企业微信',  // 企业微信
   'menu.login': '登录',
   'menu.register': '注册',
   'menu.register.result': '注册结果',
