@@ -519,7 +519,8 @@ def create_obj(dn=None, type='user', info=None):
     dn_base = dn.split(',', 1)[1]
     # 用到的时候连接AD服务器
     conn_ad = access_ad_server()
-    check_ou_res = check_ou(conn_ad, dn_base)
+    # check_ou_res = check_ou(conn_ad, dn_base)       # 疯狂报错 TODO 需要优化检查
+    check_ou_res = 1
     if not check_ou_res:        # 判断是否有这个OU路径 没有则返回-2
         return -2
     else:
