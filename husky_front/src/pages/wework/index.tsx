@@ -72,6 +72,7 @@ export default () => {
             <ProCard>
                 <Button type="primary" key='btn-testWeWork' onClick={testWeworkApi} icon={<ClockCircleOutlined />}>企业微信API连通测试</Button>
                 <ProTable
+                    rowSelection={{}}
                     headerTitle="可编辑表格测试"
                     rowKey="userid"
                     columns={columns}             // 列名

@@ -1,17 +1,22 @@
 import { AdAccountInfoItemProps, AdAccountParamsType, addAdAccount, ModalFormProps } from "@/services/ad";
+import { ClockCircleOutlined, DownOutlined, ExclamationCircleOutlined, FormOutlined } from '@ant-design/icons';
 import ProCard from '@ant-design/pro-card';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { ProColumnType } from '@ant-design/pro-table/es/Table';
-import { Button, Divider, message, Modal } from 'antd';
+import { Button, Divider, Dropdown, Menu, message, Modal, Popconfirm, Table, Tag, Transfer } from 'antd';
+import difference from 'lodash/difference';
 import React, { useEffect, useState } from 'react';
 import { request } from 'umi';
 
 const AdAccountPage: React.FC<ModalFormProps> = () => {
   const [proForm] = ProForm.useForm();
   const [visible, setVisible] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);    // 表格加载
+  const [btnCreateLoading, setBtnCreateLoading] = useState(false);    // 创建按钮异步任务
+  const [btnUpdateLoading, setBtnUpdateLoading] = useState(false);    // 更新按钮异步任务
+  const [hrVisible, setHrVisible] = useState(false);
   const [visibleOption, setVisibleOption] = useState(false);
 
   const columns: Array<ProColumnType<AdAccountInfoItemProps>> = [
@@ -82,6 +87,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
       } else {
         message.error(msg.message);
       }
+      setBtnCreateLoading(false);    // 按钮加载结束
       return;
     }
     // 如果提交失败
@@ -92,11 +98,13 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
 
   // 创建账号
   const onCreate = (values: AdAccountParamsType) => {
+    setBtnCreateLoading(true);    // 按钮加载状态
     handleSubmit(values);
     setVisible(false);
   };
-  // 批量创建账号
-  function batchAddAdAccount() {
+  // 从HAND的HR系统创建账号
+  function batchAddHandAdAccount() {
+    setHrVisible(true);
     console.log('批量创建账号会提供一个表格模板，填写后上传校验并批量创建账号')
   }
 
@@ -104,6 +112,138 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
   function resetPwd() {
     setVisibleOption(true)
     console.log('重设密码')
+  }
+
+  /**
+ *  删除节点
+ * @param selectedRows
+ */
+  const handleRemove = async (selectedRows: AdAccountInfoItemProps[]) => {
+    console.log(selectedRows)
+    const hide = message.loading('正在删除');
+    if (!selectedRows) return true;
+    try {
+      // await removeRule({
+      //   key: selectedRows.map((row) => row.key),
+      // });
+      console.log('调用service 方法执行批量操作!')
+      hide();
+      message.success('删除成功，即将刷新');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('删除失败，请重试');
+      return false;
+    }
+  };
+
+  function updateLdapUsers() {
+    setBtnUpdateLoading(true);
+    console.log('手动更新LDAP服务器用户');
+  }
+
+  // 自定义穿梭框中表格
+  const TableTransfer = ({ leftColumns, rightColumns, ...restProps }) => (
+    <Transfer {...restProps} showSelectAll={false}
+      // 穿梭框样式
+      listStyle={{
+        width: 250,
+        height: 450,
+      }}
+    >
+      {({
+        direction,
+        filteredItems,
+        onItemSelectAll,
+        onItemSelect,
+        selectedKeys: listSelectedKeys,
+        disabled: listDisabled,
+      }) => {
+        const modelTransterTableColumns = direction === 'left' ? leftColumns : rightColumns;
+
+        const rowSelection = {
+          getCheckboxProps: (item: { disabled: any; }) => ({ disabled: listDisabled || item.disabled }),
+          onSelectAll(selected: boolean, selectedRows: any[]) {
+            const treeSelectedKeys = selectedRows
+              .filter((item: { disabled: any; }) => !item.disabled)
+              .map(({ key }) => key);
+            const diffKeys = selected
+              ? difference(treeSelectedKeys, listSelectedKeys)
+              : difference(listSelectedKeys, treeSelectedKeys);
+            onItemSelectAll(diffKeys, selected);
+          },
+          onSelect({ key }: any, selected: boolean) {
+            onItemSelect(key, selected);
+          },
+          selectedRowKeys: listSelectedKeys,
+        };
+
+        return (
+          <Table
+            rowSelection={rowSelection}
+            columns={modelTransterTableColumns}
+            dataSource={filteredItems}
+            pagination={{                 // 分页
+              showQuickJumper: true,
+              pageSize: 6   // 每页6条数据
+            }}
+            size="small"
+            style={{ pointerEvents: listDisabled ? 'none' : null }}
+            onRow={({ key, disabled: itemDisabled }) => ({
+              onClick: () => {
+                if (itemDisabled || listDisabled) return;
+                onItemSelect(key, !listSelectedKeys.includes(key));
+              },
+            })}
+          />
+        );
+      }}
+    </Transfer>
+  );
+
+  const mockTags = ['admin', 'zy', 'hand'];
+
+  const mockData = [];
+  for (let i = 0; i < 20; i++) {
+    mockData.push({
+      key: i.toString(),
+      title: `佩奇${i + 1}`,
+      description: `佩奇打野${i + 1}`,
+      // disabled: i % 4 === 0,
+      tag: mockTags[i % 3],
+    });
+  }
+
+  const originTargetKeys = mockData.filter(item => +item.key % 3 > 1).map(item => item.key);
+
+  // 穿梭框
+  const [targetKeys, setTargetKeys] = useState(originTargetKeys);
+  const leftTableColumns = [
+    {
+      dataIndex: 'title',
+      title: '姓名',
+    },
+    {
+      dataIndex: 'tag',
+      title: '标签',
+      render: (tag: React.ReactNode) => <Tag>{tag}</Tag>,
+    },
+    {
+      dataIndex: 'description',
+      title: '描述',
+    },
+  ];
+  const rightTableColumns = [
+    {
+      dataIndex: 'title',
+      title: '姓名',
+    },
+  ];
+  // 穿梭框数据修改方法
+  const onTransferChange = (nextTargetKeys: React.SetStateAction<string[]>) => {
+    console.log('onTransferChange 触发');
+    console.log(nextTargetKeys);
+    setTargetKeys(nextTargetKeys);
   }
 
   return (
@@ -149,16 +289,76 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
               >
                 {resetText}
               </a>,
-              // <a key="out">导出</a>,
             ];
           },
         }}
-        toolBarRender={() => [
-          <Button type="primary" key='btn-addAdAccount' onClick={() => setVisible(true)}>创建账号</Button>,
+        toolBarRender={(action, { selectedRows }) => [
+          // 多选情况下出现的按钮
+          selectedRows && selectedRows.length > 0 && (
+            <Dropdown
+              overlay={
+                <Menu
+                  onClick={async (e) => {
+                    if (e.key === 'remove') {
+                      await handleRemove(selectedRows);
+                      action.reload();
+                    }
+                  }}
+                  selectedKeys={[]}
+                >
+                  <Menu.Item key="remove">批量删除</Menu.Item>
+                  <Menu.Item key="approval">批量审批</Menu.Item>
+                </Menu>
+              }
+            >
+              <Button>
+                批量操作 <DownOutlined />
+              </Button>
+            </Dropdown>
+          ),
+          // 按钮
+          <Divider key='divider-batchOption' type="vertical" />,
+          <Button type="primary" key='btn-addAdAccount'
+            loading={btnCreateLoading} onClick={() => setVisible(true)} icon={<FormOutlined />}>创建账号</Button>,
           <Divider key='divider-addAdAccount' type="vertical" />,
-          <Button type="default" key='btn-batchAddAdAccount' disabled onClick={() => batchAddAdAccount()}>批量创建账号</Button>,
-        ]}
+          <Button type="default" key='btn-batchAddHandAdAccount' onClick={() => batchAddHandAdAccount()}>HR系统创建账号</Button>,
+          <Divider key='divider-updateLDAP' type="vertical" />,
+          <Popconfirm title="确定更新LDAP服务器用户？" okText="确定" cancelText="点错了"
+            icon={<ExclamationCircleOutlined />} onConfirm={updateLdapUsers}>
+            <Button type="default" key='btn-updateLDAP' icon={<ClockCircleOutlined />}
+              loading={btnUpdateLoading}>手动更新LDAP用户</Button>
+          </Popconfirm>
+        ]
+        }
+        rowSelection={{}}   // 多选
       />
+
+      <Modal
+        destroyOnClose
+        visible={hrVisible}
+        title="Hand系统创建账号"
+        okText="保存"
+        cancelText="取消"
+        onCancel={() => { setHrVisible(false); }}
+        onOk={() => { setHrVisible(false) }}
+        width={1000}
+        style={{ top: 20 }}
+      >
+        {/* 模态框中的穿梭框 */}
+        <TableTransfer
+          dataSource={mockData}
+          targetKeys={targetKeys}
+          disabled={false}    // 无数据部分灰色
+          showSearch={true}    // 搜索框
+          onChange={onTransferChange}    // 每次变化时触发方法
+          filterOption={(inputValue: any, item: { title: string | any[]; tag: string | any[]; }) =>
+            item.title.indexOf(inputValue) !== -1 || item.tag.indexOf(inputValue) !== -1
+          }
+          leftColumns={leftTableColumns}
+          rightColumns={rightTableColumns}
+        />
+      </Modal>
+
       <Modal
         destroyOnClose
         visible={visible}
