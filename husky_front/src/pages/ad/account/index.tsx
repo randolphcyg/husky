@@ -95,8 +95,21 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
       hideInForm: true,
       width: 200,
       valueType: 'dateTime',
-      // TODO: 搜索框能不能和该列的类型不同，比如列是dateTime类型，搜索框是dateTimeRange类型
-      // 方便对其进行时间范围上的框选
+      renderFormItem: () => {
+        // 重写时间框选替代时间搜索
+        return <RangePicker
+          ranges={{
+            '最近三月': [moment().subtract(3, 'months'), moment()],
+            '最近三周': [moment().subtract(3, 'weeks'), moment()],
+            '最近三天': [moment().subtract(3, 'days'), moment()],
+            '今天': [moment().subtract(1, 'days'), moment()],
+            '最近一小时': [moment().subtract(1, 'hours'), moment().endOf('hour')],
+          }}
+          showTime
+          format="YYYY/MM/DD HH:mm:ss"
+          onChange={onChange}
+        />;
+      }
     },
     {
       title: '修改时间',
@@ -105,6 +118,21 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
       hideInForm: true,
       width: 200,
       valueType: 'dateTime',
+      renderFormItem: () => {
+        // 重写时间框选替代时间搜索
+        return <RangePicker
+          ranges={{
+            '最近三月': [moment().subtract(3, 'months'), moment()],
+            '最近三周': [moment().subtract(3, 'weeks'), moment()],
+            '最近三天': [moment().subtract(3, 'days'), moment()],
+            '今天': [moment().subtract(1, 'days'), moment()],
+            '最近一小时': [moment().subtract(1, 'hours'), moment().endOf('hour')],
+          }}
+          showTime
+          format="YYYY/MM/DD HH:mm:ss"
+          onChange={onChange}
+        />;
+      }
     },
     {
       title: '操作',
@@ -316,27 +344,17 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
           defaultColsNumber: 1,
           split: true,
           span: 8,
+          collapsed: false,   // 不收起查询
+          collapseRender: (collapsed: false, showCollapseButton: false) => { <></> },  // 收起按钮渲染为空(去掉收起按钮)
           optionRender: ({ searchText, resetText }, { form }) => {
             return [
-              <a
-                key="searchText"
-                onClick={() => {
-                  form?.submit();
-                }}
-              >
-                {searchText}
-              </a>,
-              <a
-                key="resetText"
-                onClick={() => {
-                  form?.resetFields();
-                }}
-              >
-                {resetText}
-              </a>,
+              <Button key="searchText" type="primary"
+                onClick={() => { form?.submit(); }} >{searchText}</Button>,
+              <Button key="resetText" type="default"
+                onClick={() => { form?.resetFields(); }} >{resetText}</Button>,
             ];
           },
-          searchText:'查询'
+          searchText: '查询'
         }}
         toolBarRender={(action, { selectedRows }) => [
           // 多选情况下出现的按钮
@@ -378,18 +396,6 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
         }
         rowSelection={{}}   // 多选
       />
-      <RangePicker
-      ranges={{
-        '最近三月': [moment().subtract(3, 'months'), moment()],
-        '最近三周': [moment().subtract(3, 'weeks'), moment()],
-        '最近三天': [moment().subtract(3, 'days'), moment()],
-        '今天': [moment(), moment()],
-        // '最近一小时': [moment().startOf('hour'), moment().endOf('hour')],
-      }}
-      showTime
-      format="YYYY/MM/DD HH:mm:ss"
-      onChange={onChange}
-    />
 
       <Modal
         destroyOnClose
