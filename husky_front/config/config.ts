@@ -71,9 +71,9 @@ export default defineConfig({
           component: './ad/account',
         },
         {
-          path: '/ad/server',
-          name: 'server',
-          component: './ad/server',
+          path: '/ad/ou',
+          name: 'ou',
+          component: './ad/ou',
         },
       ],
     },

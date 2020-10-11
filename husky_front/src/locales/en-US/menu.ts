@@ -3,7 +3,7 @@ export default {
   'menu.more-blocks': 'More Blocks',
   'menu.home': 'Home',
   'menu.ad': 'AD service',  // AD域管理
-  'menu.ad.server': 'AD server',  // AD域管理-服务器
+  'menu.ad.ou': 'AD OU',  // AD域管理-组织单位
   'menu.ad.account': 'AD account',  // AD域管理-账户
   'menu.visual': 'visual',  // 可视化
   'menu.visual.bug': 'bug visual',  // 可视化-bug

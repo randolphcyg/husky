@@ -4,7 +4,7 @@ import { request } from 'umi';
 export interface AccountFormItemProps {
   ldap: string;
   name: string;
-  email: string;
+  mail: string;
   tel: string;
   title: string;
 }

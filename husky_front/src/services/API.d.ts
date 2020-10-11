@@ -4,14 +4,10 @@ declare namespace API {
     name?: string; // 姓名
     title?: string; // 职位
     group?: string; // 组
-    signature?: string; // 签名
-    tags?: {
-      key: string;
-      label: string;
-    }[];
     userid?: string;
     access?: 'user' | 'guest' | 'admin'; // 权限
-    unreadCount?: number;
+    mail?: string;
+    phone?: string;
   }
 
   export interface LoginStateType {

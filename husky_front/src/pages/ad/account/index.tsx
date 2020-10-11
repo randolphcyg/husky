@@ -5,10 +5,13 @@ import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { ProColumnType } from '@ant-design/pro-table/es/Table';
-import { Button, Divider, Dropdown, Menu, message, Modal, Popconfirm, Table, Tag, Transfer } from 'antd';
+import { DatePicker, Button, Divider, Dropdown, Menu, message, Modal, Popconfirm, Table, Tag, Transfer } from 'antd';
 import difference from 'lodash/difference';
+import moment from "moment";
 import React, { useEffect, useState } from 'react';
 import { request } from 'umi';
+
+const { RangePicker } = DatePicker;
 
 const AdAccountPage: React.FC<ModalFormProps> = () => {
   const [proForm] = ProForm.useForm();
@@ -19,50 +22,89 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
   const [hrVisible, setHrVisible] = useState(false);
   const [visibleOption, setVisibleOption] = useState(false);
 
+
+  function onChange(dates, dateStrings) {
+    console.log('From: ', dates[0], ', to: ', dates[1]);
+    console.log('From: ', dateStrings[0], ', to: ', dateStrings[1]);
+  }
+
   const columns: Array<ProColumnType<AdAccountInfoItemProps>> = [
     {
-      title: '账号',
-      dataIndex: 'sam',
-      hideInForm: true,
-      fixed: 'left',      // 固定左侧
-      width: '10%',
-    },
-    {
       title: '姓名',
-      dataIndex: 'name',
-      width: '8%',
+      dataIndex: 'displayName',
+      fixed: 'left',
+      width: 100,
       copyable: true,
     },
     {
+      title: '账号',
+      dataIndex: 'sAMAccountName',
+      hideInForm: true,
+      // fixed: 'left',      // 固定左侧
+      width: 130,
+    },
+    // {
+    //   title: 'objectGUID',
+    //   dataIndex: 'objectGUID',
+    //   hideInForm: true,
+    //   width: 300,
+    // },
+    {
       title: '邮箱',
-      dataIndex: 'email',
+      dataIndex: 'mail',
       copyable: true,
       hideInForm: true,
       hideInSearch: true,
-      width: '20%',
+      width: 260,
+    },
+    // 等待LDAP数据全量更新，mobile字段替代telephoneNumber字段更准确些，注意其他平台同步修改
+    {
+      title: '移动电话',
+      dataIndex: 'mobile',
+      copyable: true,
+      hideInForm: true,
+      hideInSearch: true,
+      width: 120,
     },
     {
       title: '手机号',
-      dataIndex: 'telphone',
+      dataIndex: 'telephoneNumber',
       copyable: true,
       hideInForm: true,
       hideInSearch: true,
-      width: '10%',
+      width: 120,
     },
     {
       title: '职位',
       dataIndex: 'title',
       hideInForm: true,
       hideInSearch: true,
-      width: '10%',
+      width: 100,
     },
     {
       title: '部门',
       dataIndex: 'department',
-      copyable: true,           // 可复制
-      ellipsis: true,           // 省略过长文本
+      // ellipsis: true,           // 省略过长文本
       hideInForm: true,
-      width: '22%',
+      width: 100,
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'whenCreated',
+      // ellipsis: true,
+      hideInForm: true,
+      width: 200,
+      valueType: 'dateTime',
+      // TODO: 搜索框能不能和该列的类型不同，比如列是dateTime类型，搜索框是dateTimeRange类型
+      // 方便对其进行时间范围上的框选
+    },
+    {
+      title: '修改时间',
+      dataIndex: 'whenChanged',
+      // ellipsis: true,
+      hideInForm: true,
+      width: 200,
+      valueType: 'dateTime',
     },
     {
       title: '操作',
@@ -70,8 +112,9 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
       hideInForm: true,
       hideInSearch: true,
       fixed: 'right',
-      width: '20%',
+      width: 150,
       render: () => <Button danger onClick={resetPwd} disabled>重设密码</Button>,
+      // TODO: 重置密码嵌套popfirm，和管理员可以在页面直接修改或者移动用户架构放在一起完善后端接口
     },
   ]
 
@@ -102,7 +145,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
     handleSubmit(values);
     setVisible(false);
   };
-  // 从HAND的HR系统创建账号
+  // 从母公司的HR系统创建账号
   function batchAddHandAdAccount() {
     setHrVisible(true);
     console.log('批量创建账号会提供一个表格模板，填写后上传校验并批量创建账号')
@@ -250,13 +293,14 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
     <PageHeaderWrapper>
       <ProTable
         headerTitle="AD域用户列表"
-        rowKey="sam"
+        rowKey="sAMAccountName"
         columns={columns}             // 列名
         loading={loading}             // 加载中
         onLoad={() => setLoading(false)}  // 数据加载完操作
         scroll={{ x: 1300 }}          // 滑动轴
         pagination={{                 // 分页
           showQuickJumper: true,
+          pageSize: 10   // 每页10条数据
         }}
         // 表格请求数据
         request={async (params = {}) =>
@@ -270,7 +314,8 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
         search={{
           defaultCollapsed: false,
           defaultColsNumber: 1,
-          span: 6,
+          split: true,
+          span: 8,
           optionRender: ({ searchText, resetText }, { form }) => {
             return [
               <a
@@ -291,6 +336,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
               </a>,
             ];
           },
+          searchText:'查询'
         }}
         toolBarRender={(action, { selectedRows }) => [
           // 多选情况下出现的按钮
@@ -332,6 +378,18 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
         }
         rowSelection={{}}   // 多选
       />
+      <RangePicker
+      ranges={{
+        '最近三月': [moment().subtract(3, 'months'), moment()],
+        '最近三周': [moment().subtract(3, 'weeks'), moment()],
+        '最近三天': [moment().subtract(3, 'days'), moment()],
+        '今天': [moment(), moment()],
+        // '最近一小时': [moment().startOf('hour'), moment().endOf('hour')],
+      }}
+      showTime
+      format="YYYY/MM/DD HH:mm:ss"
+      onChange={onChange}
+    />
 
       <Modal
         destroyOnClose
@@ -399,7 +457,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
                     pattern: /^[^\s]*$/,
                     message: '禁止输入空格!'
                   }]} />
-              <ProFormText width="xs" name="name" label="姓名" placeholder="甄小明"
+              <ProFormText width="xs" name="displayName" label="姓名" placeholder="甄小明"
                 rules={[
                   {
                     required: true,
@@ -422,7 +480,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
                   }]} />
             </ProForm.Group>
             <ProForm.Group title="联系信息">
-              <ProFormText width="s" name="email" label="邮箱" placeholder="XXX@hand-china.com"
+              <ProFormText width="s" name="mail" label="邮箱" placeholder="XXX@XXX-china.com"
                 rules={[
                   {
                     required: true,
@@ -432,7 +490,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
                     pattern: /^[^\s]*$/,
                     message: '禁止输入空格!'
                   }]} />
-              <ProFormText width="s" name="tel" label="手机" placeholder="手机号"
+              <ProFormText width="s" name="telephoneNumber" label="手机" placeholder="手机号"
                 rules={[
                   {
                     required: true,

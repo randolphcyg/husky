@@ -63,7 +63,6 @@ def ldap_login(request):
             if res:
                 entry = conn_ad.response[0]
                 if 'attributes' in entry.keys():
-                    attr_dict = entry['attributes']
                     # 校验dn的密码
                     dn = entry['dn']
                     try:
@@ -135,7 +134,7 @@ def test_send_mail(request):
         res = dict()
         try:
             test_send_res = test_send_create_ad_user_init_info_mail(
-                sam='Z66666',
+                sAMAccountName='Z66666',
                 pwd='test6666',
                 mail_host=mailServerSmtpServer,
                 mail_user=mailServerAdmin,
@@ -335,7 +334,7 @@ def access_ad_server() -> object:
                        port=636,               # 636安全端口
                        use_ssl=True,
                        get_info=ALL,
-                       connect_timeout=20)      # 连接超时为3秒
+                       connect_timeout=30)      # 连接超时为3秒
     try:
         conn_ad = Connection(
             server=server_ad,
@@ -357,39 +356,58 @@ def access_ad_server() -> object:
 
 
 def back_ad_account_to_redis(searchFilterUser, baseDnEnabled, conn_redis_accounts) -> list:
-    '''从AD服务器获取账号数据并存储到redis
+    '''从AD服务器获取用户数据并转储到redis
     '''
     # 连接AD域
     conn_ad = access_ad_server()
     # 查询AD服务器
-    attr = ['sAMAccountName',
-            'displayName',
-            'distinguishedName',
-            'mail',
-            'telephoneNumber',
-            'title',
-            'whenCreated',
+    attr = ['objectGUID',           # LDAP唯一标识符
+            'sAMAccountName',       # SAM账号
+            'distinguishedName',    # dn
+            'accountExpires',       # 账户过期时间
+            'pwdLastSet',           # 用户下次登录必须修改密码
+            'whenCreated',          # 创建时间
+            'whenChanged',          # 修改时间
+            'displayName',          # 显示名
+            'sn',                   # 姓
+            'givenName',            # 名
+            'mail',                 # 邮箱
+            'mobile',               # 移动电话
+            'telephoneNumber',      # 电话号码
+            'company',              # 公司
+            'department',           # 部门
+            'title',                # 职务
+            'badPwdCount',          # 密码错误次数
             ]
     entry_list = conn_ad.extend.standard.paged_search(
         search_filter=searchFilterUser,
         search_base=baseDnEnabled,
         search_scope=SUBTREE,
         attributes=attr,
-        paged_size=100,
+        paged_size=500,
         generator=False)        # 关闭生成器，结果为列表
     # 存入数据库
     body = list()
     for user in entry_list:
+        # 从LDAP服务器查询任何数据都要作有无此属性的判断
         body.append(
             {
-                'sam': user['attributes']['sAMAccountName'],
-                'name': user['attributes']['displayName'],
-                'department': '/'.join([x.replace('OU=', '') for x in user['attributes']['distinguishedName'].split(',', 1)[1].rsplit(',', 2)[0].split(',')][::-1]),
-                'email': user['attributes']['mail'],
-                'telphone': user['attributes']['telephoneNumber'],
+                'objectGUID': user['attributes']['objectGUID'],
+                'sAMAccountName': user['attributes']['sAMAccountName'],
+                'accountExpires': str(user['attributes']['accountExpires']),
+                'pwdLastSet': str(user['attributes']['pwdLastSet']),
+                'whenCreated': user['attributes']['whenCreated'].strftime('%Y-%m-%d %H:%M:%S'),
+                'whenChanged': user['attributes']['whenChanged'].strftime('%Y-%m-%d %H:%M:%S'),
+                'displayName': user['attributes']['displayName'],
+                # 'department': '/'.join([x.replace('OU=', '') for x in user['attributes']['distinguishedName'].split(',', 1)[1].rsplit(',', 2)[0].split(',')][::-1]),
+                'department': user['attributes']['distinguishedName'].split(',', 1)[1].split(',')[0].replace('OU=', ''),
                 'title': user['attributes']['title'],
+                'mail': user['attributes']['mail'],
+                'mobile': user['attributes']['mobile'] if hasattr(user['attributes'], 'mobile') else '暂无',
+                'telephoneNumber': user['attributes']['telephoneNumber'],
             }
         )
+        # break
     # 将最新的数据覆盖过来
     AdServerAccounts = dict()
     AdServerAccounts['result'] = body
@@ -401,16 +419,13 @@ def back_ad_account_to_redis(searchFilterUser, baseDnEnabled, conn_redis_account
 
 @csrf_exempt
 def fetch_ad_account_list(request) -> json:
-    '''查询AD域的账户列表,页数由前端传参,之后改成分页类型的
+    '''查询AD域的账户列表,前端分页，后端传符合条件的全量数据
     '''
     if request.method == 'GET':
         # 前端传值
-        # current = request.GET.get('current')        # 当前页数
-        # pageSize = request.GET.get('pageSize')        # 页数
-        sam = request.GET.get('sam')        # ldap账号
-        name = request.GET.get('name')        # 姓名
+        sAMAccountName = request.GET.get('sAMAccountName')        # ldap账号
+        displayName = request.GET.get('displayName')        # 姓名
         department = request.GET.get('department')        # 部门
-        # print(current, pageSize, sam, name, department)
         # 从redis的账号库读取数据
         conn_redis_accounts = get_redis_connection("ad_accounts_cache")
         str_data = conn_redis_accounts.get('AdServerAccounts')
@@ -427,10 +442,10 @@ def fetch_ad_account_list(request) -> json:
             baseDnEnabled = json_data['baseDnEnabled']
             body = back_ad_account_to_redis(searchFilterUser, baseDnEnabled, conn_redis_accounts)
         # 在这里对查询到的的数据进行查询过滤
-        if sam is not None and sam != '':       # 根据 ldap账号 模糊查询
-            body = [person for person in body if sam in person['sam']]
-        if name is not None and name != '':       # 根据 name 模糊查询
-            body = [person for person in body if name in person['name']]
+        if sAMAccountName is not None and sAMAccountName != '':       # 根据 ldap账号 模糊查询
+            body = [person for person in body if sAMAccountName in person['sAMAccountName']]
+        if displayName is not None and displayName != '':       # 根据 displayName 模糊查询
+            body = [person for person in body if displayName in person['displayName']]
         if department is not None and department != '':       # 根据 department 模糊查询
             body = [person for person in body if department in person['department']]
         # 组装返回结果
@@ -450,9 +465,9 @@ def add_ad_account(request):
         data_req = json.loads(request.body)
         # 接受前端请求数据
         eid = data_req.get('eid')
-        name = data_req.get('name')
+        displayName = data_req.get('displayName')
         department = data_req.get('department')
-        email = data_req.get('email')
+        mail = data_req.get('mail')
         tel = data_req.get('tel')
         title = data_req.get('title')
         # 准备AD域创建用户所需要的数据
@@ -467,15 +482,15 @@ def add_ad_account(request):
 
         # 用户组织判断
         if department.split('.')[0] == '甄云科技':
-            sam_prefix = zyPrefix
+            sAMAccountName_prefix = zyPrefix
             department_list = department.split('.')
             department_list.insert(1, '上海总部')
-            dn = 'CN=' + str(name + str(eid)) + ',' + 'OU=' + ',OU='.join(department_list[::-1]) + ',' + baseDn
+            dn = 'CN=' + str(displayName + str(eid)) + ',' + 'OU=' + ',OU='.join(department_list[::-1]) + ',' + baseDn
         else:
-            sam_prefix = handPrefix
-            dn = 'CN=' + str(name + str(eid)) + ',' + baseDnHand
-        sam = sam_prefix + str(eid).zfill(6)
-        user_info = [sam, dn, name, email, tel, title]
+            sAMAccountName_prefix = handPrefix
+            dn = 'CN=' + str(displayName + str(eid)) + ',' + baseDnHand
+        sAMAccountName = sAMAccountName_prefix + str(eid).zfill(6)
+        user_info = [sAMAccountName, dn, displayName, mail, tel, title]
 
         create_res_code = create_obj(info=user_info)     # 创建对象结果，创建成功返回数值0
         res_code_map = {
@@ -503,14 +518,14 @@ def create_obj(dn=None, type='user', info=None):
                     'ou': ['organizationalUnit', 'posixGroup', 'top'],
                     }
     if info is not None:
-        [sam, dn, name, email, tel, title] = info
-        user_attr = {'sAMAccountname': sam,      # 登录名
+        [sAMAccountName, dn, displayName, mail, tel, title] = info
+        user_attr = {'sAMAccountname': sAMAccountName,      # 登录名
                      'userAccountControl': 544,  # 启用账户
-                     'displayname': name,        # 姓名
-                     'givenName': name[0:1],     # 姓
-                     'sn': name[1:],             # 名
+                     'displayname': displayName,        # 姓名
+                     'givenName': displayName[0:1],     # 姓
+                     'sn': displayName[1:],             # 名
                      'title': title,             # 头衔
-                     'mail': email,              # 邮箱
+                     'mail': mail,              # 邮箱
                      'telephoneNumber': tel,     # 电话号
                      }
     else:
@@ -542,20 +557,20 @@ def create_obj(dn=None, type='user', info=None):
                 conn_redis = get_redis_connection("configs_cache")
                 str_data = conn_redis.get('MailServerConfig')
                 json_data = json.loads(str_data)
-                send_mail_res = send_create_ad_user_init_info_mail(sam=sam,
+                send_mail_res = send_create_ad_user_init_info_mail(sAMAccountName=sAMAccountName,
                                                                    pwd=new_pwd,
                                                                    mail_host=json_data['mailServerSmtpServer'],
                                                                    mail_user=json_data['mailServerAdmin'],
                                                                    mail_pwd=json_data['mailServerAdminPwd'],
                                                                    mail_sender=json_data['mailServerSender'],
                                                                    ad_help_file_url=json_data['adAccountHelpFile'],
-                                                                   mail_rcv=email,
+                                                                   mail_rcv=mail,
                                                                    )
                 if send_mail_res == 0:
                     return 0
                 else:
                     # 此时密码请保留一份
-                    error_logger.log("发送邮件失败，保留账号: " + sam + "密码: " + new_pwd)
+                    error_logger.log("发送邮件失败，保留账号: " + sAMAccountName + "密码: " + new_pwd)
                     return 1
         else:
             return add_result['result']
@@ -615,7 +630,7 @@ def check_ou(conn, ou, ou_list=None):
 
 
 @csrf_exempt
-def send_create_ad_user_init_info_mail(sam: string,
+def send_create_ad_user_init_info_mail(sAMAccountName: string,
                                        pwd: string,
                                        mail_host: string,
                                        mail_user: string,
@@ -625,7 +640,7 @@ def send_create_ad_user_init_info_mail(sam: string,
                                        mail_rcv: string,
                                        ) -> int:
     '''创建账户成功，给该用户邮箱发送邮件
-    sam: AD账号
+    sAMAccountName: AD账号
     pwd: AD账号密码
     '''
     # 邮件标题
@@ -1117,7 +1132,7 @@ def send_create_ad_user_init_info_mail(sam: string,
 
                     <div style="Margin-left: 20px;Margin-right: 20px;Margin-top: 24px;">
             <div style="mso-line-height-rule: exactly;mso-text-raise: 11px;vertical-align: middle;">
-                <h1 class="size-24" style="Margin-top: 0;Margin-bottom: 0;font-style: normal;font-weight: normal;color: #565656;font-size: 20px;line-height: 28px;font-family: Avenir,sans-serif;" lang="x-size-24">&#29956;&#20113;&#31185;&#25216;&#32479;&#19968;&#35748;&#35777;&#36134;&#21495;</h1><p style="Margin-top: 20px;Margin-bottom: 0;font-family: ubuntu,sans-serif;"><span class="font-ubuntu">&#24744;&#22909;&#65292;&#24050;&#20026;&#24744;&#21019;&#24314;&#36134;&#21495;&#65292;&#20449;&#24687;&#22914;&#19979;&#65306;</span></p><ul style="Margin-top: 20px;Margin-bottom: 0;Margin-left: 24px;padding: 0;list-style-type: disc;"><li style="Margin-top: 20px;Margin-bottom: 0;Margin-left: 0;text-align: left;font-family: Ubuntu, sans-serif;"><span class="font-ubuntu"><strong>&#29992;&#25143;&#21517;</strong>: """ + sam + """</span></li><li style="Margin-top: 0;Margin-bottom: 0;Margin-left: 0;font-family: Ubuntu,
+                <h1 class="size-24" style="Margin-top: 0;Margin-bottom: 0;font-style: normal;font-weight: normal;color: #565656;font-size: 20px;line-height: 28px;font-family: Avenir,sans-serif;" lang="x-size-24">&#29956;&#20113;&#31185;&#25216;&#32479;&#19968;&#35748;&#35777;&#36134;&#21495;</h1><p style="Margin-top: 20px;Margin-bottom: 0;font-family: ubuntu,sans-serif;"><span class="font-ubuntu">&#24744;&#22909;&#65292;&#24050;&#20026;&#24744;&#21019;&#24314;&#36134;&#21495;&#65292;&#20449;&#24687;&#22914;&#19979;&#65306;</span></p><ul style="Margin-top: 20px;Margin-bottom: 0;Margin-left: 24px;padding: 0;list-style-type: disc;"><li style="Margin-top: 20px;Margin-bottom: 0;Margin-left: 0;text-align: left;font-family: Ubuntu, sans-serif;"><span class="font-ubuntu"><strong>&#29992;&#25143;&#21517;</strong>: """ + sAMAccountName + """</span></li><li style="Margin-top: 0;Margin-bottom: 0;Margin-left: 0;font-family: Ubuntu,
         sans-serif;"><span class="font-ubuntu"><strong>&#21021;&#22987;&#23494;&#30721;</strong>: """ + pwd + """</span></li></ul><p style="Margin-top: 20px;Margin-bottom: 0;font-family: verdana,sans-serif;"><span class="font-verdana">&#8203;&#8203;<strong>&#21021;&#22987;&#23494;&#30721;&#21487;&#20197;&#20462;&#25913;</strong>&#65292;&#35831;&#21450;&#26102;&#20462;&#25913;&#23494;&#30721;&#65281;</span></p><p style="Margin-top: 20px;Margin-bottom: 20px;font-family: verdana,sans-serif;"><span class="font-verdana"><strong>&#36134;&#21495;&#23494;&#30721;&#20449;&#24687;&#20165;&#38480;&#26412;&#20154;&#20351;&#29992;</strong>&#65292;&#19981;&#24471;&#20511;&#19982;&#20182;&#20154;!</span></p>
             </div>
             </div>
@@ -1208,7 +1223,7 @@ def send_create_ad_user_init_info_mail(sam: string,
 
 
 @csrf_exempt
-def test_send_create_ad_user_init_info_mail(sam: string,
+def test_send_create_ad_user_init_info_mail(sAMAccountName: string,
                                             pwd: string,
                                             mail_host: string,
                                             mail_user: string,
@@ -1218,7 +1233,7 @@ def test_send_create_ad_user_init_info_mail(sam: string,
                                             mail_rcv: string,
                                             ) -> int:
     '''给指定邮箱邮箱发送测试邮件
-    sam: AD账号
+    sAMAccountName: AD账号
     pwd: AD账号密码
     '''
     # 邮件标题
@@ -1708,7 +1723,7 @@ def test_send_create_ad_user_init_info_mail(sam: string,
 
                     <div style="Margin-left: 20px;Margin-right: 20px;Margin-top: 24px;">
             <div style="mso-line-height-rule: exactly;mso-text-raise: 11px;vertical-align: middle;">
-                <h1 class="size-24" style="Margin-top: 0;Margin-bottom: 0;font-style: normal;font-weight: normal;color: #565656;font-size: 20px;line-height: 28px;font-family: Avenir,sans-serif;" lang="x-size-24">&#29956;&#20113;&#31185;&#25216;&#32479;&#19968;&#35748;&#35777;&#36134;&#21495;</h1><p style="Margin-top: 20px;Margin-bottom: 0;font-family: ubuntu,sans-serif;"><span class="font-ubuntu">&#24744;&#22909;&#65292;&#24050;&#20026;&#24744;&#21019;&#24314;&#36134;&#21495;&#65292;&#20449;&#24687;&#22914;&#19979;&#65306;</span></p><ul style="Margin-top: 20px;Margin-bottom: 0;Margin-left: 24px;padding: 0;list-style-type: disc;"><li style="Margin-top: 20px;Margin-bottom: 0;Margin-left: 0;text-align: left;font-family: Ubuntu, sans-serif;"><span class="font-ubuntu"><strong>&#29992;&#25143;&#21517;</strong>: """ + sam + """</span></li><li style="Margin-top: 0;Margin-bottom: 0;Margin-left: 0;font-family: Ubuntu,
+                <h1 class="size-24" style="Margin-top: 0;Margin-bottom: 0;font-style: normal;font-weight: normal;color: #565656;font-size: 20px;line-height: 28px;font-family: Avenir,sans-serif;" lang="x-size-24">&#29956;&#20113;&#31185;&#25216;&#32479;&#19968;&#35748;&#35777;&#36134;&#21495;</h1><p style="Margin-top: 20px;Margin-bottom: 0;font-family: ubuntu,sans-serif;"><span class="font-ubuntu">&#24744;&#22909;&#65292;&#24050;&#20026;&#24744;&#21019;&#24314;&#36134;&#21495;&#65292;&#20449;&#24687;&#22914;&#19979;&#65306;</span></p><ul style="Margin-top: 20px;Margin-bottom: 0;Margin-left: 24px;padding: 0;list-style-type: disc;"><li style="Margin-top: 20px;Margin-bottom: 0;Margin-left: 0;text-align: left;font-family: Ubuntu, sans-serif;"><span class="font-ubuntu"><strong>&#29992;&#25143;&#21517;</strong>: """ + sAMAccountName + """</span></li><li style="Margin-top: 0;Margin-bottom: 0;Margin-left: 0;font-family: Ubuntu,
         sans-serif;"><span class="font-ubuntu"><strong>&#21021;&#22987;&#23494;&#30721;</strong>: """ + pwd + """</span></li></ul><p style="Margin-top: 20px;Margin-bottom: 0;font-family: verdana,sans-serif;"><span class="font-verdana">&#8203;&#8203;<strong>&#21021;&#22987;&#23494;&#30721;&#21487;&#20197;&#20462;&#25913;</strong>&#65292;&#35831;&#21450;&#26102;&#20462;&#25913;&#23494;&#30721;&#65281;</span></p><p style="Margin-top: 20px;Margin-bottom: 20px;font-family: verdana,sans-serif;"><span class="font-verdana"><strong>&#36134;&#21495;&#23494;&#30721;&#20449;&#24687;&#20165;&#38480;&#26412;&#20154;&#20351;&#29992;</strong>&#65292;&#19981;&#24471;&#20511;&#19982;&#20182;&#20154;!</span></p>
             </div>
             </div>

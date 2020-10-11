@@ -3,7 +3,7 @@ export default {
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',
   'menu.ad': 'AD域管理',  // AD域管理
-  'menu.ad.server': 'AD域服务器',  // AD域管理-服务器
+  'menu.ad.ou': 'AD域组织单位',  // AD域管理-组织单位
   'menu.ad.account': 'AD域账户',  // AD域管理-账户
   'menu.visual': '可视化',  // 可视化
   'menu.visual.bug': 'BUG可视化',  // 可视化-bug

@@ -34,9 +34,9 @@ export interface AdServerFormProps {
 // AD域账户信息数据项接口
 export interface AdAccountInfoItemProps {
   sam: string;
-  name: string;
+  sAMAccountName: string;
   department: string;
-  email: number;
+  mail: number;
   telphone: string;
   title: string;
   options: any;
@@ -47,7 +47,7 @@ export interface ModalFormItemProps {
   eid: string;
   name: string;
   department: string;
-  email: string;
+  mail: string;
   tel: string;
 }
 
