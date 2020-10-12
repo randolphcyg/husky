@@ -1,3 +1,4 @@
+import { RangePickerDateProps } from 'antd/lib/date-picker/generatePicker';
 import { request } from 'umi';
 
 // AD账号数据项接口
@@ -38,6 +39,8 @@ export interface AdAccountInfoItemProps {
   department: string;
   mail: number;
   telphone: string;
+  whenCreated: RangePickerDateProps<Date>;    // 不知道这么定义类型行不行 待请教
+  whenChanged: RangePickerDateProps<Date>;
   title: string;
   options: any;
 }
@@ -62,9 +65,10 @@ export interface ModalFormProps {
  * @summary 获取AD域账户列表
  * @description 获取列表
  */
-export async function fetchAdAccountList() {
+export async function fetchAdAccountList(params: AdAccountInfoItemProps) {
   return request('/api/fetchAdAccountList', {
     method: 'GET',
+    data: params,
   });
 }
 // service 创建AD域账户接口

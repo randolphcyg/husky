@@ -5,6 +5,7 @@ import random
 import re
 import smtplib
 import string
+from datetime import datetime, timedelta
 from email.header import Header
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
@@ -396,8 +397,8 @@ def back_ad_account_to_redis(searchFilterUser, baseDnEnabled, conn_redis_account
                 'sAMAccountName': user['attributes']['sAMAccountName'],
                 'accountExpires': str(user['attributes']['accountExpires']),
                 'pwdLastSet': str(user['attributes']['pwdLastSet']),
-                'whenCreated': user['attributes']['whenCreated'].strftime('%Y-%m-%d %H:%M:%S'),
-                'whenChanged': user['attributes']['whenChanged'].strftime('%Y-%m-%d %H:%M:%S'),
+                'whenCreated': (user['attributes']['whenCreated'] + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S'),
+                'whenChanged': (user['attributes']['whenChanged'] + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S'),
                 'displayName': user['attributes']['displayName'],
                 # 'department': '/'.join([x.replace('OU=', '') for x in user['attributes']['distinguishedName'].split(',', 1)[1].rsplit(',', 2)[0].split(',')][::-1]),
                 'department': user['attributes']['distinguishedName'].split(',', 1)[1].split(',')[0].replace('OU=', ''),
@@ -423,9 +424,11 @@ def fetch_ad_account_list(request) -> json:
     '''
     if request.method == 'GET':
         # 前端传值
-        sAMAccountName = request.GET.get('sAMAccountName')        # ldap账号
-        displayName = request.GET.get('displayName')        # 姓名
-        department = request.GET.get('department')        # 部门
+        sAMAccountName = request.GET.get('sAMAccountName')      # ldap账号
+        displayName = request.GET.get('displayName')            # 姓名
+        department = request.GET.get('department')              # 部门
+        whenCreatedRange = request.GET.getlist('whenCreated')            # 创建时间
+        whenChangedRange = request.GET.getlist('whenChanged')            # 创建时间
         # 从redis的账号库读取数据
         conn_redis_accounts = get_redis_connection("ad_accounts_cache")
         str_data = conn_redis_accounts.get('AdServerAccounts')
@@ -448,6 +451,10 @@ def fetch_ad_account_list(request) -> json:
             body = [person for person in body if displayName in person['displayName']]
         if department is not None and department != '':       # 根据 department 模糊查询
             body = [person for person in body if department in person['department']]
+        if whenCreatedRange is not None and whenCreatedRange != []:
+            body = [person for person in body if whenCreatedRange[0] < person['whenCreated'] < whenCreatedRange[1]]
+        if whenChangedRange is not None and whenChangedRange != []:            
+            body = [person for person in body if whenChangedRange[0] < person['whenChanged'] < whenChangedRange[1]]
         # 组装返回结果
         res = {
             'code': 0,

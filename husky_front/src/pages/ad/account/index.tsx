@@ -5,7 +5,7 @@ import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { ProColumnType } from '@ant-design/pro-table/es/Table';
-import { DatePicker, Button, Divider, Dropdown, Menu, message, Modal, Popconfirm, Table, Tag, Transfer } from 'antd';
+import { Button, DatePicker, Divider, Dropdown, Menu, message, Modal, Popconfirm, Table, Tag, Transfer } from 'antd';
 import difference from 'lodash/difference';
 import moment from "moment";
 import React, { useEffect, useState } from 'react';
@@ -21,12 +21,6 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
   const [btnUpdateLoading, setBtnUpdateLoading] = useState(false);    // 更新按钮异步任务
   const [hrVisible, setHrVisible] = useState(false);
   const [visibleOption, setVisibleOption] = useState(false);
-
-
-  function onChange(dates, dateStrings) {
-    console.log('From: ', dates[0], ', to: ', dates[1]);
-    console.log('From: ', dateStrings[0], ', to: ', dateStrings[1]);
-  }
 
   const columns: Array<ProColumnType<AdAccountInfoItemProps>> = [
     {
@@ -91,7 +85,6 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
     {
       title: '创建时间',
       dataIndex: 'whenCreated',
-      // ellipsis: true,
       hideInForm: true,
       width: 200,
       valueType: 'dateTime',
@@ -102,19 +95,17 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
             '最近三月': [moment().subtract(3, 'months'), moment()],
             '最近三周': [moment().subtract(3, 'weeks'), moment()],
             '最近三天': [moment().subtract(3, 'days'), moment()],
-            '今天': [moment().subtract(1, 'days'), moment()],
-            '最近一小时': [moment().subtract(1, 'hours'), moment().endOf('hour')],
+            '今天': [moment().startOf('day'), moment()],
+            '最近一小时': [moment().subtract(1, 'hours'), moment()],
           }}
           showTime
           format="YYYY/MM/DD HH:mm:ss"
-          onChange={onChange}
         />;
       }
     },
     {
       title: '修改时间',
       dataIndex: 'whenChanged',
-      // ellipsis: true,
       hideInForm: true,
       width: 200,
       valueType: 'dateTime',
@@ -125,12 +116,11 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
             '最近三月': [moment().subtract(3, 'months'), moment()],
             '最近三周': [moment().subtract(3, 'weeks'), moment()],
             '最近三天': [moment().subtract(3, 'days'), moment()],
-            '今天': [moment().subtract(1, 'days'), moment()],
-            '最近一小时': [moment().subtract(1, 'hours'), moment().endOf('hour')],
+            '今天': [moment().startOf('day'), moment()],
+            '最近一小时': [moment().subtract(1, 'hours'), moment()],
           }}
           showTime
           format="YYYY/MM/DD HH:mm:ss"
-          onChange={onChange}
         />;
       }
     },
@@ -345,7 +335,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
           split: true,
           span: 8,
           collapsed: false,   // 不收起查询
-          collapseRender: (collapsed: false, showCollapseButton: false) => { <></> },  // 收起按钮渲染为空(去掉收起按钮)
+          collapseRender: () => { return <></>; },  // 收起按钮渲染为空(去掉收起按钮)
           optionRender: ({ searchText, resetText }, { form }) => {
             return [
               <Button key="searchText" type="primary"
@@ -370,8 +360,8 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
                   }}
                   selectedKeys={[]}
                 >
-                  <Menu.Item key="remove">批量删除</Menu.Item>
-                  <Menu.Item key="approval">批量审批</Menu.Item>
+                  <Menu.Item key="btnBatchRemove">批量删除</Menu.Item>
+                  <Menu.Item key="btnBatchApproval">批量审批</Menu.Item>
                 </Menu>
               }
             >
