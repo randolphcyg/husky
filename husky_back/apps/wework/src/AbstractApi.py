@@ -114,7 +114,7 @@ class AbstractApi(object):
         errCode = response.get('errcode')
         errMsg = response.get('errmsg')
 
-        if errCode is 0:
+        if errCode == 0:
             return response
         else:
             raise ApiException(errCode, errMsg)

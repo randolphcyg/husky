@@ -8,7 +8,7 @@
             "program": "${workspaceFolder}\\husky_back\\manage.py",
             "args": [
                 "runserver",
-                "--noreload"
+                "--noreload",
             ],
             "django": true
         },

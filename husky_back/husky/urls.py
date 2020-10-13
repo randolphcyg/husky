@@ -13,26 +13,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path
-from django.conf.urls import include, url
-from apps.visual.views import bugs
-from apps.user.views import (login_view,
-                             current_user,
-                             load_account_config,
-                             save_account_config)
-from apps.ad.views import (fetch_ad_account_list,
-                           add_ad_account,
-                           save_ad_server_config,
-                           test_ad_server_config_is_connect,
+from apps.ad.views import (add_ad_account, fetch_ad_account_list, ldap_login,
                            load_ad_server_config_form_data,
                            load_mail_server_config_form_data,
-                           save_mail_server_config,
-                           test_send_mail,
-                           ldap_login,
-                           )
-from apps.wework.views import wework_contact, wework_ldap, featch_wework_user_list
-
+                           save_ad_server_config, save_mail_server_config,
+                           test_ad_server_config_is_connect, test_send_mail)
+from apps.user.views import (current_user, load_account_config, login_view,
+                             save_account_config)
+from apps.visual.views import bugs
+from apps.wework.views import (featch_wework_user_list, wework_contact,
+                               wework_ldap)
+from django.conf.urls import include, url
+from django.contrib import admin
+from django.urls import path
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -56,5 +49,4 @@ urlpatterns = [
     url(r'api/weworkLdap', wework_ldap, name='weworkLdap'),
     # 企业微信自建应用
     url(r'api/featchWeworkUserList', featch_wework_user_list, name='featchWeworkUserList'),
-    
 ]

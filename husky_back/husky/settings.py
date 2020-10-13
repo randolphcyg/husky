@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 import sys
+
 import pymysql
 
 pymysql.install_as_MySQLdb()
@@ -46,6 +47,9 @@ INSTALLED_APPS = [
     'apps.ad',          # AD域管理模块
     'rest_framework',    # restful
     # 'apps.api.apps.ApiConfig',    # restful
+    'celery',
+    'django_celery_beat',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -109,7 +113,7 @@ CACHES = {
         "LOCATION": "redis://127.0.0.1:6379/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            # "PASSWORD": "V%xw1xZqDK",   # 密码
+            "PASSWORD": "V%xw1xZqDK",   # 密码
         }
     },
     # 配置信息缓存库
@@ -118,7 +122,7 @@ CACHES = {
         "LOCATION": "redis://127.0.0.1:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            # "PASSWORD": "V%xw1xZqDK",   # 密码
+            "PASSWORD": "V%xw1xZqDK",   # 密码
         }
     },
     # AD域账号信息缓存库
@@ -127,10 +131,42 @@ CACHES = {
         "LOCATION": "redis://127.0.0.1:6379/2",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            # "PASSWORD": "V%xw1xZqDK",   # 密码
+            "PASSWORD": "V%xw1xZqDK",   # 密码
         }
     }
 }
+
+# celery相关配置
+# 配置celery时区，默认时UTC。
+timezone = 'Asia/Shanghai'
+
+# 任务队列的链接地址 celery配置redis作为broker。redis有16个数据库，编号0~15，这里使用第1个。
+broker_url = 'redis://:V%xw1xZqDK@127.0.0.1:6379/3'
+
+# 设置存储结果的后台  结果队列的链接地址
+result_backend = 'redis://:V%xw1xZqDK@127.0.0.1:6379/4'
+
+# 可接受的内容格式
+accept_content = ["json"]
+# 任务序列化数据格式
+task_serializer = "json"
+# 结果序列化数据格式
+result_serializer = "json"
+
+# 可选参数：给某个任务限流
+# task_annotations = {'tasks.my_task': {'rate_limit': '10/s'}}
+
+# 可选参数：给任务设置超时时间。超时立即中止worker
+# task_time_limit = 10 * 60
+
+# 可选参数：给任务设置软超时时间，超时抛出Exception
+# task_soft_time_limit = 10 * 60
+
+# 可选参数：如果使用django_celery_beat进行定时任务
+beat_scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
+
+# 更多选项见
+# https://docs.celeryproject.org/en/stable/userguide/configuration.html
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
