@@ -139,10 +139,10 @@ CACHES = {
 # 配置celery时区，默认时UTC。
 timezone = 'Asia/Shanghai'
 
-# 任务队列的链接地址 celery配置redis作为broker。redis有16个数据库，编号0~15，这里使用第1个。
+# 任务队列的链接地址 celery配置redis作为broker
 broker_url = 'redis://:V%xw1xZqDK@127.0.0.1:6379/3'
 
-# 设置存储结果的后台  结果队列的链接地址
+# 设置存储结果的后台 结果队列的链接地址
 result_backend = 'redis://:V%xw1xZqDK@127.0.0.1:6379/4'
 
 # 可接受的内容格式

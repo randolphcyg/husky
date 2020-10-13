@@ -87,7 +87,7 @@ const AccountView: React.FC<AccountFormItemProps> = (props) => {
                         <Field text="Z25576" valueType="text" mode={'read'} plain={true} />
                     </Descriptions.Item>
                     <Descriptions.Item label="真实姓名">
-                        <Field text="蔡迎港" valueType="text" mode={'read'} plain={true} />
+                        <Field text="管理员" valueType="text" mode={'read'} plain={true} />
                     </Descriptions.Item>
                     <Descriptions.Item label="头像">
                         <Field
@@ -100,10 +100,10 @@ const AccountView: React.FC<AccountFormItemProps> = (props) => {
                         <Field text="技术顾问" valueType="text" mode={state} plain={true} initialValue="技术顾问" />
                     </Descriptions.Item>
                     <Descriptions.Item label="邮箱">
-                        <Field text="yinggang.cal@hand-china.com" valueType="text" mode={state} plain={true} initialValue="yinggang.cal@hand-china.com" />
+                        <Field text="yuan.guanli@hand-china.com" valueType="text" mode={state} plain={true} initialValue="yinggang.cal@hand-china.com" />
                     </Descriptions.Item>
                     <Descriptions.Item label="电话">
-                        <Field text="13341648819" valueType="text" mode={state} plain={true} initialValue="13341648819" />
+                        <Field text="13341646666" valueType="text" mode={state} plain={true} initialValue="13341648819" />
                     </Descriptions.Item>
                 </Descriptions>
 
