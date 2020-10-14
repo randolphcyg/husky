@@ -1,3 +1,4 @@
+import re
 import json
 import logging
 import random
@@ -502,16 +503,23 @@ def reset_ad_account_pwd(request):
     if request.method == 'POST':
         data_req = json.loads(request.body)
         # 接受前端请求数据
-        resetPwdType = data_req.get('resetPwdType')       # 新密码
+        if 'newManualPwd' in data_req.keys():       # 手动设置密码 后端再次校验密码强度
+            newManualPwd = data_req.get('newManualPwd')       # 前端传过来的新密码
+            if newManualPwd is not None:
+                pwd_judge_res = judge_pwd_level(newManualPwd)
+                if not pwd_judge_res:
+                    res = {
+                        'code': -1,
+                        'message': '密码复杂度要求: 大小写、数字、特殊字符【!@#$%^&*()】四个必须满足三个!',
+                    }
+                    return JsonResponse(res)
+        else:           # 自动设置密码
+            newManualPwd = generate_pwd(8)
+
         resetPwdDisplayName = data_req.get('resetPwdDisplayName')
         resetPwdMail = data_req.get('resetPwdMail')
         resetPwdSam = data_req.get('resetPwdSam')
-        print(resetPwdType, resetPwdDisplayName, resetPwdMail, resetPwdSam)
-        if resetPwdType == 'manual':
-            newManualPwd = data_req.get('newManualPwd')       # 新密码
-            if newManualPwd is not None:
-                print(newManualPwd)
-        # dn = data_req.get('dn')         # 账号
+        # print(resetPwdDisplayName, resetPwdMail, resetPwdSam)
 
         # 从redis的配置库读取AD配置
         conn_redis_configs = get_redis_connection("configs_cache")
@@ -530,6 +538,32 @@ def reset_ad_account_pwd(request):
         }
         # logger.info('修改用户密码异步任务: ' + 'DN: ' + displayName + 'SAM: ' + sAMAccountName)
         return JsonResponse(res)
+
+
+def judge_pwd_level(pwd):
+    '''密码复杂度判断
+    '''
+    level = 0
+    NUMBER = re.compile(r'[0-9]')
+    LOWER_CASE = re.compile(r'[a-z]')
+    UPPER_CASE = re.compile(r'[A-Z]')
+    OTHERS = re.compile(r'[^0-9A-Za-z]')
+    if len(pwd) < 8:
+        return False
+    else:
+        if NUMBER.search(pwd):
+            level += 1
+        if LOWER_CASE.search(pwd):
+            level += 1
+        if UPPER_CASE.search(pwd):
+            level += 1
+        if OTHERS.search(pwd):
+            level += 1
+        # 密码复杂度要求
+        if level >= 3:
+            return True
+        else:
+            return False
 
 
 @csrf_exempt

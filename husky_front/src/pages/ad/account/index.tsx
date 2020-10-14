@@ -29,6 +29,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
     resetPwdSam: '',
     resetPwdDisplayName: '',
     resetPwdMail: '',
+    newManualPwd: '',    // 新密码
   }
 
   const columns: Array<ProColumnType<AdAccountInfoItemProps>> = [
@@ -194,6 +195,8 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
   // 重设密码模态框下拉框
   function onSelectResetPwdTypechange(value: string) {
     if (value === 'auto') {
+      resetPwdProForm.setFieldsValue({'newManualPwd': ''})    // 前端不给定新的密码
+      console.log(resetPwdProForm.getFieldValue('newManualPwd'))
       setInputResetPwdVisible(false);   // 自动重设密码输入框隐藏
     } else if (value === 'manual') {
       setInputResetPwdVisible(true);    // 手动重设密码输入框出现
@@ -217,7 +220,6 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
     catch (error) {
       message.error('提交重设密码申请失败，请重试!');
     }
-    // setVisibleResetPwdModal(false);    // 关闭模态框
   };
 
   /**
