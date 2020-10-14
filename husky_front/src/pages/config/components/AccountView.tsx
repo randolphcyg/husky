@@ -5,7 +5,6 @@ import Field, { ProFieldFCMode } from '@ant-design/pro-field';
 import ProForm from '@ant-design/pro-form';
 import { Button, Descriptions, Divider, message, Popconfirm } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { connect } from 'umi';
 
 
 
@@ -107,7 +106,7 @@ const AccountView: React.FC<AccountFormItemProps> = (props) => {
                     </Descriptions.Item>
                 </Descriptions>
 
-                <Popconfirm title="确定修改？" okText="是" cancelText="否" icon={ <ExclamationCircleOutlined />}
+                <Popconfirm title="确定修改？" okText="是" cancelText="否" icon={<ExclamationCircleOutlined />}
                     onConfirm={() => {
                         proForm.validateFields()
                             .then(values => {
@@ -137,4 +136,4 @@ const AccountView: React.FC<AccountFormItemProps> = (props) => {
     );
 }
 
-export default connect(({ }) => ({}))(AccountView);
+export default AccountView;

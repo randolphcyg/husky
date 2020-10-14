@@ -4,7 +4,6 @@ import ProCard from '@ant-design/pro-card';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { Button, Divider, Form, Input, message, Popconfirm } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { connect } from 'umi';
 
 
 const MsgView: React.FC<MailServerFormProps> = (props) => {
@@ -166,4 +165,4 @@ const MsgView: React.FC<MailServerFormProps> = (props) => {
   );
 }
 
-export default connect(({ }) => ({}))(MsgView);
+export default MsgView;

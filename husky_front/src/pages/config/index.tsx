@@ -1,7 +1,7 @@
 import { PageContainer } from '@ant-design/pro-layout';
 import { Menu } from 'antd';
 import React, { Component } from 'react';
-import { connect, Dispatch, FormattedMessage } from 'umi';
+import { Dispatch, FormattedMessage } from 'umi';
 import AccountView from './components/AccountView';
 import AdServerView from './components/AdServerView';
 import MsgView from './components/MsgView';
@@ -151,6 +151,4 @@ class Settings extends Component<SettingsProps, SettingsState> {
   }
 }
 
-export default connect(
-  ({ accountAndsettings }: { accountAndsettings: {} }) => ({}),
-)(Settings);
+export default Settings;

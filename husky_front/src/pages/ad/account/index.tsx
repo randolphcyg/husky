@@ -5,7 +5,7 @@ import ProForm, { ProFormSelect, ProFormText } from '@ant-design/pro-form';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { ProColumnType } from '@ant-design/pro-table/es/Table';
-import { Button, DatePicker, Divider, Dropdown, Form, Input, Menu, message, Modal, Popconfirm, Table, Tag, Transfer } from 'antd';
+import { Select, Button, DatePicker, Divider, Dropdown, Form, Input, Menu, message, Modal, Popconfirm, Table, Tag, Transfer } from 'antd';
 import difference from 'lodash/difference';
 import moment from "moment";
 import React, { useState } from 'react';
@@ -16,14 +16,15 @@ const { RangePicker } = DatePicker;
 const AdAccountPage: React.FC<ModalFormProps> = () => {
   const [proForm] = ProForm.useForm();
   const [resetPwdProForm] = ProForm.useForm();
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false);    // 创建账户模态框状态
   const [loading, setLoading] = useState(true);    // 表格加载
   const [btnCreateLoading, setBtnCreateLoading] = useState(false);    // 创建按钮异步任务
   const [btnUpdateLoading, setBtnUpdateLoading] = useState(false);    // 更新按钮异步任务
-  const [hrVisible, setHrVisible] = useState(false);
-  const [visibleOption, setVisibleOption] = useState(false);
-  const [inputResetPwdVisible, setInputResetPwdVisible] = useState(false);
-  // 重设密码模态框提供参考信息
+  const [hrVisible, setHrVisible] = useState(false);  // hr系统同步用户模态框状态
+  const [visibleResetPwdModal, setVisibleResetPwdModal] = useState(false);    // 修改密码模态框状态
+  const [inputResetPwdVisible, setInputResetPwdVisible] = useState(false);    // 修改密码模态框表单 修改类型输入框状态
+  const [btnResetPwdLoading, setBtnResetPwdLoading] = useState(false);    // 修改密码 按钮状态
+  // 重设密码模态框表单信息
   const resetPwdmodalProps = {
     resetPwdSam: '',
     resetPwdDisplayName: '',
@@ -143,7 +144,9 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
         <Popconfirm title="确定重设该用户密码？" okText="确定" cancelText="点错了"
           icon={<ExclamationCircleOutlined />}
           onConfirm={() => resetLdapAccountPwd(record)}>
-          <Button danger>重设密码</Button>
+          <Button danger
+            loading={btnResetPwdLoading}
+          >重设密码</Button>
         </Popconfirm>,
     },
   ]
@@ -175,7 +178,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
   // 从母公司的HR系统创建账号
   function batchAddHandAdAccount() {
     setHrVisible(true);
-    console.log('批量创建账号会提供一个表格模板，填写后上传校验并批量创建账号')
+    console.log('穿梭框左表可搜索HAND hr系统用户表，将选中用户向右侧发送，即可生成ldap账号')
   }
 
   // 重设密码触发方法
@@ -184,43 +187,37 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
     resetPwdmodalProps.resetPwdDisplayName = record['displayName'];
     resetPwdmodalProps.resetPwdMail = record['mail'];
     resetPwdProForm.setFieldsValue(resetPwdmodalProps);    // 模态框表单塞值
-    setVisibleOption(true);    // 模态框状态
+    setBtnResetPwdLoading(true);    // 修改密码按钮加载状态
+    setVisibleResetPwdModal(true);    // 模态框加载状态
   }
 
   // 重设密码模态框下拉框
   function onSelectResetPwdTypechange(value: string) {
-    console.log('下拉选项变化')
     if (value === 'auto') {
-      setInputResetPwdVisible(false);  // 自动重设密码输入框隐藏
+      setInputResetPwdVisible(false);   // 自动重设密码输入框隐藏
     } else if (value === 'manual') {
-      setInputResetPwdVisible(true);  // 手动重设密码输入框出现
+      setInputResetPwdVisible(true);    // 手动重设密码输入框出现
     }
-  }
-
-  // 重设密码提交
-  const onSubmitResetPwd = (values: AdAccountPwdParamsType) => {
-    handleResetPwdSubmit(values);
-    setVisibleOption(false);
   }
 
   // 异步处理提交重设密码
   async function handleResetPwdSubmit(values: AdAccountPwdParamsType) {
     try {
       // 提交重设密码申请 到service方法
-      console.log('异步处理提交重设密码', values)
       const msg = await resetAdAccountPwd({ ...values });
       if (msg.code === 0) {
         message.success(msg.message);
       } else {
         message.error(msg.message);
       }
-      setBtnCreateLoading(false);    // 按钮加载结束
+      setBtnResetPwdLoading(false);    // 修改密码按钮加载结束
       return;
     }
     // 如果提交失败
     catch (error) {
       message.error('提交重设密码申请失败，请重试!');
     }
+    // setVisibleResetPwdModal(false);    // 关闭模态框
   };
 
   /**
@@ -554,17 +551,16 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
 
       <Modal
         title="修改用户密码"
-        visible={visibleOption}
-        onCancel={() => setVisibleOption(false)}
+        visible={visibleResetPwdModal}
+        onCancel={() => setVisibleResetPwdModal(false)}
         okText="确认"
         cancelText="取消"
         onOk={() => {
           resetPwdProForm
             .validateFields()
             .then(values => {
-              console.log('提交', values)
-              onSubmitResetPwd(values);
-              resetPwdProForm.resetFields();
+              handleResetPwdSubmit(values);
+              setVisibleResetPwdModal(false);
             })
             .catch(info => {
               console.log('验证模态框表单失败:', info);
@@ -572,38 +568,37 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
         }}
       >
         <ProForm
-          submitter={false}   // 去除表单自带提交按钮
-          form={resetPwdProForm}          // 表单数据
+          submitter={false}           // 去除表单自带提交按钮
+          form={resetPwdProForm}      // 表单数据
         >
-          <Form.Item label="账号" name="resetPwdSam" style={{ 'color': 'red', }}>
-            <span className="ant-form-text" >{resetPwdProForm.getFieldValue('resetPwdSam')}</span>
+          <Form.Item label="账号" name="resetPwdSam" style={{ 'color': 'red' }}>
+            <span className="ant-form-text" style={{ 'backgroundColor': 'yellow' }}>{resetPwdProForm.getFieldValue('resetPwdSam')}</span>
           </Form.Item>
           <Form.Item label="姓名" name="resetPwdDisplayName" style={{ 'color': 'red', }}>
-            <span className="ant-form-text" >{resetPwdProForm.getFieldValue('resetPwdDisplayName')}</span>
+            <span className="ant-form-text" style={{ 'backgroundColor': 'yellow' }}>{resetPwdProForm.getFieldValue('resetPwdDisplayName')}</span>
           </Form.Item>
           <Form.Item label="邮箱" name="resetPwdMail" style={{ 'color': 'red', }}>
-            <span className="ant-form-text" >{resetPwdProForm.getFieldValue('resetPwdMail')}</span>
+            <span className="ant-form-text" style={{ 'backgroundColor': 'yellow' }}>{resetPwdProForm.getFieldValue('resetPwdMail')}</span>
           </Form.Item>
           {/* 管理员选择随机密码或手动设置一个符合复杂度条件的密码(前后端进行复杂度判断) */}
-          <ProFormSelect
-            hasFeedback
-            name="resetPwdType"
-            label="密码修改方式"
-            initialValue="auto"
-            options={[
-              { value: 'auto', label: '自动修改', },
-              { value: 'manual', label: '手动修改', }
-            ]}
-            rules={[{ required: true, message: '必须选择一个修改方式!' }]}
-          // onChange={onSelectResetPwdTypechange}
-          />
+          <Form.Item label="密码修改方式">
+            <Select
+              key="resetPwdType"
+              defaultValue="auto"
+              options={[
+                { value: 'auto', label: '自动修改[系统自动生成8位复杂密码并发送至用户邮箱]', },
+                { value: 'manual', label: '手动修改', }
+              ]}
+              onChange={onSelectResetPwdTypechange}
+            />
+          </Form.Item>
           {inputResetPwdVisible && (
             <div>
               <Form.Item name="newManualPwd" label="密码"
                 rules={[
                   {
                     required: true,
-                    message: '密码不可为空!'
+                    message: '请输入八位以上复杂密码!'
                   },
                   {
                     pattern: /^[^\s]*$/,
