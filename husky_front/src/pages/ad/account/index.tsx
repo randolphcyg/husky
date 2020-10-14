@@ -1,7 +1,6 @@
 import { AdAccountInfoItemProps, AdAccountParamsType, AdAccountPwdParamsType, addAdAccount, ModalFormProps, resetAdAccountPwd } from "@/services/ad";
 import { ClockCircleOutlined, DownOutlined, ExclamationCircleOutlined, FormOutlined } from '@ant-design/icons';
 import ProCard from '@ant-design/pro-card';
-import Field from '@ant-design/pro-field';
 import ProForm, { ProFormSelect, ProFormText } from '@ant-design/pro-form';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
@@ -190,6 +189,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
 
   // 重设密码模态框下拉框
   function onSelectResetPwdTypechange(value: string) {
+    console.log('下拉选项变化')
     if (value === 'auto') {
       setInputResetPwdVisible(false);  // 自动重设密码输入框隐藏
     } else if (value === 'manual') {
@@ -575,11 +575,18 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
           submitter={false}   // 去除表单自带提交按钮
           form={resetPwdProForm}          // 表单数据
         >
-          <ProFormText width="m" name="resetPwdSam" label="账号" rules={[]} disabled />
-          <ProFormText width="m" name="resetPwdDisplayName" label="姓名" rules={[]} />
-          <ProFormText width="m" name="resetPwdMail" label="邮箱" rules={[]} />
+          <Form.Item label="账号" name="resetPwdSam" style={{ 'color': 'red', }}>
+            <span className="ant-form-text" >{resetPwdProForm.getFieldValue('resetPwdSam')}</span>
+          </Form.Item>
+          <Form.Item label="姓名" name="resetPwdDisplayName" style={{ 'color': 'red', }}>
+            <span className="ant-form-text" >{resetPwdProForm.getFieldValue('resetPwdDisplayName')}</span>
+          </Form.Item>
+          <Form.Item label="邮箱" name="resetPwdMail" style={{ 'color': 'red', }}>
+            <span className="ant-form-text" >{resetPwdProForm.getFieldValue('resetPwdMail')}</span>
+          </Form.Item>
           {/* 管理员选择随机密码或手动设置一个符合复杂度条件的密码(前后端进行复杂度判断) */}
           <ProFormSelect
+            hasFeedback
             name="resetPwdType"
             label="密码修改方式"
             initialValue="auto"
@@ -587,9 +594,8 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
               { value: 'auto', label: '自动修改', },
               { value: 'manual', label: '手动修改', }
             ]}
-          // request={
-          //   renderFormItem= {onChange={onSelectResetPwdTypechange}}
-          // }
+            rules={[{ required: true, message: '必须选择一个修改方式!' }]}
+          // onChange={onSelectResetPwdTypechange}
           />
           {inputResetPwdVisible && (
             <div>
