@@ -1,38 +1,82 @@
-import React, { Component } from 'react';
-import ProTable from '@ant-design/pro-table';
+import { BugInfoItemProps } from "@/services/visual";
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Button, Divider, Alert, Modal, message, Spin, Pagination } from 'antd';
-import { connect } from 'umi';
+import ProTable from '@ant-design/pro-table';
+import { ProColumnType } from '@ant-design/pro-table/es/Table';
+import { Alert, Button, Divider, Modal, Spin } from 'antd';
+import 'echarts/extension/dataTool'; //工具栏
+import 'echarts/lib/chart/bar'; //柱状图
+import 'echarts/lib/chart/line'; //折线图
+import 'echarts/lib/chart/pie'; //饼图
 import echarts from 'echarts/lib/echarts';
-import 'echarts/lib/chart/bar';       //柱状图
-import 'echarts/lib/chart/pie';       //饼图
-import 'echarts/lib/chart/line';      //折线图
-import 'echarts/extension/dataTool';   //工具栏
+import React, { useEffect, useState } from 'react';
+import { request } from 'umi';
 
-class VisualPage extends Component {
-  state = {
-    modalVisible: false,
-  }
+const VisualPage: React.FC = () => {
+  const [loading, setLoading] = useState(true);    // 表格加载
+  const [modalVisible, setModalVisible] = useState(false);
 
-  componentDidMount() {
-    this.loadData();
-  }
+  const columns: Array<ProColumnType<BugInfoItemProps>> = [
+    {
+      title: '编号',
+      dataIndex: 'num',
+      hideInForm: true,
+      fixed: 'left',
+      width: '10%',
+    },
+    {
+      title: '标题',
+      dataIndex: 'title',
+      width: '20%',
+    },
+    {
+      title: '优先级',
+      dataIndex: 'level',
+      hideInForm: true,
+      width: '10%',
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      hideInForm: true,
+      width: '10%',
+    },
+    {
+      title: '经办人',
+      dataIndex: 'manager',
+      hideInForm: true,
+      width: '10%',
+    },
+    {
+      title: '经办人流转',
+      dataIndex: 'managers',
+      width: '10%',
+      hideInSearch: true,
+      hideInForm: true,
+    },
+    {
+      title: '经办人停留时间',
+      dataIndex: 'managers_delay',
+      width: '10%',
+      hideInForm: true,
+    },
+    {
+      title: '操作',
+      dataIndex: 'options',
+      hideInForm: true,
+      hideInSearch: true,
+      fixed: 'right',
+      width: '20%',
+      render: () => <a>动作</a>,
+    },
+  ];
 
-  //获取列表
-  loadData() {
-    console.log('页面方法 loadData');
-    //使用connect后，dispatch通过props传给了组件
-    const { dispatch } = this.props;
-    dispatch({ type: 'visual/fetchBugList', payload: null });
-  }
-
-  // 模态框控制
-  handleModalVisible(visible: boolean) {
-    this.setState({ modalVisible: visible });
-  }
+  useEffect(() => {
+    return () => {
+    }
+  }, [])
 
   // 柱状图
-  generateHistogram() {
+  function generateHistogram() {
     console.log('柱状图 generateHistogram');
     var dom = document.getElementById("container");
     var myChart = echarts.init(dom);
@@ -82,7 +126,7 @@ class VisualPage extends Component {
   // generatePieChart() {
   //   console.log('饼图 generatePieChart');
   // }
-  generatePieChart = async () => {
+  async function generatePieChart() {
     console.log('饼图 generatePieChart');
     var dom = document.getElementById("container");
     var myChart = echarts.init(dom);
@@ -376,7 +420,7 @@ class VisualPage extends Component {
     }
   }
   // 折线图
-  generateLineChart() {
+  function generateLineChart() {
     console.log('折线图 generateLineChart');
     var dom = document.getElementById("container");
     var myChart = echarts.init(dom);
@@ -464,106 +508,75 @@ class VisualPage extends Component {
     }
   }
 
-  render() {
-    const { visual } = this.props;
-    const { bugList, loading } = visual;
-    const { modalVisible } = this.state;
-    const columns = [
-      {
-        title: '编号',
-        dataIndex: 'num',
-        hideInForm: true,
-        fixed: 'left',
-        width: '10%',
-      },
-      {
-        title: '标题',
-        dataIndex: 'title',
-        width: '20%',
-      },
-      {
-        title: '优先级',
-        dataIndex: 'level',
-        hideInForm: true,
-        width: '10%',
-      },
-      {
-        title: '状态',
-        dataIndex: 'status',
-        hideInForm: true,
-        width: '10%',
-      },
-      {
-        title: '经办人',
-        dataIndex: 'manager',
-        hideInForm: true,
-        width: '10%',
-      },
-      {
-        title: '经办人流转',
-        dataIndex: 'managers',
-        width: '10%',
-        hideInSearch: true,
-        hideInForm: true,
-      },
-      {
-        title: '经办人停留时间',
-        dataIndex: 'managers_delay',
-        width: '10%',
-        hideInForm: true,
-      },
-      {
-        title: '操作',
-        dataIndex: 'options',
-        hideInForm: true,
-        hideInSearch: true,
-        fixed: 'right',
-        width: '20%',
-        render: () => <a>动作</a>,
-      },
-    ];
 
-    return (
-      <PageHeaderWrapper>
-        <ProTable
-          headerTitle="数据列表"
-          rowKey="num"
-          toolBarRender={() => [
-            <Button type="primary" key='btn-modal' onClick={() => this.handleModalVisible(true)}>可视化图表</Button>,
-          ]}
-          columns={columns}     // 列名
-          dataSource={bugList}  // 数据源
-          search={true}         // 搜索
-          scroll={{ x: 1300 }}  // 滑动轴
-          pagination={true}     // 分页
-          loading={loading}     // 加载中
-        />
-        <Modal
-          destroyOnClose
-          title="一级可视化图表"
-          visible={modalVisible}
-          onCancel={() => this.handleModalVisible(false)}
-          footer={null}
-          width={1300}
-        >
-          {/* 模态框 container 留空 */}
-          <div id="container" style={{ width: '100%', height: 420 }}>
-            <Spin tip="Loading...">
-              <Alert
-                message="暂无图例"
-                description="点击【生成图表】按钮生成图表"
-                type="info"
-              />
-            </Spin>
-          </div>
-          <Button type="primary" key='btn-generateHistogram' onClick={() => this.generateHistogram()}>柱状图</Button>,
+  return (
+    <PageHeaderWrapper>
+      <ProTable
+        headerTitle="数据列表"
+        rowKey="num"
+        loading={loading}     // 加载中
+        onLoad={() => setLoading(false)}  // 数据加载完操作
+        toolBarRender={() => [
+          <Button type="primary" key='btn-modal' onClick={() => setModalVisible(true)}>可视化图表</Button>,
+        ]}
+        columns={columns}     // 列名
+        // 表格请求数据
+        request={async (params = {}) =>
+          request<{
+            data: BugInfoItemProps[];
+          }>('/api/items', {
+            params,
+          })
+        }
+        // 表格搜索
+        search={{
+          defaultCollapsed: false,
+          defaultColsNumber: 1,
+          split: true,
+          span: 8,
+          collapsed: false,   // 不收起查询
+          collapseRender: () => { return <></>; },  // 收起按钮渲染为空(去掉收起按钮)
+          optionRender: ({ searchText, resetText }, { form }) => {
+            return [
+              <Button key="searchText" type="primary"
+                onClick={() => { form?.submit(); }} >{searchText}</Button>,
+              <Button key="resetText" type="default"
+                onClick={() => { form?.resetFields(); }} >{resetText}</Button>,
+            ];
+          },
+          searchText: '查询'
+        }}
+        scroll={{ x: 1300 }}  // 滑动轴
+        pagination={{                 // 分页
+          showQuickJumper: true,
+          pageSize: 10   // 每页 10 条数据
+        }}
+      />
+      <Modal
+        destroyOnClose
+        title="一级可视化图表"
+        visible={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={null}
+        width={1300}
+      >
+        {/* 模态框 container 留空 */}
+        <div id="container" style={{ width: '100%', height: 420 }}>
+          <Spin tip="Loading...">
+            <Alert
+              message="暂无图例"
+              description="点击【生成图表】按钮生成图表"
+              type="info"
+            />
+          </Spin>
+        </div>
+        <Button type="primary" key='btn-generateHistogram' onClick={() => generateHistogram()}>柱状图</Button>,
           <Divider key='divider-generateHistogram' type="vertical" />
-          <Button type="ghost" key='btn-generatePieChart' onClick={() => this.generatePieChart()}>扇形图</Button>,
+        <Button type="ghost" key='btn-generatePieChart' onClick={() => generatePieChart()}>扇形图</Button>,
           <Divider key='divider-generatePieChart' type="vertical" />
-          <Button type="default" key='btn-generateLineChart' onClick={() => this.generateLineChart()}>折线图</Button>,
+        <Button type="default" key='btn-generateLineChart' onClick={() => generateLineChart()}>折线图</Button>,
         </Modal>
-      </PageHeaderWrapper>);
-  }
+    </PageHeaderWrapper>
+  );
 }
-//使用umi的connect方法把命名空间为 visual 的 model 的数据通过 props 传给页面
-export default connect(({ visual }) => ({ visual }))(VisualPage);
+export default VisualPage;

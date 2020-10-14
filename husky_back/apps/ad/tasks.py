@@ -34,6 +34,15 @@ def auto_aync_remote_mysql():
 
 
 @shared_task(name='create_ad_obj')
+def reset_ad_user_pwd(info):
+    '''AD域重设密码的异步方法
+    '''
+    [sAMAccountName, displayName, mail, pwd] = info
+    print(info)
+    pass
+    
+
+@shared_task(name='create_ad_obj')
 def create_ad_obj(info=None, type='user'):
     '''AD域创建对象的异步方法
     '''

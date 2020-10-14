@@ -26,6 +26,15 @@ export interface AdServerFormItemProps {
   baseDnHand: string;
 }
 
+// AD账号重设密码接口
+export interface AdAccountPwdParamsType {
+  sAMAccountName: string;
+  displayName: string;
+  mail: string;
+  resetPwdType: string;
+  newManualPwd: string;
+}
+
 // AD服务器表单接口
 export interface AdServerFormProps {
   onCheckAdServerConfigConnect: (values: AdServerFormItemProps) => void;
@@ -37,7 +46,7 @@ export interface AdAccountInfoItemProps {
   sam: string;
   sAMAccountName: string;
   department: string;
-  mail: number;
+  mail: string;
   telphone: string;
   whenCreated: RangePickerDateProps<Date>;    // 不知道这么定义类型行不行 待请教
   whenChanged: RangePickerDateProps<Date>;
@@ -99,5 +108,13 @@ export async function saveAdServerConfig(params: AdServerFormItemProps) {
 export async function loadAdServerConfigFormData() {
   return request('/api/loadAdServerConfigFormData', {
     method: 'GET',
+  });
+}
+
+// service 重设AD域账户密码接口
+export async function resetAdAccountPwd(params: AdAccountPwdParamsType) {
+  return request('/api/resetAdAccountPwd', {
+    method: 'POST',
+    data: params,
   });
 }

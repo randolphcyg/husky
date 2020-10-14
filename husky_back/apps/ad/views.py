@@ -496,6 +496,43 @@ def add_ad_account(request):
 
 
 @csrf_exempt
+def reset_ad_account_pwd(request):
+    '''重设AD域账户密码
+    '''
+    if request.method == 'POST':
+        data_req = json.loads(request.body)
+        # 接受前端请求数据
+        resetPwdType = data_req.get('resetPwdType')       # 新密码
+        resetPwdDisplayName = data_req.get('resetPwdDisplayName')
+        resetPwdMail = data_req.get('resetPwdMail')
+        resetPwdSam = data_req.get('resetPwdSam')
+        print(resetPwdType, resetPwdDisplayName, resetPwdMail, resetPwdSam)
+        if resetPwdType == 'manual':
+            newManualPwd = data_req.get('newManualPwd')       # 新密码
+            if newManualPwd is not None:
+                print(newManualPwd)
+        # dn = data_req.get('dn')         # 账号
+
+        # 从redis的配置库读取AD配置
+        conn_redis_configs = get_redis_connection("configs_cache")
+        str_data_config = conn_redis_configs.get('AdServerConfig')
+        json_data = json.loads(str_data_config)
+        baseDn = json_data['baseDn']
+        zyPrefix = json_data['zyPrefix']
+        handPrefix = json_data['handPrefix']
+        baseDnHand = json_data['baseDnHand']
+        # 异步任务
+        # info = [sAMAccountName, displayName, mail, newManualPwd]
+        # tasks.reset_ad_user_pwd.delay(info=info)     # 异步任务
+        res = {
+            'code': 0,
+            'message': '修改密码任务排队中，请稍后复查执行结果!',
+        }
+        # logger.info('修改用户密码异步任务: ' + 'DN: ' + displayName + 'SAM: ' + sAMAccountName)
+        return JsonResponse(res)
+
+
+@csrf_exempt
 def generate_pwd(count):
     '''
     @param count{int} 所需密码长度

@@ -124,7 +124,7 @@ def bugs(request):
         res = {
             'code': 0,
             'message': '操作成功',
-            'body': body
+            'data': body
         }
         return JsonResponse(res)
     else:
