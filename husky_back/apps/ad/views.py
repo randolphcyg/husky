@@ -476,14 +476,20 @@ def add_ad_account(request):
         baseDnHand = json_data['baseDnHand']
 
         # 用户组织判断
-        if department.split('.')[0] == '甄云科技':
+        if '甄云科技' in department and '.' in department and department.split('.')[0] == '甄云科技':
             sAMAccountName_prefix = zyPrefix
             department_list = department.split('.')
             department_list.insert(1, '上海总部')
             dn = 'CN=' + str(displayName + str(eid)) + ',' + 'OU=' + ',OU='.join(department_list[::-1]) + ',' + baseDn
-        else:
+        elif '汉得信息' in department:
             sAMAccountName_prefix = handPrefix
             dn = 'CN=' + str(displayName + str(eid)) + ',' + baseDnHand
+        else:
+            res = {
+                'code': -1,
+                'message': '暂不支持创建非子母公司账号!',
+            }
+            return JsonResponse(res)
         sAMAccountName = sAMAccountName_prefix + str(eid).zfill(6)
         # 组装AD域创建用户所需要的数据
         user_info = [sAMAccountName, dn, displayName, mail, tel, title]
@@ -590,9 +596,9 @@ def check_ou(conn, ou, ou_list=None):
     '''
     # 从redis的配置库读取AD配置
     conn_redis_configs = get_redis_connection("configs_cache")
-    str_data_config = conn_redis_configs.get('AdServerConfig')
-    json_data = json.loads(str_data_config)
-    searchFilterOu = json_data['searchFilterOu']
+    str_data_AdServerConfig = conn_redis_configs.get('AdServerConfig')
+    json_data_AdServerConfig = json.loads(str_data_AdServerConfig)
+    searchFilterOu = json_data_AdServerConfig['searchFilterOu']
 
     if ou_list is None:
         ou_list = []

@@ -90,6 +90,7 @@ def create_ad_obj(info=None, type='user'):
                      'sn': displayName[1:],             # 名
                      'title': title,             # 头衔
                      'mail': mail,              # 邮箱
+                     'mobile': tel,     # 手机号
                      'telephoneNumber': tel,     # 电话号
                      }
     else:
@@ -98,8 +99,7 @@ def create_ad_obj(info=None, type='user'):
     dn_base = dn.split(',', 1)[1]
     # 用到的时候连接AD服务器
     conn_ad = access_ad_server()
-    # check_ou_res = check_ou(conn_ad, dn_base)
-    check_ou_res = 1
+    check_ou_res = check_ou(conn_ad, dn_base)
     if not check_ou_res:        # 判断是否有这个OU路径 没有则返回-2
         return -2
     else:
