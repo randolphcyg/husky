@@ -33,14 +33,46 @@ def auto_aync_remote_mysql():
     return 'auto_aync 测试'
 
 
-@shared_task(name='create_ad_obj')
+@shared_task(name='reset_ad_user_pwd')
 def reset_ad_user_pwd(info):
-    '''AD域重设密码的异步方法
+    '''AD域重设密码的方法
     '''
-    [sAMAccountName, displayName, mail, pwd] = info
-    print(info)
-    pass
-    
+    [sAMAccountName, resetPwdMail, filter_phrase_by_sAMAccountName, newManualPwd] = info
+    # 从redis读取LDAP服务器配置
+    conn_redis_configs = get_redis_connection("configs_cache")
+    str_data_AdServerConfig = conn_redis_configs.get('AdServerConfig')
+    json_data_AdServerConfig = json.loads(str_data_AdServerConfig)
+    baseDn = json_data_AdServerConfig['baseDn']
+    # 查找用户的dn
+    conn_ad = access_ad_server()
+    search_by_sAMAccountName = conn_ad.search(search_base=baseDn, search_filter=filter_phrase_by_sAMAccountName, attributes=['distinguishedName'])
+    search_by_sAMAccountName_json_list = json.loads(conn_ad.response_to_json())['entries']
+    dn = search_by_sAMAccountName_json_list[0]['dn']
+    old_pwd = ''
+    modify_password_res = conn_ad.extend.microsoft.modify_password(dn, newManualPwd, old_pwd)
+
+    if modify_password_res:     # 修改密码成功 发邮件
+        # 从redis读取邮件服务器配置信息
+        str_data_MailServerConfig = conn_redis_configs.get('MailServerConfig')
+        json_data_MailServerConfig = json.loads(str_data_MailServerConfig)
+        send_mail_res = send_reset_ad_user_pwd_info_mail(sAMAccountName=sAMAccountName,
+                                                         pwd=newManualPwd,
+                                                         mail_host=json_data_MailServerConfig['mailServerSmtpServer'],
+                                                         mail_user=json_data_MailServerConfig['mailServerAdmin'],
+                                                         mail_pwd=json_data_MailServerConfig['mailServerAdminPwd'],
+                                                         mail_sender=json_data_MailServerConfig['mailServerSender'],
+                                                         ad_help_file_url=json_data_MailServerConfig['adAccountHelpFile'],
+                                                         mail_rcv=resetPwdMail,
+                                                         )
+        if send_mail_res == 0:      # 发送邮件成功
+            return 0
+        else:
+            # 发送邮件错误则日志中记录信息 因为AD密码不可查因此如果发送失败没人知道密码，需要重设
+            error_logger.log("重设密码发送邮件失败，保留信息: " + dn + "新密码: " + newManualPwd)
+            return 1
+    else:
+        return 1
+
 
 @shared_task(name='create_ad_obj')
 def create_ad_obj(info=None, type='user'):
@@ -66,7 +98,8 @@ def create_ad_obj(info=None, type='user'):
     dn_base = dn.split(',', 1)[1]
     # 用到的时候连接AD服务器
     conn_ad = access_ad_server()
-    check_ou_res = check_ou(conn_ad, dn_base)
+    # check_ou_res = check_ou(conn_ad, dn_base)
+    check_ou_res = 1
     if not check_ou_res:        # 判断是否有这个OU路径 没有则返回-2
         return -2
     else:
@@ -1289,5 +1322,45 @@ def test_send_create_ad_user_init_info_mail(sAMAccountName: str,
         return 0
     except smtplib.SMTPException as e:
         error_logger(str(e))
+        return 1
+    smtpObj.quit()
+
+
+@shared_task(name='send_reset_ad_user_pwd_info_mail')
+def send_reset_ad_user_pwd_info_mail(sAMAccountName: str,
+                                     pwd: str,
+                                     mail_host: str,
+                                     mail_user: str,
+                                     mail_pwd: str,
+                                     mail_sender: str,
+                                     ad_help_file_url: str,
+                                     mail_rcv: str,
+                                     ) -> int:
+    '''重设密码成功成功，给该用户邮箱发送邮件
+    sAMAccountName: AD账号
+    pwd: AD账号新密码
+    '''
+    # 邮件标题
+    mail_title = '【AD域账号密码修改通知】'
+    # 登录
+    smtpObj = smtplib.SMTP()
+    smtpObj.connect(mail_host, 25)    # 25 为 SMTP 端口号
+    smtpObj.login(mail_user, mail_pwd)
+
+    try:
+        message = MIMEMultipart('related')            # 消息基础
+        message["Subject"] = Header(mail_title, 'utf-8')
+        sender = ("%s<" + mail_sender + ">") % (Header(mail_sender, 'utf-8'),)
+        message['From'] = Header(sender, 'utf-8')
+        message['To'] = Header(mail_rcv, 'utf-8')
+        msgAlternative = MIMEMultipart('alternative')
+        message.attach(msgAlternative)
+        mail_msg = "LDAP账号: " + sAMAccountName + "\n新密码: " + pwd          # 邮件内容
+
+        msgAlternative.attach(MIMEText(mail_msg, 'plain', 'utf-8'))
+        smtpObj.sendmail(from_addr=mail_user, to_addrs=[mail_rcv], msg=str(message))
+        return 0
+    except smtplib.SMTPException as e:
+        error_logger.error((str(e)))
         return 1
     smtpObj.quit()

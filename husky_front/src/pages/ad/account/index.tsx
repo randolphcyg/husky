@@ -1,5 +1,5 @@
 import { AdAccountInfoItemProps, AdAccountParamsType, AdAccountPwdParamsType, addAdAccount, ModalFormProps, resetAdAccountPwd } from "@/services/ad";
-import { ClockCircleOutlined, DownOutlined, ExclamationCircleOutlined, FormOutlined } from '@ant-design/icons';
+import { ClockCircleOutlined, DownOutlined, ExclamationCircleOutlined, FormOutlined, CloseSquareOutlined } from '@ant-design/icons';
 import ProCard from '@ant-design/pro-card';
 import ProForm, { ProFormSelect, ProFormText } from '@ant-design/pro-form';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
@@ -195,8 +195,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
   // 重设密码模态框下拉框
   function onSelectResetPwdTypechange(value: string) {
     if (value === 'auto') {
-      resetPwdProForm.setFieldsValue({'newManualPwd': ''})    // 前端不给定新的密码
-      console.log(resetPwdProForm.getFieldValue('newManualPwd'))
+      resetPwdProForm.setFieldsValue({ 'newManualPwd': '' })    // 前端不给定新的密码
       setInputResetPwdVisible(false);   // 自动重设密码输入框隐藏
     } else if (value === 'manual') {
       setInputResetPwdVisible(true);    // 手动重设密码输入框出现
@@ -499,7 +498,8 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
                   {
                     pattern: /^[^\s]*$/,
                     message: '禁止输入空格!'
-                  }]} />
+                  },
+                ]} />
               <ProFormText width="xs" name="displayName" label="姓名" placeholder="甄小明"
                 rules={[
                   {
@@ -554,19 +554,35 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
       <Modal
         title="修改用户密码"
         visible={visibleResetPwdModal}
-        onCancel={() => setVisibleResetPwdModal(false)}
-        okText="确认"
-        cancelText="取消"
-        onOk={() => {
-          resetPwdProForm
-            .validateFields()
-            .then(values => {
-              handleResetPwdSubmit(values);
-              setVisibleResetPwdModal(false);
-            })
-            .catch(info => {
-              console.log('验证模态框表单失败:', info);
-            });
+        keyboard={true}
+        // 重写模态框底部
+        footer={
+          [<Button onClick={
+            () => {
+              setVisibleResetPwdModal(false);    // 模态框加载结束
+              setBtnResetPwdLoading(false);    // 按钮加载结束
+            }
+          }>取消</Button>,
+          <Popconfirm title="请再次确认是否重设该用户密码？" okText="我确定" cancelText="点错了"
+            icon={<ExclamationCircleOutlined />}
+            onConfirm={() => {
+              resetPwdProForm
+                .validateFields()
+                .then(values => {
+                  handleResetPwdSubmit(values);
+                  setVisibleResetPwdModal(false);
+                })
+                .catch(info => {
+                  console.log('验证模态框表单失败:', info);
+                });
+            }}>
+            <Button danger>提交修改</Button>
+          </Popconfirm>]
+        }
+        closeIcon={<CloseSquareOutlined />}
+        onCancel={() => {
+          setVisibleResetPwdModal(false);    // 模态框加载结束
+          setBtnResetPwdLoading(false);    // 按钮加载结束
         }}
       >
         <ProForm
@@ -600,12 +616,17 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
                 rules={[
                   {
                     required: true,
-                    message: '请输入八位以上复杂密码!'
+                    message: '密码不可为空!'
                   },
                   {
                     pattern: /^[^\s]*$/,
                     message: '禁止输入空格!'
-                  }]} ><Input.Password />
+                  },
+                  {
+                    pattern: /^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z\W_]+$)(?![a-z0-9]+$)(?![a-z\W_]+$)(?![0-9\W_]+$)[a-zA-Z0-9\W_]{8,16}$/,
+                    message: '密码复杂度要求: 大小写、数字、特殊字符四个必须满足三个!\n不能包含用户的帐户名，不能包含用户姓名中超过两个连续字符的部分!'
+                  },
+                ]} ><Input.Password />
               </Form.Item>
             </div>
           )}
