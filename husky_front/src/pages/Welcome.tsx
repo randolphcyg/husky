@@ -51,9 +51,6 @@ const Welcome: React.FC<{}> = () => {
                 <li>
                   <a href="/ad/account">AD账号管理</a>  可以对用户账号管理、密码重置、策略设计  <Tag color="blue">开发中</Tag>
                 </li>
-                <li>
-                  <a href="/visual/bug">迭代可视化</a>  对公司的技术迭代进行记录和分析，以此跟进开发情况  <Tag color="blue">待开发</Tag>
-                </li>
               </ul>
             </Paragraph>
           </Typography>
