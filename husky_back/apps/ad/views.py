@@ -476,12 +476,12 @@ def add_ad_account(request):
         baseDnHand = json_data['baseDnHand']
 
         # 用户组织判断
-        if '甄云科技' in department and '.' in department and department.split('.')[0] == '甄云科技':
+        if 'XX公司' in department and '.' in department and department.split('.')[0] == 'XX公司':
             sAMAccountName_prefix = zyPrefix
             department_list = department.split('.')
             department_list.insert(1, '上海总部')
             dn = 'CN=' + str(displayName + str(eid)) + ',' + 'OU=' + ',OU='.join(department_list[::-1]) + ',' + baseDn
-        elif '汉得信息' in department:
+        elif 'XX公司母公司' in department:
             sAMAccountName_prefix = handPrefix
             dn = 'CN=' + str(displayName + str(eid)) + ',' + baseDnHand
         else:
