@@ -500,7 +500,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
                     message: '禁止输入空格!'
                   },
                 ]} />
-              <ProFormText width="xs" name="displayName" label="姓名" placeholder="甄小明"
+              <ProFormText width="xs" name="displayName" label="姓名" placeholder="小明"
                 rules={[
                   {
                     required: true,
