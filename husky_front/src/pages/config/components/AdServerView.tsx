@@ -132,8 +132,8 @@ const AdServerView: React.FC<AdServerFormProps> = (props) => {
           <ProFormText name="searchFilterUser" label="用户对象过滤条件" placeholder="(objectclass=user)" />
           <ProFormText name="searchFilterOu" label="OU对象过滤条件" placeholder="(objectclass=organizationalUnit)" />
           <ProFormText name="baseDnDisabled" label="离职账户OU" placeholder="OU=disabled,DC=GOING-LINK,DC=com" />
-          <ProFormText name="baseDnEnabled" label="在职账户OU" placeholder="OU=甄云科技,DC=GOING-LINK,DC=com" />
-          <ProFormText name="baseDnHand" label="HAND账户OU" placeholder="OU=汉得信息,OU=上海总部,OU=甄云科技" />
+          <ProFormText name="baseDnEnabled" label="在职账户OU" placeholder="OU=XX公司,DC=GOING-LINK,DC=com" />
+          <ProFormText name="baseDnHand" label="HAND账户OU" placeholder="OU=汉得信息,OU=上海总部,OU=XX公司" />
         </ProForm.Group>
         <Button type="default" onClick={() => {
           proForm.validateFields()
