@@ -177,7 +177,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
     setVisible(false);
   };
   // 从母公司的HR系统创建账号
-  function batchAddHandAdAccount() {
+  function batchAddxxMumAdAccount() {
     setHrVisible(true);
     console.log('穿梭框左表可搜索HAND hr系统用户表，将选中用户向右侧发送，即可生成ldap账号')
   }
@@ -421,7 +421,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
           <Button type="primary" key='btn-addAdAccount'
             loading={btnCreateLoading} onClick={() => setVisible(true)} icon={<FormOutlined />}>创建账号</Button>,
           <Divider key='divider-addAdAccount' type="vertical" />,
-          <Button type="default" key='btn-batchAddHandAdAccount' onClick={() => batchAddHandAdAccount()}>HR系统创建账号</Button>,
+          <Button type="default" key='btn-batchAddxxMumAdAccount' onClick={() => batchAddxxMumAdAccount()}>HR系统创建账号</Button>,
           <Divider key='divider-updateLDAP' type="vertical" />,
           <Popconfirm title="确定更新LDAP服务器用户？" okText="确定" cancelText="点错了"
             icon={<ExclamationCircleOutlined />} onConfirm={updateLdapUsers}>
@@ -436,7 +436,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
       <Modal
         destroyOnClose
         visible={hrVisible}
-        title="Hand系统创建账号"
+        title="HR系统创建账号"
         okText="保存"
         cancelText="取消"
         onCancel={() => { setHrVisible(false); }}
