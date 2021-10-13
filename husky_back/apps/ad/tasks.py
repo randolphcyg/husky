@@ -631,7 +631,7 @@ def send_create_ad_user_init_info_mail(sAMAccountName: str,
                 <div class="header" style="Margin: 0 auto;max-width: 600px;min-width: 320px; width: 320px;width: calc(28000% - 167400px);" id="emb-email-header-container">
                 <!--[if (mso)|(IE)]><table align="center" class="header" cellpadding="0" cellspacing="0" role="presentation"><tr><td style="width: 600px"><![endif]-->
                 <div class="logo emb-logo-margin-box" style="font-size: 26px;line-height: 32px;Margin-top: 47px;Margin-bottom: 9px;color: #41637e;font-family: Avenir,sans-serif;Margin-left: 20px;Margin-right: 20px;" align="center">
-                    <div class="logo-center" align="center" id="emb-email-header"><a style="text-decoration: none;transition: opacity 0.1s ease-in;color: #41637e;" href="https://www.going-link.com/"><img style="display: block;height: auto;width: 100%;border: 0;max-width: 205px;" src="cid:zy" alt="" width="205" /></a></div>
+                    <div class="logo-center" align="center" id="emb-email-header"><a style="text-decoration: none;transition: opacity 0.1s ease-in;color: #41637e;" href="https://www.going-link.com/"><img style="display: block;height: auto;width: 100%;border: 0;max-width: 205px;" src="cid:logo" alt="" width="205" /></a></div>
                 </div>
                 <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
                 </div>
@@ -719,12 +719,12 @@ def send_create_ad_user_init_info_mail(sAMAccountName: str,
         </body></html>
         """
         msgAlternative.attach(MIMEText(mail_msg, 'html', 'utf-8'))
-        img_url = os.path.join(settings.BASE_DIR, r"static\images\zy.png")
+        img_url = os.path.join(settings.BASE_DIR, r"static\images\logo.png")
         fp = open(img_url, 'rb')       # 图片位置
         msgImage = MIMEImage(fp.read())
         fp.close()
         # 定义图片 ID，在 HTML 文本中引用
-        msgImage.add_header('Content-ID', '<zy>')
+        msgImage.add_header('Content-ID', '<logo>')
         message.attach(msgImage)
         smtpObj.sendmail(from_addr=mail_user, to_addrs=[mail_rcv], msg=str(message))
         return 0
@@ -1222,7 +1222,7 @@ def test_send_create_ad_user_init_info_mail(sAMAccountName: str,
                 <div class="header" style="Margin: 0 auto;max-width: 600px;min-width: 320px; width: 320px;width: calc(28000% - 167400px);" id="emb-email-header-container">
                 <!--[if (mso)|(IE)]><table align="center" class="header" cellpadding="0" cellspacing="0" role="presentation"><tr><td style="width: 600px"><![endif]-->
                 <div class="logo emb-logo-margin-box" style="font-size: 26px;line-height: 32px;Margin-top: 47px;Margin-bottom: 9px;color: #41637e;font-family: Avenir,sans-serif;Margin-left: 20px;Margin-right: 20px;" align="center">
-                    <div class="logo-center" align="center" id="emb-email-header"><a style="text-decoration: none;transition: opacity 0.1s ease-in;color: #41637e;" href="https://www.going-link.com/"><img style="display: block;height: auto;width: 100%;border: 0;max-width: 205px;" src="cid:zy" alt="" width="205" /></a></div>
+                    <div class="logo-center" align="center" id="emb-email-header"><a style="text-decoration: none;transition: opacity 0.1s ease-in;color: #41637e;" href="https://www.going-link.com/"><img style="display: block;height: auto;width: 100%;border: 0;max-width: 205px;" src="cid:logo" alt="" width="205" /></a></div>
                 </div>
                 <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
                 </div>
@@ -1310,12 +1310,12 @@ def test_send_create_ad_user_init_info_mail(sAMAccountName: str,
         </body></html>
         """
         msgAlternative.attach(MIMEText(mail_msg, 'html', 'utf-8'))
-        img_url = os.path.join(settings.BASE_DIR, r"static\images\zy.png")
+        img_url = os.path.join(settings.BASE_DIR, r"static\images\logo.png")
         fp = open(img_url, 'rb')       # 图片位置
         msgImage = MIMEImage(fp.read())
         fp.close()
         # 定义图片 ID，在 HTML 文本中引用
-        msgImage.add_header('Content-ID', '<zy>')
+        msgImage.add_header('Content-ID', '<logo>')
         message.attach(msgImage)
         smtpObj.sendmail(from_addr=mail_user, to_addrs=[mail_rcv], msg=str(message))
         logger.info("测试发送邮件成功!" + "测试发件人: " + mail_user + "测试收件人: " + mail_rcv)
