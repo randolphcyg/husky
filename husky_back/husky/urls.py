@@ -21,7 +21,6 @@ from apps.ad.views import (add_ad_account, fetch_ad_account_list, ldap_login,
                            test_ad_server_config_is_connect, test_send_mail)
 from apps.user.views import (current_user, load_account_config, login_view,
                              save_account_config)
-from apps.visual.views import bugs
 from apps.wework.views import (featch_wework_user_list, wework_contact,
                                wework_ldap)
 from django.conf.urls import include, url
@@ -33,7 +32,6 @@ urlpatterns = [
     url(r'^api/login', login_view, name='login'),
     url(r'^api/ldapLogin', ldap_login, name='ldapLogin'),
     url(r'^api/currentUser', current_user, name='currentUser'),
-    url(r'^api/items', bugs, name='items'),     # bug可视化暂时接口
     url(r'^api/fetchAdAccountList', fetch_ad_account_list, name='fetchAdAccountList'),     # 读取AD服务器账号列表
     url(r'^api/addAdAccount', add_ad_account, name='addAdAccount'),       # 创建AD服务器账号
     url(r'^api/resetAdAccountPwd', reset_ad_account_pwd, name='resetAdAccountPwd'),       # 重设AD服务器账号密码(管理员)
