@@ -17,13 +17,13 @@ export interface AdServerFormItemProps {
   baseDn: string;
   adminAccount: string;
   adminPwd: string;
-  zyPrefix: string;
-  handPrefix: string;
+  xxPrefix: string;
+  xxMumPrefix: string;
   searchFilterUser: string;
   searchFilterOu: string;
   baseDnDisabled: string;
   baseDnEnabled: string;
-  baseDnHand: string;
+  baseDnMum: string;
 }
 
 // AD账号重设密码接口
