@@ -52,9 +52,9 @@
 
 3. 项目仓库
 
-后端仓库：[husky-back](https://gitee.com/RandolphCYG/husky-back) 
+后端仓库：[husky-back](https://github.com/RandolphCYG/husky-back) 
 
-前端仓库：husky-front](https://gitee.com/RandolphCYG/husky-front) 
+前端仓库：husky-front](https://github.com/RandolphCYG/husky-front) 
 
 ## 3. 开发环境安装步骤
 
@@ -67,7 +67,7 @@
 
 	```python
 	# 拉项目源码
-	git clone git@gitee.com:RandolphCYG/husky-back.git
+	git clone git@github.com:RandolphCYG/husky-back.git
 	# 进入项目目录
 	cd /husky-back/husky
 	# 升级pip
@@ -160,7 +160,7 @@ python manage.py runserver 0.0.0.0:3033
 
 ```python
 # 拉项目源码
-git clone git@gitee.com:RandolphCYG/husky-front.git
+git clone git@github.com:RandolphCYG/husky-front.git
 # 进入项目目录
 cd /husky-front
 # 不使用mock数据启动前端项目
