@@ -77,20 +77,6 @@ export default defineConfig({
         },
       ],
     },
-    // 可视化
-    {
-      path: '/visual',
-      name: 'visual',
-      icon: 'pieChart',
-      access: 'canAdmin',
-      routes: [
-        {
-          path: '/visual/bug',
-          name: 'bug',
-          component: './visual/bug',
-        },
-      ],
-    },
     // 示例
     {
       path: '/demo',
