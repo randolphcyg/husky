@@ -5,8 +5,6 @@ export default {
   'menu.ad': 'AD service',  // AD域管理
   'menu.ad.ou': 'AD OU',  // AD域管理-组织单位
   'menu.ad.account': 'AD account',  // AD域管理-账户
-  'menu.visual': 'visual',  // 可视化
-  'menu.visual.bug': 'bug visual',  // 可视化-bug
   'menu.demo': 'demo',  // 示例
   'menu.config': 'config',  // 配置中心
   'menu.wework': 'wework',  // 企业微信
