@@ -5,8 +5,6 @@ export default {
   'menu.ad': 'AD域管理',  // AD域管理
   'menu.ad.ou': 'AD域组织单位',  // AD域管理-组织单位
   'menu.ad.account': 'AD域账户',  // AD域管理-账户
-  'menu.visual': '可视化',  // 可视化
-  'menu.visual.bug': 'BUG可视化',  // 可视化-bug
   'menu.demo': '示例',  // 示例
   'menu.config': '配置中心',  // 配置中心
   'menu.wework': '企业微信',  // 企业微信
