@@ -12,10 +12,10 @@ export default defineConfig({
     hmr: true,
   },
   layout: {
-    name: 'going-link',
+    name: 'logo',
     locale: true,
     // logo: false,   // 不显示默认logo
-    logo: '../zy.svg', // 显示执行logo
+    logo: '../logo.svg', // 显示执行logo
   },
   locale: {
     // default zh-CN
