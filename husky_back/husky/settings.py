@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps.user',            # 用户模块
-    'apps.visual',          # 可视化模块
     'apps.ad',              # AD域管理模块
     'rest_framework',       # restful
     # 'apps.api.apps.ApiConfig',    # restful
