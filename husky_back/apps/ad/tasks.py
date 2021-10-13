@@ -158,7 +158,7 @@ def send_create_ad_user_init_info_mail(sAMAccountName: str,
     # 邮件标题
     mail_title = '【AD域初始账号密码创建通知】'
     # 邮件内容链接
-    UUAP_URL = "https://ldap.going-link.net/RDWeb/Pages/zh-CN/password.aspx"
+    UUAP_URL = "https://xxx.net/RDWeb/Pages/zh-CN/password.aspx"
     UUAP_MANUAL_URL = ad_help_file_url
     # 登录
     smtpObj = smtplib.SMTP()
@@ -631,7 +631,7 @@ def send_create_ad_user_init_info_mail(sAMAccountName: str,
                 <div class="header" style="Margin: 0 auto;max-width: 600px;min-width: 320px; width: 320px;width: calc(28000% - 167400px);" id="emb-email-header-container">
                 <!--[if (mso)|(IE)]><table align="center" class="header" cellpadding="0" cellspacing="0" role="presentation"><tr><td style="width: 600px"><![endif]-->
                 <div class="logo emb-logo-margin-box" style="font-size: 26px;line-height: 32px;Margin-top: 47px;Margin-bottom: 9px;color: #41637e;font-family: Avenir,sans-serif;Margin-left: 20px;Margin-right: 20px;" align="center">
-                    <div class="logo-center" align="center" id="emb-email-header"><a style="text-decoration: none;transition: opacity 0.1s ease-in;color: #41637e;" href="https://www.going-link.com/"><img style="display: block;height: auto;width: 100%;border: 0;max-width: 205px;" src="cid:logo" alt="" width="205" /></a></div>
+                    <div class="logo-center" align="center" id="emb-email-header"><a style="text-decoration: none;transition: opacity 0.1s ease-in;color: #41637e;" href="https://www.baidu.com/"><img style="display: block;height: auto;width: 100%;border: 0;max-width: 205px;" src="cid:logo" alt="" width="205" /></a></div>
                 </div>
                 <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
                 </div>
@@ -668,7 +668,7 @@ def send_create_ad_user_init_info_mail(sAMAccountName: str,
                     <div style="Margin-left: 20px;Margin-right: 20px;Margin-top: 24px;Margin-bottom: 24px;">
             <div class="btn btn--depth btn--medium" style="text-align:center;">
                 <![if !mso]><a style="border-radius: 4px;display: inline-block;font-size: 12px;font-weight: bold;line-height: 22px;padding: 10px 20px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;border: 1px solid rgba(0, 0, 0, 0.25);box-shadow: inset 0 -3px 0 -1px rgba(0, 0, 0, 0.2), inset 0 2px 1px -1px #ffffff;text-shadow: 0 1px 0 rgba(0, 0, 0, 0.21);background-color: #38deba;font-family: Roboto Condensed, Arial Narrow, Avenir Next Condensed, Roboto, sans-serif;" href=\"""" + UUAP_URL + """\">&#33258;&#21161;&#20462;&#25913;&#23494;&#30721;</a><![endif]>
-            <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://ldap.going-link.net/RDWeb/Pages/zh-CN/password.aspx" style="width:112px" arcsize="10%" strokecolor="#2AA68C" filled="t"><v:fill type="gradient" angle="180" color="#38DEBA" color2="#30BD9E"></v:fill><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#FFFFFF;font-family:Roboto Condensed,Arial Narrow,Avenir Next Condensed,Roboto,sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">&#33258;&#21161;&#20462;&#25913;&#23494;&#30721;</center></v:textbox></v:roundrect><![endif]--></div>
+            <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://xxx/RDWeb/Pages/zh-CN/password.aspx" style="width:112px" arcsize="10%" strokecolor="#2AA68C" filled="t"><v:fill type="gradient" angle="180" color="#38DEBA" color2="#30BD9E"></v:fill><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#FFFFFF;font-family:Roboto Condensed,Arial Narrow,Avenir Next Condensed,Roboto,sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">&#33258;&#21161;&#20462;&#25913;&#23494;&#30721;</center></v:textbox></v:roundrect><![endif]--></div>
             </div>
 
                 </div>
@@ -678,7 +678,7 @@ def send_create_ad_user_init_info_mail(sAMAccountName: str,
                     <div style="Margin-left: 20px;Margin-right: 20px;Margin-top: 24px;Margin-bottom: 24px;">
             <div class="btn btn--depth btn--medium" style="text-align:center;">
                 <![if !mso]><a style="border-radius: 4px;display: inline-block;font-size: 12px;font-weight: bold;line-height: 22px;padding: 10px 20px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;border: 1px solid rgba(0, 0, 0, 0.25);box-shadow: inset 0 -3px 0 -1px rgba(0, 0, 0, 0.2), inset 0 2px 1px -1px #ffffff;text-shadow: 0 1px 0 rgba(0, 0, 0, 0.21);background-color: #42dedb;font-family: Trebuchet MS, Lucida Grande, Lucida Sans Unicode, sans-serif;" href=\"""" + UUAP_MANUAL_URL + """\">&#24110;&#21161;&#35828;&#26126;&#25991;&#26723;</a><![endif]>
-            <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://open-console.going-link.com/#/knowledge/project/doc/3?baseName=SRM%E7%9F%A5%E8%AF%86%E5%BA%93&id=16&name=SRM%E4%BA%A7%E5%93%81%E5%B9%B3%E5%8F%B0&orgId=1&organizationId=1&spaceId=105&type=project" style="width:112px" arcsize="10%" strokecolor="#32A6A4" filled="t"><v:fill type="gradient" angle="180" color="#42DEDB" color2="#38BDBA"></v:fill><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#FFFFFF;font-family:Trebuchet MS,Lucida Grande,Lucida Sans Unicode,sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">&#24110;&#21161;&#35828;&#26126;&#25991;&#26723;</center></v:textbox></v:roundrect><![endif]--></div>
+            <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://xxx" style="width:112px" arcsize="10%" strokecolor="#32A6A4" filled="t"><v:fill type="gradient" angle="180" color="#42DEDB" color2="#38BDBA"></v:fill><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#FFFFFF;font-family:Trebuchet MS,Lucida Grande,Lucida Sans Unicode,sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">&#24110;&#21161;&#35828;&#26126;&#25991;&#26723;</center></v:textbox></v:roundrect><![endif]--></div>
             </div>
 
                 </div>
@@ -751,7 +751,7 @@ def test_send_create_ad_user_init_info_mail(sAMAccountName: str,
     # 邮件标题
     mail_title = '【测试邮件-AD域初始账号密码创建通知】'
     # 邮件内容链接
-    UUAP_URL = "https://ldap.going-link.net/RDWeb/Pages/zh-CN/password.aspx"
+    UUAP_URL = "https://xxx/RDWeb/Pages/zh-CN/password.aspx"
     UUAP_MANUAL_URL = ad_help_file_url
     # 登录
     smtpObj = smtplib.SMTP()
@@ -1222,7 +1222,7 @@ def test_send_create_ad_user_init_info_mail(sAMAccountName: str,
                 <div class="header" style="Margin: 0 auto;max-width: 600px;min-width: 320px; width: 320px;width: calc(28000% - 167400px);" id="emb-email-header-container">
                 <!--[if (mso)|(IE)]><table align="center" class="header" cellpadding="0" cellspacing="0" role="presentation"><tr><td style="width: 600px"><![endif]-->
                 <div class="logo emb-logo-margin-box" style="font-size: 26px;line-height: 32px;Margin-top: 47px;Margin-bottom: 9px;color: #41637e;font-family: Avenir,sans-serif;Margin-left: 20px;Margin-right: 20px;" align="center">
-                    <div class="logo-center" align="center" id="emb-email-header"><a style="text-decoration: none;transition: opacity 0.1s ease-in;color: #41637e;" href="https://www.going-link.com/"><img style="display: block;height: auto;width: 100%;border: 0;max-width: 205px;" src="cid:logo" alt="" width="205" /></a></div>
+                    <div class="logo-center" align="center" id="emb-email-header"><a style="text-decoration: none;transition: opacity 0.1s ease-in;color: #41637e;" href="https://www.baidu.com/"><img style="display: block;height: auto;width: 100%;border: 0;max-width: 205px;" src="cid:logo" alt="" width="205" /></a></div>
                 </div>
                 <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
                 </div>
@@ -1259,7 +1259,7 @@ def test_send_create_ad_user_init_info_mail(sAMAccountName: str,
                     <div style="Margin-left: 20px;Margin-right: 20px;Margin-top: 24px;Margin-bottom: 24px;">
             <div class="btn btn--depth btn--medium" style="text-align:center;">
                 <![if !mso]><a style="border-radius: 4px;display: inline-block;font-size: 12px;font-weight: bold;line-height: 22px;padding: 10px 20px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;border: 1px solid rgba(0, 0, 0, 0.25);box-shadow: inset 0 -3px 0 -1px rgba(0, 0, 0, 0.2), inset 0 2px 1px -1px #ffffff;text-shadow: 0 1px 0 rgba(0, 0, 0, 0.21);background-color: #38deba;font-family: Roboto Condensed, Arial Narrow, Avenir Next Condensed, Roboto, sans-serif;" href=\"""" + UUAP_URL + """\">&#33258;&#21161;&#20462;&#25913;&#23494;&#30721;</a><![endif]>
-            <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://ldap.going-link.net/RDWeb/Pages/zh-CN/password.aspx" style="width:112px" arcsize="10%" strokecolor="#2AA68C" filled="t"><v:fill type="gradient" angle="180" color="#38DEBA" color2="#30BD9E"></v:fill><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#FFFFFF;font-family:Roboto Condensed,Arial Narrow,Avenir Next Condensed,Roboto,sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">&#33258;&#21161;&#20462;&#25913;&#23494;&#30721;</center></v:textbox></v:roundrect><![endif]--></div>
+            <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://xxx/RDWeb/Pages/zh-CN/password.aspx" style="width:112px" arcsize="10%" strokecolor="#2AA68C" filled="t"><v:fill type="gradient" angle="180" color="#38DEBA" color2="#30BD9E"></v:fill><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#FFFFFF;font-family:Roboto Condensed,Arial Narrow,Avenir Next Condensed,Roboto,sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">&#33258;&#21161;&#20462;&#25913;&#23494;&#30721;</center></v:textbox></v:roundrect><![endif]--></div>
             </div>
 
                 </div>
@@ -1269,7 +1269,7 @@ def test_send_create_ad_user_init_info_mail(sAMAccountName: str,
                     <div style="Margin-left: 20px;Margin-right: 20px;Margin-top: 24px;Margin-bottom: 24px;">
             <div class="btn btn--depth btn--medium" style="text-align:center;">
                 <![if !mso]><a style="border-radius: 4px;display: inline-block;font-size: 12px;font-weight: bold;line-height: 22px;padding: 10px 20px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;border: 1px solid rgba(0, 0, 0, 0.25);box-shadow: inset 0 -3px 0 -1px rgba(0, 0, 0, 0.2), inset 0 2px 1px -1px #ffffff;text-shadow: 0 1px 0 rgba(0, 0, 0, 0.21);background-color: #42dedb;font-family: Trebuchet MS, Lucida Grande, Lucida Sans Unicode, sans-serif;" href=\"""" + UUAP_MANUAL_URL + """\">&#24110;&#21161;&#35828;&#26126;&#25991;&#26723;</a><![endif]>
-            <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://open-console.going-link.com/#/knowledge/project/doc/3?baseName=SRM%E7%9F%A5%E8%AF%86%E5%BA%93&id=16&name=SRM%E4%BA%A7%E5%93%81%E5%B9%B3%E5%8F%B0&orgId=1&organizationId=1&spaceId=105&type=project" style="width:112px" arcsize="10%" strokecolor="#32A6A4" filled="t"><v:fill type="gradient" angle="180" color="#42DEDB" color2="#38BDBA"></v:fill><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#FFFFFF;font-family:Trebuchet MS,Lucida Grande,Lucida Sans Unicode,sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">&#24110;&#21161;&#35828;&#26126;&#25991;&#26723;</center></v:textbox></v:roundrect><![endif]--></div>
+            <!--[if mso]><p style="line-height:0;margin:0;">&nbsp;</p><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://xxx" style="width:112px" arcsize="10%" strokecolor="#32A6A4" filled="t"><v:fill type="gradient" angle="180" color="#42DEDB" color2="#38BDBA"></v:fill><v:textbox style="mso-fit-shape-to-text:t" inset="0px,9px,0px,9px"><center style="font-size:12px;line-height:22px;color:#FFFFFF;font-family:Trebuchet MS,Lucida Grande,Lucida Sans Unicode,sans-serif;font-weight:bold;mso-line-height-rule:exactly;mso-text-raise:4px">&#24110;&#21161;&#35828;&#26126;&#25991;&#26723;</center></v:textbox></v:roundrect><![endif]--></div>
             </div>
 
                 </div>
