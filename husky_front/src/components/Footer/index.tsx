@@ -4,18 +4,18 @@ import { DefaultFooter } from '@ant-design/pro-layout';
 
 export default () => (
   <DefaultFooter
-    copyright="2020 甄云科技平台管理部出品"
+    copyright="2020 XX公司出品"
     links={[
       {
-        key: '甄云科技',
-        title: '甄云科技',
-        href: 'https://www.going-link.com/',
+        key: 'XX公司',
+        title: 'XX公司',
+        href: '',
         blankTarget: true,
       },
       {
         key: 'husky',
         title: <GithubOutlined />,
-        href: 'https://gitee.com/RandolphCYG/husky',
+        href: 'https://github.com/RandolphCYG/husky',
         blankTarget: true,
       },
       {
