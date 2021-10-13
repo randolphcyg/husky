@@ -511,7 +511,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
                     message: '禁止输入空格!'
                   }]} />
               <ProFormText width="xs" name="title" label="岗位" initialValue="技术顾问" rules={[{ required: true, message: '请填写岗位!' }]} />
-              <ProFormText width="s" name="department" label="部门" placeholder="甄云科技.产品研发中心.产品技术中心.供应商和协议部"
+              <ProFormText width="s" name="department" label="部门" placeholder="XX公司.xx部"
                 rules={[
                   {
                     required: true,
