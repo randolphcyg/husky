@@ -308,7 +308,7 @@ const AdAccountPage: React.FC<ModalFormProps> = () => {
     </Transfer>
   );
 
-  const mockTags = ['admin', 'zy', 'hand'];
+  const mockTags = ['admin', 'xx', 'xxMum'];
 
   const mockData = [];
   for (let i = 0; i < 20; i++) {
