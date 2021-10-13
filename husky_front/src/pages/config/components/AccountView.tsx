@@ -99,10 +99,10 @@ const AccountView: React.FC<AccountFormItemProps> = (props) => {
                         <Field text="技术顾问" valueType="text" mode={state} plain={true} initialValue="技术顾问" />
                     </Descriptions.Item>
                     <Descriptions.Item label="邮箱">
-                        <Field text="yuan.guanli@hand-china.com" valueType="text" mode={state} plain={true} initialValue="yinggang.cal@hand-china.com" />
+                        <Field text="yuan.guanli@qq.com" valueType="text" mode={state} plain={true} initialValue="yinggang.cal@qq.com" />
                     </Descriptions.Item>
                     <Descriptions.Item label="电话">
-                        <Field text="13341646666" valueType="text" mode={state} plain={true} initialValue="13341648819" />
+                        <Field text="133561646666" valueType="text" mode={state} plain={true} initialValue="13651648819" />
                     </Descriptions.Item>
                 </Descriptions>
 
